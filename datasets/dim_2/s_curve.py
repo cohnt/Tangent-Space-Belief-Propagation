@@ -5,7 +5,7 @@ def make_s_curve(n_samples, noise_factor):
 		n_samples: number of points to generate
 		noise_factor: variance of the noise added to each dimension
 		
-		For best results, noise_factor should be pretty small (at most 0.01)
+		For best results, noise_factor should be pretty small (at most 0.001)
 	"""
 
 	# The s curve is parameterized by 
