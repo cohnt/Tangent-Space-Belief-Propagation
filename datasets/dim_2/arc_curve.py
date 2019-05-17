@@ -12,6 +12,7 @@ def make_arc_curve(n_samples, noise_factor):
 	# x(t) = 0.5 + 0.5cos(t)
 	# y(t) = 0.5sin(t)
 	# for 0 <= t <= pi
+	# See for graph: https://www.desmos.com/calculator/ete1b4p535
 	lowerBound = 0.0
 	upperBound = np.pi
 	

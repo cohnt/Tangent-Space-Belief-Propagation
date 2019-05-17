@@ -12,6 +12,7 @@ def make_s_curve(n_samples, noise_factor):
 	# x(t) = 0.5 + sin(t)cos(t)
 	# y(t) = 0.5 + 0.5cos(t)
 	# for (3/4)pi <= t <= (9/4)pi
+	# See for graph: https://www.desmos.com/calculator/ete1b4p535
 	lowerBound = 3.0 * np.pi / 4.0
 	upperBound = 9.0 * np.pi / 4.0
 	
