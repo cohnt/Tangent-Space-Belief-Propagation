@@ -13,8 +13,8 @@ def plot_neighbors_2d(points, color, neighbors_graph, ax, line_color="grey", poi
 			target_idx = (np.where(neighbors_graph[point_idx].toarray()[0])[0])[neighbor_idx] # Evil numpy f***ery because spare matrices behave strangely
 			coordinates[point_idx, neighbor_idx, :, 0] = np.array([points[point_idx, :][0], points[target_idx, :][0]])
 			coordinates[point_idx, neighbor_idx, :, 1] = np.array([points[point_idx, :][1], points[target_idx, :][1]])
-	lines = LineCollection(coordinates.reshape((num_points*num_neighbors, 2, 2)), color=line_color)
-	ax.scatter(points[:,0], points[:,1], c=color, cmap=plt.cm.Spectral, s=point_size**2)
+	lines = LineCollection(coordinates.reshape((num_points*num_neighbors, 2, 2)), color=line_color, zorder=1)
+	ax.scatter(points[:,0], points[:,1], c=color, cmap=plt.cm.Spectral, s=point_size**2, zorder=2)
 	ax.add_collection(lines)
 
 def plot_neighbors_3d(points, color, neighbors_graph, ax, line_color="grey", point_size=5):
@@ -27,8 +27,8 @@ def plot_neighbors_3d(points, color, neighbors_graph, ax, line_color="grey", poi
 			coordinates[point_idx, neighbor_idx, :, 0] = np.array([points[point_idx, :][0], points[target_idx, :][0]])
 			coordinates[point_idx, neighbor_idx, :, 1] = np.array([points[point_idx, :][1], points[target_idx, :][1]])
 			coordinates[point_idx, neighbor_idx, :, 2] = np.array([points[point_idx, :][2], points[target_idx, :][2]])
-	lines = Line3DCollection(coordinates.reshape((num_points*num_neighbors, 2, 3)), color=line_color)
-	ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=point_size**2)
+	lines = Line3DCollection(coordinates.reshape((num_points*num_neighbors, 2, 3)), color=line_color, zorder=1)
+	ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=point_size**2, zorder=2)
 	ax.add_collection(lines)
 
 if __name__ == "__main__":
