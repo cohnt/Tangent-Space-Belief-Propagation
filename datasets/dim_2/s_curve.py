@@ -25,10 +25,12 @@ def make_s_curve(n_samples, noise_factor):
 	cov = [[noise_factor, 0], [0, noise_factor]]
 	noise = np.random.multivariate_normal(mean, cov, n_samples)
 
-	return data + noise
+	color = (t - lowerBound) / (upperBound - lowerBound)
+
+	return (data + noise, color)
 
 if __name__ == "__main__":
 	import matplotlib.pyplot as plt
-	data = make_s_curve(500, 0.001)
-	plt.scatter(data[:,0], data[:,1])
+	data, color = make_s_curve(500, 0.001)
+	plt.scatter(data[:,0], data[:,1], c=color, cmap=plt.cm.Spectral)
 	plt.show()

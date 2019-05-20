@@ -30,13 +30,15 @@ def make_s_sheet(n_samples, noise_factor):
 	       [0, 0, noise_factor]]
 	noise = np.random.multivariate_normal(mean, cov, n_samples)
 
-	return data + noise
+	color = (t - tLowerBound) / (tUpperBound - tLowerBound)
+
+	return (data + noise, color)
 
 if __name__ == "__main__":
 	from mpl_toolkits.mplot3d import Axes3D
 	import matplotlib.pyplot as plt
-	data = make_s_sheet(500, 0.001)
+	data, color = make_s_sheet(500, 0.001)
 	fig = plt.figure()
 	ax = fig.add_subplot(111, projection='3d')
-	ax.scatter(data[:,0], data[:,1], data[:,2])
+	ax.scatter(data[:,0], data[:,1], data[:,2], c=color, cmap=plt.cm.Spectral)
 	plt.show()
