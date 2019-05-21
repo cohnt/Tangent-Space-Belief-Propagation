@@ -6,6 +6,8 @@ neighbors_k = 8   # The value of 'k' used for k-nearest-neighbors
 num_points = 500   # Number of data points
 data_noise = 0.001 # How much noise is added to the data
 
+output_dir = "results/"
+
 ################
 # Load Dataset #
 ################
@@ -24,7 +26,8 @@ neighbor_graph = kneighbors_graph(points, neighbors_k, mode="distance", n_jobs=-
 
 fig, ax = plt.subplots()
 plot_neighbors_2d(points, color, neighbor_graph, ax)
-plt.show()
+plt.savefig(output_dir + "nearest_neighbors.svg")
+plt.close(fig)
 
 ####################
 # Initialize Graph #
