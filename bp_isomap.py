@@ -25,7 +25,7 @@ neighbor_graph = kneighbors_graph(points, neighbors_k, mode="distance", n_jobs=-
 # NOTE: this is not a symmetric matrix.
 
 fig, ax = plt.subplots()
-plot_neighbors_2d(points, color, neighbor_graph, ax)
+plot_neighbors_2d(points, color, neighbor_graph, ax, point_size=3, line_width=0.25, edge_thickness=0.25)
 plt.savefig(output_dir + "nearest_neighbors.svg")
 plt.close(fig)
 
