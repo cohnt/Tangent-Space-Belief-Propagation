@@ -121,7 +121,10 @@ for iter_num in range(1, num_iters+1):
 	sys.stdout.flush()
 	t0 = time.time()
 
-	pass # TODO
+	if iter_num == 1:
+		messages_next = copy.deepcopy(messages_prev)
+	else:
+		pass # TODO
 
 	t1 = time.time()
 	message_time = t1-t0
