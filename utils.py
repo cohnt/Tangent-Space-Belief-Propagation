@@ -17,8 +17,8 @@ def write(*args, **kwargs):
 def flush(*args, **kwargs):
 	sys.stdout.flush(*args, **kwargs)
 
-def weightedSample(vec):
-	# Given a vector of weights, return a weighted sample (index)
-	vec = vec / sum(vec)
-	cdf = np.cumsum(vec)
-	return np.argmax(cdf > np.random.random())
+def weightedSample(vec, num):
+	# Given a (1d) vector of weights, return num weighted samples (as indices)
+	if vec.dtype != float:
+		vec = vec.astype(float)
+	return np.random.choice(len(vec), num, p=(vec / sum(vec)))
