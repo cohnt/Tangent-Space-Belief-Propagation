@@ -92,6 +92,13 @@ for key, value in neighbor_pair_list:
 # Message Passing #
 ###################
 
+class Belief:
+	def __init__(self):
+		self.pos = np.zeros((num_samples, 1))
+		self.weights = np.zeros(num_samples)
+
+belief = [Belief() for _ in range(num_points)]
+
 for iter_num in range(num_iters):
 	##################
 	# Message Update #
