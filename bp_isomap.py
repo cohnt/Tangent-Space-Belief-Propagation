@@ -106,17 +106,54 @@ class Belief:
 
 belief = [Belief() for _ in range(num_points)]
 
-for iter_num in range(num_iters):
+for iter_num in range(1, num_iters+1):
+	sys.stdout.write("\nIteration %d\n" % iter_num)
+
+	message_time = 0
+	belief_time = 0
+	image_time = 0
+	total_time = 0
+
 	##################
 	# Message Update #
 	##################
+	sys.stdout.write("Performing message update...")
+	sys.stdout.flush()
+	t0 = time.time()
 
 	pass # TODO
+
+	t1 = time.time()
+	message_time = t1-t0
+	sys.stdout.write("Done! dt=%f\n" % message_time)
 
 	#################
 	# Belief Update #
 	#################
+	sys.stdout.write("Performing belief update...")
+	sys.stdout.flush()
+	t0 = time.time()
 
 	pass # TODO
+
+	t1 = time.time()
+	belief_time = t1-t0
+	sys.stdout.write("Done! dt=%f\n" % belief_time)
+
+	################
+	# Write Images #
+	################
+	sys.stdout.write("Writing images...")
+	sys.stdout.flush()
+	t0 = time.time()
+
+	pass # TODO
+
+	t1 = time.time()
+	image_time = t1-t0
+	sys.stdout.write("Done! dt=%f\n" % image_time)
+
+	total_time = message_time + belief_time + image_time
+	sys.stdout.write("Total iteration time: %f\n" % total_time)
 
 sys.stdout.write("\n")
