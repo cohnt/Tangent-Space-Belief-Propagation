@@ -7,13 +7,15 @@ import copy
 from utils import write, flush
 
 num_iters = 5      # Number of iterations of the message passing algorithm to run
-neighbors_k = 8    # The value of 'k' used for k-nearest-neighbors
-num_points = 500   # Number of data points
+neighbors_k = 2    # The value of 'k' used for k-nearest-neighbors
+num_points = 5   # Number of data points
 data_noise = 0.001 # How much noise is added to the data
 num_samples = 200  # Numbers of samples used in the belief propagation algorithm
-
+explore_perc = 0.5 # Fraction of uniform samples to keep exploring
 initial_dim = 2    # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1     # The number of dimensions the data is being reduced to
+
+message_resample_cov = np.eye(target_dim) * 0.1 # TODO: Change
 
 output_dir = "results/"
 
@@ -99,6 +101,7 @@ for key, value in neighbor_pair_list:
 ###################
 # Message Passing #
 ###################
+from utils import weightedSample, list_mvn
 
 class Belief:
 	def __init__(self):
@@ -125,7 +128,34 @@ for iter_num in range(1, num_iters+1):
 	if iter_num == 1:
 		messages_next = copy.deepcopy(messages_prev)
 	else:
-		pass # TODO
+		# Resample messages from previous belief
+		for neighbor_pair in neighbor_pair_list:
+			t = neighbor_pair[0]
+			s = neighbor_pair[1]
+			end_rand_ind = int(np.floor(num_samples * explore_perc))
+
+			start_ind = 0
+			max_weight_ind = np.argmax(belief[s].weights)
+			max_weight = belief[s].weights[max_weight_ind]
+			if max_weight != 1.0 / num_samples:
+				# Not all samples have the same weight, so we keep the highest weighted sample
+				start_ind = 1
+
+			# Keep the best sample (if start_ind == 0, this will be an empty slice and nothing will happen)
+			messages_next[t][s].pos[0:start_ind] = belief[s].pos[max_weight_ind][:]
+			# messages_next[t][s].weights[0:start_ind] = belief[s].weights[max_weight_ind]
+			messages_next[t][s].weights[0:start_ind] = 1.0 / num_samples
+
+			# Sample [start_int, end_rand_in) uniformly across the state space, each with uniform weight
+			messages_next[t][s].pos[start_ind:end_rand_ind] = np.random.uniform(-2, 2, (end_rand_ind - start_ind, 1))
+			messages_next[t][s].weights[start_ind:end_rand_ind] = 1.0 / num_samples
+
+			# Sample [end_rand_in, num_samples) based on the belief, with added noise
+			num_samples_left = num_samples - end_rand_ind
+			belief_inds = weightedSample(belief[s].weights, num_samples_left)
+			messages_next[t][s].pos[end_rand_ind:num_samples] = list_mvn(belief[s].pos[belief_inds], message_resample_cov, single_cov=True)
+			# messages_next[t][s].weights[end_rand_ind, num_samples] = belief[s].weights[belief_inds]
+			messages_next[t][s].weights[end_rand_ind:num_samples] = 1.0 / num_samples
 
 	t1 = time.time()
 	message_time = t1-t0
