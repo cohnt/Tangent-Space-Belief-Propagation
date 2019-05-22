@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from collections import namedtuple
 import time
 import sys
+import copy
 
 num_iters = 5      # Number of iterations of the message passing algorithm to run
 neighbors_k = 8    # The value of 'k' used for k-nearest-neighbors
@@ -74,7 +75,18 @@ sys.stdout.flush()
 # Initialize Messages #
 #######################
 
-message_list_shape = (num_points, num_points)
+class Message:
+	def __init__(self):
+		self.pos = np.zeros((num_samples, 1))
+		self.weights = np.zeros(num_samples)
+
+messages_prev = [[None for j in range(num_points)] for i in range(num_points)]
+for key, value in neighbor_pair_list:
+	# Note that key represents where the message is coming from and value represents where the message is going to
+	# In other words, messages[key][value] === m_key->value
+	messages_prev[key][value] = Message()
+	messages_prev[key][value].pos = np.random.uniform(-2, 2, (num_samples, 1))
+	messages_prev[key][value].weights = np.zeros(num_samples) + (1.0 / num_samples)
 
 ###################
 # Message Passing #
