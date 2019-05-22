@@ -13,5 +13,12 @@ def sparseMaximum(A, B):
 
 def write(*args, **kwargs):
 	sys.stdout.write(*args, **kwargs)
+
 def flush(*args, **kwargs):
 	sys.stdout.flush(*args, **kwargs)
+
+def weightedSample(vec):
+	# Given a vector of weights, return a weighted sample (index)
+	vec = vec / sum(vec)
+	cdf = np.cumsum(vec)
+	return np.argmax(cdf > np.random.random())
