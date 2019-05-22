@@ -4,11 +4,7 @@ from collections import namedtuple
 import time
 import sys
 import copy
-
-def write(*args, **kwargs):
-	sys.stdout.write(*args, **kwargs)
-def flush(*args, **kwargs):
-	sys.stdout.flush(*args, **kwargs)
+from utils import write, flush
 
 num_iters = 5      # Number of iterations of the message passing algorithm to run
 neighbors_k = 8    # The value of 'k' used for k-nearest-neighbors

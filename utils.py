@@ -1,4 +1,5 @@
 import numpy as np
+import sys
 
 def sparseMatrixToDict(mat):
 	# https://stackoverflow.com/questions/52322847/what-is-an-efficient-way-to-convert-an-adjacency-matrix-to-a-dictionary
@@ -9,3 +10,8 @@ def sparseMaximum(A, B):
 	BisBigger = A-B
 	BisBigger.data = np.where(BisBigger.data < 0, 1, 0)
 	return A - A.multiply(BisBigger) + B.multiply(BisBigger)
+
+def write(*args, **kwargs):
+	sys.stdout.write(*args, **kwargs)
+def flush(*args, **kwargs):
+	sys.stdout.flush(*args, **kwargs)
