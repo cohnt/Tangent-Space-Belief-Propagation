@@ -5,6 +5,11 @@ import time
 import sys
 import copy
 
+def write(*args, **kwargs):
+	sys.stdout.write(*args, **kwargs)
+def flush(*args, **kwargs):
+	sys.stdout.flush(*args, **kwargs)
+
 num_iters = 5      # Number of iterations of the message passing algorithm to run
 neighbors_k = 8    # The value of 'k' used for k-nearest-neighbors
 num_points = 500   # Number of data points
@@ -16,20 +21,20 @@ target_dim = 1     # The number of dimensions the data is being reduced to
 
 output_dir = "results/"
 
-sys.stdout.write("\n")
+write("\n")
 
 ################
 # Load Dataset #
 ################
 from datasets.dim_2.s_curve import make_s_curve
 
-sys.stdout.write("Generating dataset...")
-sys.stdout.flush()
+write("Generating dataset...")
+flush()
 t0 = time.time()
 points, color = make_s_curve(num_points, data_noise)
 t1 = time.time()
-sys.stdout.write("Done! dt=%f\n" % (t1-t0))
-sys.stdout.flush()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
 
 #######################
 # k-Nearest-Neighbors #
@@ -37,25 +42,25 @@ sys.stdout.flush()
 from sklearn.neighbors import kneighbors_graph
 from visualization.plot_neighbors import plot_neighbors_2d
 
-sys.stdout.write("Computing nearest neighbors...")
-sys.stdout.flush()
+write("Computing nearest neighbors...")
+flush()
 t0 = time.time()
 neighbor_graph = kneighbors_graph(points, neighbors_k, mode="distance", n_jobs=-1)
 t1 = time.time()
-sys.stdout.write("Done! dt=%f\n" % (t1-t0))
-sys.stdout.flush()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
 # NOTE: this is not a symmetric matrix.
 
-sys.stdout.write("Saving nearest neighbors plot...")
-sys.stdout.flush()
+write("Saving nearest neighbors plot...")
+flush()
 t0 = time.time()
 fig, ax = plt.subplots()
 plot_neighbors_2d(points, color, neighbor_graph, ax, point_size=3, line_width=0.25, edge_thickness=0.25)
 plt.savefig(output_dir + "nearest_neighbors.svg")
 plt.close(fig)
 t1 = time.time()
-sys.stdout.write("Done! dt=%f\n" % (t1-t0))
-sys.stdout.flush()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
 
 ####################
 # Initialize Graph #
@@ -63,16 +68,16 @@ sys.stdout.flush()
 from utils import sparseMatrixToDict, sparseMaximum
 
 # Make the matrix symmetric, and convert it to a dictionary
-sys.stdout.write("Initializing graph data structures...")
-sys.stdout.flush()
+write("Initializing graph data structures...")
+flush()
 t0 = time.time()
 neighbor_graph = sparseMaximum(neighbor_graph, neighbor_graph.T)
 neighbor_dict = sparseMatrixToDict(neighbor_graph)
 neighbor_pair_list = [(key, value) for key, arr in neighbor_dict.items() for value in arr]
 num_messages = len(neighbor_pair_list)
 t1 = time.time()
-sys.stdout.write("Done! dt=%f\n" % (t1-t0))
-sys.stdout.flush()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
 
 #######################
 # Initialize Messages #
@@ -107,7 +112,7 @@ class Belief:
 belief = [Belief() for _ in range(num_points)]
 
 for iter_num in range(1, num_iters+1):
-	sys.stdout.write("\nIteration %d\n" % iter_num)
+	write("\nIteration %d\n" % iter_num)
 
 	message_time = 0
 	belief_time = 0
@@ -117,8 +122,8 @@ for iter_num in range(1, num_iters+1):
 	##################
 	# Message Update #
 	##################
-	sys.stdout.write("Performing message update...")
-	sys.stdout.flush()
+	write("Performing message update...")
+	flush()
 	t0 = time.time()
 
 	if iter_num == 1:
@@ -128,35 +133,35 @@ for iter_num in range(1, num_iters+1):
 
 	t1 = time.time()
 	message_time = t1-t0
-	sys.stdout.write("Done! dt=%f\n" % message_time)
+	write("Done! dt=%f\n" % message_time)
 
 	#################
 	# Belief Update #
 	#################
-	sys.stdout.write("Performing belief update...")
-	sys.stdout.flush()
+	write("Performing belief update...")
+	flush()
 	t0 = time.time()
 
 	pass # TODO
 
 	t1 = time.time()
 	belief_time = t1-t0
-	sys.stdout.write("Done! dt=%f\n" % belief_time)
+	write("Done! dt=%f\n" % belief_time)
 
 	################
 	# Write Images #
 	################
-	sys.stdout.write("Writing images...")
-	sys.stdout.flush()
+	write("Writing images...")
+	flush()
 	t0 = time.time()
 
 	pass # TODO
 
 	t1 = time.time()
 	image_time = t1-t0
-	sys.stdout.write("Done! dt=%f\n" % image_time)
+	write("Done! dt=%f\n" % image_time)
 
 	total_time = message_time + belief_time + image_time
-	sys.stdout.write("Total iteration time: %f\n" % total_time)
+	write("Total iteration time: %f\n" % total_time)
 
-sys.stdout.write("\n")
+write("\n")
