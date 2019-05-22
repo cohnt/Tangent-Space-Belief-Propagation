@@ -84,12 +84,16 @@ class Message:
 		self.weights = np.zeros(num_samples)
 
 messages_prev = [[None for j in range(num_points)] for i in range(num_points)]
+messages_next = [[None for j in range(num_points)] for i in range(num_points)]
 for key, value in neighbor_pair_list:
 	# Note that key represents where the message is coming from and value represents where the message is going to
 	# In other words, messages[key][value] === m_key->value
 	messages_prev[key][value] = Message()
 	messages_prev[key][value].pos = np.random.uniform(-2, 2, (num_samples, target_dim))
 	messages_prev[key][value].weights = np.zeros(num_samples) + (1.0 / num_samples)
+
+	messages_next[key][value] = Message()
+	# We don't initialize any values into messages_next
 
 ###################
 # Message Passing #
