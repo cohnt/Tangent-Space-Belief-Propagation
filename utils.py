@@ -22,3 +22,17 @@ def weightedSample(vec, num):
 	if vec.dtype != float:
 		vec = vec.astype(float)
 	return np.random.choice(len(vec), num, p=(vec / sum(vec)))
+
+def list_mvn(means, covs, single_cov=False):
+	# Generate multivariate normal random vectors for a list of means and corresponding covariance matrices
+	# For n dimension, with m means, means.shape === (m, n) and covs.shape === (m, n, n)
+	# The output will be shape (m, n)
+	m = means.shape[0]
+	n = means.shape[1]
+	out = np.zeros((m, n))
+	for i in range(0, m):
+		if single_cov:
+			out[i] = np.random.multivariate_normal(means[i], covs)
+		else:
+			out[i] = np.random.multivariate_normal(means[i], covs[i])
+	return out
