@@ -7,9 +7,9 @@ import copy
 from utils import write, flush
 
 num_iters = 5      # Number of iterations of the message passing algorithm to run
-neighbors_k = 2    # The value of 'k' used for k-nearest-neighbors
-num_points = 5   # Number of data points
-data_noise = 0.001 # How much noise is added to the data
+neighbors_k = 5    # The value of 'k' used for k-nearest-neighbors
+num_points = 50   # Number of data points
+data_noise = 0.00001 # How much noise is added to the data
 num_samples = 200  # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.5 # Fraction of uniform samples to keep exploring
 initial_dim = 2    # The dimensionality of the incoming dataset (see "Load Dataset" below)
@@ -24,12 +24,12 @@ write("\n")
 ################
 # Load Dataset #
 ################
-from datasets.dim_2.s_curve import make_s_curve
+from datasets.dim_2.arc_curve import make_arc_curve
 
 write("Generating dataset...")
 flush()
 t0 = time.time()
-points, color = make_s_curve(num_points, data_noise)
+points, color = make_arc_curve(num_points, data_noise)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
@@ -163,7 +163,7 @@ def weightFromNeighbor(m_next, m_prev, current, neighbor):
 
 def weightFromPrior(m_next, m_prev, u, t, s):
 	# Use m_u->t to help weight m_t->s
-	pass # TODO
+	
 	return 1.0
 
 def sampleNeighbor(pos, s, t):
