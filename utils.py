@@ -19,6 +19,7 @@ def flush(*args, **kwargs):
 
 def weightedSample(vec, num):
 	# Given a (1d) vector of weights, return num weighted samples (as indices)
+	# The weights don't need to be normalized, but it cannot be zero everywhere.
 	if vec.dtype != float:
 		vec = vec.astype(float)
 	return np.random.choice(len(vec), num, p=(vec / sum(vec)))
