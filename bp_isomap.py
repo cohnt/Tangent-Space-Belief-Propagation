@@ -7,10 +7,10 @@ import copy
 from utils import write, flush
 
 num_iters = 5      # Number of iterations of the message passing algorithm to run
-neighbors_k = 5    # The value of 'k' used for k-nearest-neighbors
-num_points = 50   # Number of data points
+neighbors_k = 6    # The value of 'k' used for k-nearest-neighbors
+num_points = 100   # Number of data points
 data_noise = 0.00001 # How much noise is added to the data
-num_samples = 20  # Numbers of samples used in the belief propagation algorithm
+num_samples = 10   # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.5 # Fraction of uniform samples to keep exploring
 initial_dim = 2    # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1     # The number of dimensions the data is being reduced to
@@ -230,7 +230,13 @@ for iter_num in range(1, num_iters+1):
 			t = neighbor_pair_list[i][0]
 			s = neighbor_pair_list[i][1]
 			raw_weights[i][:] = weightFromNeighbor(messages_next, messages_prev, s, t)
-			raw_weights = raw_weights / raw_weights.sum(axis=1, keepdims=True)
+		# Normalize for each message (each row is for a message, so we sum along axis 1)
+		raw_weights = raw_weights / raw_weights.sum(axis=1, keepdims=True)
+		# Assign weights to the samples in messages_next
+		for i in range(0, num_messages):
+			t = neighbor_pair_list[i][0]
+			s = neighbor_pair_list[i][1]
+			messages_next[t][s].weights = raw_weights[i][:]
 
 	messages_prev = copy.deepcopy(messages_next)
 
