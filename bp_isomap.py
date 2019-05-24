@@ -10,7 +10,7 @@ num_iters = 5      # Number of iterations of the message passing algorithm to ru
 neighbors_k = 5    # The value of 'k' used for k-nearest-neighbors
 num_points = 50   # Number of data points
 data_noise = 0.00001 # How much noise is added to the data
-num_samples = 200  # Numbers of samples used in the belief propagation algorithm
+num_samples = 20  # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.5 # Fraction of uniform samples to keep exploring
 initial_dim = 2    # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1     # The number of dimensions the data is being reduced to
@@ -136,8 +136,9 @@ def weightFromNeighbor(m_next, m_prev, current, neighbor):
 			# node didn't have any neighbors, its pairwise potential would be the empty product.
 			# And the empty product is defined to be 1.
 			weights_from_priors = np.zeros(num_neighbors)
-			for u in range(0, num_neighbors):
-				weights_from_priors[u] = weightFromPrior(m_next, m_prev, u, t, s)
+			for j in range(0, num_neighbors):
+				u = neighbors[j]
+				weights_from_priors[j] = weightFromPrior(pos_t, m_prev, u, t, s)
 			weights_prior[i] = np.prod(weights_from_priors)
 
 	# Normalize (if all zero, then make all weights equal)
@@ -161,10 +162,15 @@ def weightFromNeighbor(m_next, m_prev, current, neighbor):
 	weights = np.multiply(weights_unary, weights_prior)
 	return weights
 
-def weightFromPrior(m_next, m_prev, u, t, s):
+def weightFromPrior(pos, m_prev, u, t, s):
 	# Use m_u->t to help weight m_t->s
-	
-	return 1.0
+	weight_prior = 0
+	for i in range(0, num_samples):
+		pos_pred = m_prev[u][t].pos[i]
+		dist2 = (np.asarray(pos, dtype=float) - np.asarray(pos_pred, dtype=float)) ** 2
+		weight_pairwise = 1/(1+dist2)
+		weight_prior = weight_prior + (m_prev[u][t].weights[i] * weight_pairwise)
+	return weight_prior
 
 def sampleNeighbor(pos, s, t):
 	expectedDist = neighbor_graph[s,t]
