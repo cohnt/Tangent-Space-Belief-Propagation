@@ -73,6 +73,7 @@ neighbor_graph = sparseMaximum(neighbor_graph, neighbor_graph.T)
 neighbor_dict = sparseMatrixToDict(neighbor_graph)
 neighbor_pair_list = [(key, value) for key, arr in neighbor_dict.items() for value in arr]
 num_messages = len(neighbor_pair_list)
+# neighbor_pair_list represents the identification of the messages, i.e., "message 0" is at index 0
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
@@ -109,6 +110,64 @@ class Belief:
 		self.weights = np.zeros(num_samples)
 
 belief = [Belief() for _ in range(num_points)]
+
+def weightFromNeighbor(m_next, m_prev, t, s):
+	weights_unary = np.zeros(num_samples)
+	weights_prior = np.zeros(num_samples)
+	weights = np.zeros(num_samples)
+
+	neighbors = neighbor_dict[t][:]
+	neighbors.remove(s)
+	num_neighbors = len(neighbors)
+
+	for i in range(0, num_samples):
+		# We're dealing with m_t->s
+		pos_t = m_next[t][s].pos[i]
+		pos_s = sampleNeighbor(t, pos_t) # TODO: other params
+
+		# TODO: Possibly check that pos_s[i] is valid (do we even have to?)
+		# For now, assume pos_s[i] is indeed valid
+		weights_unary[i] = 1.0 # For now, we don't actually have a unary potential
+		                       # It's not even clear if we have an observation
+
+		if num_neighbors > 0:
+			# In theory, we don't need this check, since we're using k-nearest neighbors, so
+			# every point is going to have at least k neighbors. But if, for some reason, a
+			# node didn't have any neighbors, its pairwise potential would be the empty product.
+			# And the empty product is defined to be 1.
+			weights_from_priors = np.zeros(num_neighbors)
+			for u in range(0, num_neighbors):
+				weights_from_priors[u] = weightFromPrior(m_next, m_prev, u, t, s)
+			weights_prior[i] = np.prod(weights_from_priors)
+
+	# Normalize (if all zero, then make all weights equal)
+	max_weight_unary = np.max(weights_unary)
+	max_weight_prior = np.max(weights_prior)
+
+	if max_weight_unary != 0:
+		weights_unary = weights_unary / max_weight_unary
+	else:
+		# All of weights_unary is 0 (since negative weights aren't possible). To make
+		# every element 1/num_samples, we just add that value and numpy does the rest.
+		weights_unary = weights_unary + (1.0 / num_samples)
+
+	if max_weight_prior != 0:
+		weights_prior = weights_prior / max_weight_prior
+	else:
+		# All of weights_prior is 0 (since negative weights aren't possible). To make
+		# every element 1/num_samples, we just add that value and numpy does the rest.
+		weights_prior = weights_prior + (1.0 / num_samples)
+
+	weights = np.multiply(weights_unary, weights_prior)
+	return weights
+
+def weightFromPrior(m_next, m_prev, u, t, s):
+	# Use m_u->t to help weight m_t->s
+	pass # TODO
+	return 1.0
+
+def sampleNeighbor(t, pos_t):
+	return np.random.multivariate_normal(pos_t, 0.1*np.eye(len(pos_t)))
 
 for iter_num in range(1, num_iters+1):
 	write("\nIteration %d\n" % iter_num)
@@ -156,6 +215,17 @@ for iter_num in range(1, num_iters+1):
 			messages_next[t][s].pos[end_rand_ind:num_samples] = list_mvn(belief[s].pos[belief_inds], message_resample_cov, single_cov=True)
 			# messages_next[t][s].weights[end_rand_ind, num_samples] = belief[s].weights[belief_inds]
 			messages_next[t][s].weights[end_rand_ind:num_samples] = 1.0 / num_samples
+
+	if iter_num != 1:
+		# Weight messages based on their neighbors.
+		raw_weights = np.zeros((num_messages, num_samples))
+		for i in range(0, num_messages):
+			t = neighbor_pair_list[i][0]
+			s = neighbor_pair_list[i][1]
+			raw_weights[i][:] = weightFromNeighbor(messages_next, messages_prev, t, s)
+			raw_weights = raw_weights / raw_weights.sum(axis=1, keepdims=True)
+
+	messages_prev = copy.deepcopy(messages_next)
 
 	t1 = time.time()
 	message_time = t1-t0
