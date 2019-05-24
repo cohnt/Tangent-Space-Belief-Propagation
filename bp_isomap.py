@@ -6,7 +6,7 @@ import sys
 import copy
 from utils import write, flush
 
-num_iters = 5      # Number of iterations of the message passing algorithm to run
+num_iters = 50      # Number of iterations of the message passing algorithm to run
 neighbors_k = 6    # The value of 'k' used for k-nearest-neighbors
 num_points = 100   # Number of data points
 data_noise = 0.00001 # How much noise is added to the data
@@ -251,7 +251,30 @@ for iter_num in range(1, num_iters+1):
 	flush()
 	t0 = time.time()
 
-	pass # TODO
+	for i in range(0, num_points):
+		# First, update weights of every sample w_ts based on the unary potential
+		# Because we don't have a unary potential, we don't actually do this step!
+		pass
+
+		# Now, combine all incoming messages
+		s = i
+		neighbors = neighbor_dict[s][:]
+		num_neighbors = len(neighbors)
+		combined_message = Message()
+		combined_message.pos = np.zeros((num_samples*num_neighbors, target_dim))
+		combined_message.weights = np.zeros(num_samples*num_neighbors)
+		for j in range(0, num_neighbors):
+			t = neighbors[j]
+			start = j*num_samples
+			stop = j*num_samples + num_samples
+			combined_message.pos[start:stop] = messages_next[t][s].pos[:]
+			combined_message.weights[start:stop] = messages_next[t][s].weights[:]
+		combined_message.weights = combined_message.weights / sum(combined_message.weights) # Normalize
+
+		# Resample from combined_message to get the belief
+		message_inds = weightedSample(combined_message.weights, num_samples)
+		belief[i].pos = combined_message.pos[message_inds]
+		belief[i].weights = combined_message.weights[message_inds]
 
 	t1 = time.time()
 	belief_time = t1-t0
@@ -272,5 +295,17 @@ for iter_num in range(1, num_iters+1):
 
 	total_time = message_time + belief_time + image_time
 	write("Total iteration time: %f\n" % total_time)
+
+
+# For now
+n_ind = neighbor_dict[0][0]
+print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+print "Expected distance: ", neighbor_graph[0, n_ind]
+print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
+fig, ax = plt.subplots()
+ax.scatter(belief[0].pos.flatten(), np.zeros(len(belief[0].pos)), c=belief[0].weights, cmap=plt.cm.Spectral)
+ax.scatter(belief[n_ind].pos.flatten(), np.ones(len(belief[n_ind].pos)), c=belief[1].weights, cmap=plt.cm.Spectral)
+plt.show()
 
 write("\n")
