@@ -102,7 +102,7 @@ for key, value in neighbor_pair_list:
 ###################
 # Message Passing #
 ###################
-from utils import weightedSample, list_mvn
+from utils import weightedSample, list_mvn, sphereRand
 
 class Belief:
 	def __init__(self):
@@ -111,7 +111,7 @@ class Belief:
 
 belief = [Belief() for _ in range(num_points)]
 
-def weightFromNeighbor(m_next, m_prev, t, s):
+def weightFromNeighbor(m_next, m_prev, current, neighbor):
 	weights_unary = np.zeros(num_samples)
 	weights_prior = np.zeros(num_samples)
 	weights = np.zeros(num_samples)
@@ -122,8 +122,8 @@ def weightFromNeighbor(m_next, m_prev, t, s):
 
 	for i in range(0, num_samples):
 		# We're dealing with m_t->s
-		pos_t = m_next[t][s].pos[i]
-		pos_s = sampleNeighbor(t, pos_t) # TODO: other params
+		pos_s = m_next[t][s].pos[i]
+		pos_t = sampleNeighbor(pos_s, s, t) # TODO: other params
 
 		# TODO: Possibly check that pos_s[i] is valid (do we even have to?)
 		# For now, assume pos_s[i] is indeed valid
@@ -166,8 +166,9 @@ def weightFromPrior(m_next, m_prev, u, t, s):
 	pass # TODO
 	return 1.0
 
-def sampleNeighbor(t, pos_t):
-	return np.random.multivariate_normal(pos_t, 0.1*np.eye(len(pos_t)))
+def sampleNeighbor(pos, s, t):
+	expectedDist = neighbor_graph[s,t]
+	return sphereRand(pos, expectedDist)
 
 for iter_num in range(1, num_iters+1):
 	write("\nIteration %d\n" % iter_num)
@@ -222,7 +223,7 @@ for iter_num in range(1, num_iters+1):
 		for i in range(0, num_messages):
 			t = neighbor_pair_list[i][0]
 			s = neighbor_pair_list[i][1]
-			raw_weights[i][:] = weightFromNeighbor(messages_next, messages_prev, t, s)
+			raw_weights[i][:] = weightFromNeighbor(messages_next, messages_prev, s, t)
 			raw_weights = raw_weights / raw_weights.sum(axis=1, keepdims=True)
 
 	messages_prev = copy.deepcopy(messages_next)
