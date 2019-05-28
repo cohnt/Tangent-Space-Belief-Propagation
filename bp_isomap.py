@@ -6,9 +6,9 @@ import sys
 import copy
 from utils import write, flush
 
-num_iters = 5      # Number of iterations of the message passing algorithm to run
-neighbors_k = 2    # The value of 'k' used for k-nearest-neighbors
-num_points = 6   # Number of data points
+num_iters = 200      # Number of iterations of the message passing algorithm to run
+neighbors_k = 1    # The value of 'k' used for k-nearest-neighbors
+num_points = 2   # Number of data points
 data_noise = 0.00001 # How much noise is added to the data
 num_samples = 100   # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.5 # Fraction of uniform samples to keep exploring
@@ -34,14 +34,32 @@ write("\n")
 # write("Done! dt=%f\n" % (t1-t0))
 # flush()
 
+# write("Generating dataset...")
+# flush()
+# t0 = time.time()
+# points = np.array([[0, 0], [1, 1], [2, 2.5], [3, 4], [4, 4.5], [5, 7]])
+# color = np.array([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
+# t1 = time.time()
+# write("Done! dt=%f\n" % (t1-t0))
+# flush()
+
 write("Generating dataset...")
 flush()
 t0 = time.time()
-points = np.array([[0, 0], [1, 1], [2, 2.5], [3, 4], [4, 4.5], [5, 7]])
-color = np.array([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
+points = np.array([[0, 0], [1, 1]])
+color = np.array([0.0, 1.0])
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
+
+# write("Generating dataset...")
+# flush()
+# t0 = time.time()
+# points = np.array([[0, 0], [1, 1], [2, 3]])
+# color = np.array([0.0, 0.5, 1.0])
+# t1 = time.time()
+# write("Done! dt=%f\n" % (t1-t0))
+# flush()
 
 #######################
 # k-Nearest-Neighbors #
@@ -64,7 +82,7 @@ t0 = time.time()
 fig, ax = plt.subplots()
 plot_neighbors_2d(points, color, neighbor_graph, ax, point_size=3, line_width=0.25, edge_thickness=0.25, show_labels=True)
 plt.savefig(output_dir + "nearest_neighbors.svg")
-# plt.close(fig)
+plt.close(fig)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
@@ -311,24 +329,32 @@ print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 # 	ax.scatter(belief[i].pos.flatten(), (float(i)/float(num_points))+np.zeros(len(belief[i].pos)), c=belief[i].weights, cmap=plt.cm.Spectral)
 # plt.show()
 
-fig, ax = plt.subplots()
 from visualization.plot_belief import plot_belief_1d, plot_mle_1d, plot_mean_1d
-plot_belief_1d(belief[0], ax, show_mle=True, show_mean=True)
+from visualization.plot_message import plot_message_1d
 
 fig, ax = plt.subplots()
-plot_mle_1d(belief, color, ax, show_labels=True)
+plot_belief_1d(belief, 0, ax, show_mle=True, show_mean=True)
 
 fig, ax = plt.subplots()
-plot_mean_1d(belief, color, ax, show_labels=True)
+plot_belief_1d(belief, 1, ax, show_mle=True, show_mean=True)
 
 fig, ax = plt.subplots()
-plot_neighbors_2d(points, color, neighbor_graph, ax)
-from visualization.plot_reconstruction import plot_reconstruction_1d_2d
-mlePoints = np.zeros(num_points)
-for i in range(num_points):
-	ind = np.argmax(belief[i].weights)
-	mlePoints[i] = belief[i].pos.flatten()[ind]
-plot_reconstruction_1d_2d(points, np.argsort(mlePoints), ax)
+plot_message_1d(messages_next, 0, 1, ax)
+
+fig, ax = plt.subplots()
+plot_message_1d(messages_next, 1, 0, ax)
+
+# fig, ax = plt.subplots()
+# plot_mean_1d(belief, color, ax, show_labels=True)
+
+# fig, ax = plt.subplots()
+# plot_neighbors_2d(points, color, neighbor_graph, ax)
+# from visualization.plot_reconstruction import plot_reconstruction_1d_2d
+# mlePoints = np.zeros(num_points)
+# for i in range(num_points):
+# 	ind = np.argmax(belief[i].weights)
+# 	mlePoints[i] = belief[i].pos.flatten()[ind]
+# plot_reconstruction_1d_2d(points, np.argsort(mlePoints), ax)
 plt.show()
 
 write("\n")
