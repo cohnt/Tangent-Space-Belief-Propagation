@@ -7,8 +7,8 @@ import copy
 from utils import write, flush
 
 num_iters = 50      # Number of iterations of the message passing algorithm to run
-neighbors_k = 6    # The value of 'k' used for k-nearest-neighbors
-num_points = 100   # Number of data points
+neighbors_k = 3    # The value of 'k' used for k-nearest-neighbors
+num_points = 5   # Number of data points
 data_noise = 0.00001 # How much noise is added to the data
 num_samples = 10   # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.5 # Fraction of uniform samples to keep exploring
@@ -55,7 +55,7 @@ t0 = time.time()
 fig, ax = plt.subplots()
 plot_neighbors_2d(points, color, neighbor_graph, ax, point_size=3, line_width=0.25, edge_thickness=0.25)
 plt.savefig(output_dir + "nearest_neighbors.svg")
-plt.close(fig)
+# plt.close(fig)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
@@ -81,35 +81,26 @@ flush()
 #######################
 # Initialize Messages #
 #######################
-
-class Message:
-	def __init__(self):
-		self.pos = np.zeros((num_samples, target_dim))
-		self.weights = np.zeros(num_samples)
+from utils import Message
 
 messages_prev = [[None for j in range(num_points)] for i in range(num_points)]
 messages_next = [[None for j in range(num_points)] for i in range(num_points)]
 for key, value in neighbor_pair_list:
 	# Note that key represents where the message is coming from and value represents where the message is going to
 	# In other words, messages[key][value] === m_key->value
-	messages_prev[key][value] = Message()
+	messages_prev[key][value] = Message(num_samples, target_dim)
 	messages_prev[key][value].pos = np.random.uniform(-2, 2, (num_samples, target_dim))
 	messages_prev[key][value].weights = np.zeros(num_samples) + (1.0 / num_samples)
 
-	messages_next[key][value] = Message()
+	messages_next[key][value] = Message(num_samples, target_dim)
 	# We don't initialize any values into messages_next
 
 ###################
 # Message Passing #
 ###################
-from utils import weightedSample, list_mvn, sphereRand
+from utils import Belief, weightedSample, list_mvn, sphereRand
 
-class Belief:
-	def __init__(self):
-		self.pos = np.zeros((num_samples, target_dim))
-		self.weights = np.zeros(num_samples)
-
-belief = [Belief() for _ in range(num_points)]
+belief = [Belief(num_samples, target_dim) for _ in range(num_points)]
 
 def weightFromNeighbor(m_next, m_prev, current, neighbor):
 	weights_unary = np.zeros(num_samples)
@@ -260,7 +251,7 @@ for iter_num in range(1, num_iters+1):
 		s = i
 		neighbors = neighbor_dict[s][:]
 		num_neighbors = len(neighbors)
-		combined_message = Message()
+		combined_message = Message(num_samples, target_dim)
 		combined_message.pos = np.zeros((num_samples*num_neighbors, target_dim))
 		combined_message.weights = np.zeros(num_samples*num_neighbors)
 		for j in range(0, num_neighbors):
@@ -304,8 +295,11 @@ print "Expected distance: ", neighbor_graph[0, n_ind]
 print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
 fig, ax = plt.subplots()
-ax.scatter(belief[0].pos.flatten(), np.zeros(len(belief[0].pos)), c=belief[0].weights, cmap=plt.cm.Spectral)
-ax.scatter(belief[n_ind].pos.flatten(), np.ones(len(belief[n_ind].pos)), c=belief[1].weights, cmap=plt.cm.Spectral)
+# ax.scatter(belief[0].pos.flatten(), np.zeros(len(belief[0].pos)), c=belief[0].weights, cmap=plt.cm.Spectral)
+# ax.scatter(belief[n_ind].pos.flatten(), np.ones(len(belief[n_ind].pos)), c=belief[1].weights, cmap=plt.cm.Spectral)
+for i in range(0, num_points):
+	print "Index %d, color %f" % color[i]
+	ax.scatter(belief[i].pos.flatten(), (float(i)/float(num_points))+np.zeros(len(belief[i].pos)), c=belief[i].weights, cmap=plt.cm.Spectral)
 plt.show()
 
 write("\n")

@@ -1,6 +1,16 @@
 import numpy as np
 import sys
 
+class Message:
+	def __init__(self, num_samples, target_dim):
+		self.pos = np.zeros((num_samples, target_dim))
+		self.weights = np.zeros(num_samples)
+
+class Belief:
+	def __init__(self, num_samples, target_dim):
+		self.pos = np.zeros((num_samples, target_dim))
+		self.weights = np.zeros(num_samples)
+
 def sparseMatrixToDict(mat):
 	# https://stackoverflow.com/questions/52322847/what-is-an-efficient-way-to-convert-an-adjacency-matrix-to-a-dictionary
 	return {i: [j for j, adjacent in enumerate(row) if adjacent] for i, row in enumerate(mat.toarray())}
