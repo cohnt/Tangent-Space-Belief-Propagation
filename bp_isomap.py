@@ -6,11 +6,11 @@ import sys
 import copy
 from utils import write, flush
 
-num_iters = 50      # Number of iterations of the message passing algorithm to run
+num_iters = 5      # Number of iterations of the message passing algorithm to run
 neighbors_k = 3    # The value of 'k' used for k-nearest-neighbors
 num_points = 5   # Number of data points
 data_noise = 0.00001 # How much noise is added to the data
-num_samples = 10   # Numbers of samples used in the belief propagation algorithm
+num_samples = 100   # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.5 # Fraction of uniform samples to keep exploring
 initial_dim = 2    # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1     # The number of dimensions the data is being reduced to
@@ -294,12 +294,23 @@ print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 print "Expected distance: ", neighbor_graph[0, n_ind]
 print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
+# fig, ax = plt.subplots()
+# # ax.scatter(belief[0].pos.flatten(), np.zeros(len(belief[0].pos)), c=belief[0].weights, cmap=plt.cm.Spectral)
+# # ax.scatter(belief[n_ind].pos.flatten(), np.ones(len(belief[n_ind].pos)), c=belief[1].weights, cmap=plt.cm.Spectral)
+# for i in range(0, num_points):
+# 	print "Index %d, color %f" % (i, color[i])
+# 	ax.scatter(belief[i].pos.flatten(), (float(i)/float(num_points))+np.zeros(len(belief[i].pos)), c=belief[i].weights, cmap=plt.cm.Spectral)
+# plt.show()
+
 fig, ax = plt.subplots()
-# ax.scatter(belief[0].pos.flatten(), np.zeros(len(belief[0].pos)), c=belief[0].weights, cmap=plt.cm.Spectral)
-# ax.scatter(belief[n_ind].pos.flatten(), np.ones(len(belief[n_ind].pos)), c=belief[1].weights, cmap=plt.cm.Spectral)
-for i in range(0, num_points):
-	print "Index %d, color %f" % (i, color[i])
-	ax.scatter(belief[i].pos.flatten(), (float(i)/float(num_points))+np.zeros(len(belief[i].pos)), c=belief[i].weights, cmap=plt.cm.Spectral)
+from visualization.plot_belief import plot_belief_1d, plot_mle_1d, plot_mean_1d
+plot_belief_1d(belief[0], ax, show_mle=True, show_mean=True)
+
+fig, ax = plt.subplots()
+plot_mle_1d(belief, color, ax)
+
+fig, ax = plt.subplots()
+plot_mean_1d(belief, color, ax)
 plt.show()
 
 write("\n")

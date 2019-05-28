@@ -33,7 +33,6 @@ def plot_mle_1d(beliefs, colors, ax, colormap=plt.cm.spectral, line_width=1):
 	line_bottom = 0
 	line_top = 1
 	rgb = colormap(colors)
-	print points
 	ax.vlines(points, line_bottom, line_top, colors=rgb, linewidth=line_width, linestyles='solid')
 
 def plot_mean_1d(beliefs, colors, ax, colormap=plt.cm.spectral, line_width=1):
@@ -44,5 +43,4 @@ def plot_mean_1d(beliefs, colors, ax, colormap=plt.cm.spectral, line_width=1):
 	line_bottom = 0
 	line_top = 1
 	rgb = colormap(colors)
-	print points
 	ax.vlines(points, line_bottom, line_top, colors=rgb, linewidth=line_width, linestyles='solid')
