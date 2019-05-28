@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection
 from mpl_toolkits.mplot3d.art3d import Line3DCollection
 
-def plot_neighbors_2d(points, color, neighbors_graph, ax, line_color="grey", point_size=5, line_width=1, edge_thickness=1):
+def plot_neighbors_2d(points, color, neighbors_graph, ax, line_color="grey", point_size=5, line_width=1, edge_thickness=1, show_labels=False):
 	# See https://stackoverflow.com/questions/50040310/efficient-way-to-connect-the-k-nearest-neighbors-in-a-scatterplot-using-matplotl/50040839
 	num_points = len(points)
 	num_neighbors = np.count_nonzero(neighbors_graph[0].todense())
@@ -16,6 +16,9 @@ def plot_neighbors_2d(points, color, neighbors_graph, ax, line_color="grey", poi
 	lines = LineCollection(coordinates.reshape((num_points*num_neighbors, 2, 2)), color=line_color, zorder=1, linewidths=edge_thickness)
 	ax.scatter(points[:,0], points[:,1], c=color, cmap=plt.cm.Spectral, s=point_size**2, zorder=2, linewidth=line_width)
 	ax.add_collection(lines)
+	if show_labels:
+		for i in range(num_points):
+			ax.text(points[i][0], points[i][1], ("%d" % i))
 
 def plot_neighbors_3d(points, color, neighbors_graph, ax, line_color="grey", point_size=5, line_width=1, edge_thickness=1):
 	num_points = len(points)

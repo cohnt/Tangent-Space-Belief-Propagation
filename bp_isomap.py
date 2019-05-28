@@ -62,7 +62,7 @@ write("Saving nearest neighbors plot...")
 flush()
 t0 = time.time()
 fig, ax = plt.subplots()
-plot_neighbors_2d(points, color, neighbor_graph, ax, point_size=3, line_width=0.25, edge_thickness=0.25)
+plot_neighbors_2d(points, color, neighbor_graph, ax, point_size=3, line_width=0.25, edge_thickness=0.25, show_labels=True)
 plt.savefig(output_dir + "nearest_neighbors.svg")
 # plt.close(fig)
 t1 = time.time()
@@ -316,10 +316,10 @@ from visualization.plot_belief import plot_belief_1d, plot_mle_1d, plot_mean_1d
 plot_belief_1d(belief[0], ax, show_mle=True, show_mean=True)
 
 fig, ax = plt.subplots()
-plot_mle_1d(belief, color, ax)
+plot_mle_1d(belief, color, ax, show_labels=True)
 
 fig, ax = plt.subplots()
-plot_mean_1d(belief, color, ax)
+plot_mean_1d(belief, color, ax, show_labels=True)
 plt.show()
 
 write("\n")

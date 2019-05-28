@@ -24,7 +24,7 @@ def plot_belief_1d(belief, ax, line_width=1, colormap=plt.cm.coolwarm, show_mle=
 		ax.axvline(pos, line_bottom, line_top, color="black", linewidth=mean_line_width, linestyle="--", dash_capstyle="round")
 		ax.text(pos, 0.05, label_text)
 
-def plot_mle_1d(beliefs, colors, ax, colormap=plt.cm.spectral, line_width=1):
+def plot_mle_1d(beliefs, colors, ax, colormap=plt.cm.spectral, line_width=1, show_labels=False):
 	num_points = len(beliefs)
 	points = np.zeros(num_points)
 	for i in range(num_points):
@@ -34,8 +34,11 @@ def plot_mle_1d(beliefs, colors, ax, colormap=plt.cm.spectral, line_width=1):
 	line_top = 1
 	rgb = colormap(colors)
 	ax.vlines(points, line_bottom, line_top, colors=rgb, linewidth=line_width, linestyles='solid')
+	if show_labels:
+		for i in range(num_points):
+			ax.text(points[i], float(i)/float(num_points), ("%d" % i))
 
-def plot_mean_1d(beliefs, colors, ax, colormap=plt.cm.spectral, line_width=1):
+def plot_mean_1d(beliefs, colors, ax, colormap=plt.cm.spectral, line_width=1, show_labels=False):
 	num_points = len(beliefs)
 	points = np.zeros(num_points)
 	for i in range(num_points):
@@ -44,3 +47,6 @@ def plot_mean_1d(beliefs, colors, ax, colormap=plt.cm.spectral, line_width=1):
 	line_top = 1
 	rgb = colormap(colors)
 	ax.vlines(points, line_bottom, line_top, colors=rgb, linewidth=line_width, linestyles='solid')
+	if show_labels:
+		for i in range(num_points):
+			ax.text(points[i], float(i)/float(num_points), ("%d" % i))
