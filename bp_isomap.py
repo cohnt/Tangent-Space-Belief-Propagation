@@ -298,7 +298,7 @@ fig, ax = plt.subplots()
 # ax.scatter(belief[0].pos.flatten(), np.zeros(len(belief[0].pos)), c=belief[0].weights, cmap=plt.cm.Spectral)
 # ax.scatter(belief[n_ind].pos.flatten(), np.ones(len(belief[n_ind].pos)), c=belief[1].weights, cmap=plt.cm.Spectral)
 for i in range(0, num_points):
-	print "Index %d, color %f" % color[i]
+	print "Index %d, color %f" % (i, color[i])
 	ax.scatter(belief[i].pos.flatten(), (float(i)/float(num_points))+np.zeros(len(belief[i].pos)), c=belief[i].weights, cmap=plt.cm.Spectral)
 plt.show()
 
