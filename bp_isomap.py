@@ -37,7 +37,7 @@ write("\n")
 write("Generating dataset...")
 flush()
 t0 = time.time()
-points = np.array([[0, 0], [1, 1], [2, 2], [3, 3], [4, 4], [5, 5]])
+points = np.array([[0, 0], [1, 1], [2, 2.5], [3, 4], [4, 4.5], [5, 7]])
 color = np.array([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
@@ -320,6 +320,15 @@ plot_mle_1d(belief, color, ax, show_labels=True)
 
 fig, ax = plt.subplots()
 plot_mean_1d(belief, color, ax, show_labels=True)
+
+fig, ax = plt.subplots()
+plot_neighbors_2d(points, color, neighbor_graph, ax)
+from visualization.plot_reconstruction import plot_reconstruction_1d_2d
+mlePoints = np.zeros(num_points)
+for i in range(num_points):
+	ind = np.argmax(belief[i].weights)
+	mlePoints[i] = belief[i].pos.flatten()[ind]
+plot_reconstruction_1d_2d(points, np.argsort(mlePoints), ax)
 plt.show()
 
 write("\n")
