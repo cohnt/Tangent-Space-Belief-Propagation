@@ -4,7 +4,8 @@ from matplotlib.collections import LineCollection
 from mpl_toolkits.mplot3d.art3d import Line3DCollection
 from utils import Belief
 
-def plot_belief_1d(belief, ax, line_width=1, colormap=plt.cm.coolwarm, show_mle=False, mle_line_width=4, show_mean=False, mean_line_width=4):
+def plot_belief_1d(beliefs, idx, ax, line_width=1, colormap=plt.cm.coolwarm, show_mle=False, mle_line_width=4, show_mean=False, mean_line_width=4):
+	belief = beliefs[idx]
 	num_points = len(belief.pos)
 	rgb = colormap(belief.weights / max(belief.weights))
 	line_bottom = 0
@@ -23,6 +24,8 @@ def plot_belief_1d(belief, ax, line_width=1, colormap=plt.cm.coolwarm, show_mle=
 		label_text = "Mean=%f" % pos
 		ax.axvline(pos, line_bottom, line_top, color="black", linewidth=mean_line_width, linestyle="--", dash_capstyle="round")
 		ax.text(pos, 0.05, label_text)
+
+	ax.set_title("Belief %d" % idx)
 
 def plot_mle_1d(beliefs, colors, ax, colormap=plt.cm.spectral, line_width=1, show_labels=False):
 	num_points = len(beliefs)
