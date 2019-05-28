@@ -21,5 +21,5 @@ def plot_belief_1d(belief, ax, line_width=1, colormap=plt.cm.coolwarm, show_mle=
 	if show_mean:
 		pos = np.average(belief.pos.flatten(), weights=belief.weights)
 		label_text = "Mean=%f" % pos
-		ax.axvline(pos, line_bottom, line_top, color="black", line_width=mean_line_width, linestyle="--", dash_capstyle="round")
+		ax.axvline(pos, line_bottom, line_top, color="black", linewidth=mean_line_width, linestyle="--", dash_capstyle="round")
 		ax.text(pos, 0.05, label_text)
