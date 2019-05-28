@@ -7,8 +7,8 @@ import copy
 from utils import write, flush
 
 num_iters = 5      # Number of iterations of the message passing algorithm to run
-neighbors_k = 3    # The value of 'k' used for k-nearest-neighbors
-num_points = 5   # Number of data points
+neighbors_k = 2    # The value of 'k' used for k-nearest-neighbors
+num_points = 6   # Number of data points
 data_noise = 0.00001 # How much noise is added to the data
 num_samples = 100   # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.5 # Fraction of uniform samples to keep exploring
@@ -24,12 +24,21 @@ write("\n")
 ################
 # Load Dataset #
 ################
-from datasets.dim_2.arc_curve import make_arc_curve
+# from datasets.dim_2.arc_curve import make_arc_curve
+
+# write("Generating dataset...")
+# flush()
+# t0 = time.time()
+# points, color = make_arc_curve(num_points, data_noise)
+# t1 = time.time()
+# write("Done! dt=%f\n" % (t1-t0))
+# flush()
 
 write("Generating dataset...")
 flush()
 t0 = time.time()
-points, color = make_arc_curve(num_points, data_noise)
+points = np.array([[0, 0], [1, 1], [2, 2], [3, 3], [4, 4], [5, 5]])
+color = np.array([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
