@@ -48,9 +48,9 @@ def list_mvn(means, covs, single_cov=False):
 			out[i] = np.random.multivariate_normal(means[i], covs[i])
 	return out
 
-def sphereRand(pos, radius, variance=0.01):
+def sphereRand(pos, radius, var=0.01):
 	# See method 19 from http://extremelearning.com.au/how-to-generate-uniformly-random-points-on-n-spheres-and-n-balls/
 	u = np.random.normal(0, 1, len(pos))
 	d = np.sum(u ** 2) ** (0.5)
-	D = np.random.normal(d, variance)
+	D = np.random.normal(d, var)
 	return pos + (radius * u / D)
