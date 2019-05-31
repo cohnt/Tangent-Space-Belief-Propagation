@@ -1,21 +1,20 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from collections import namedtuple
 import time
 import sys
 import copy
 from utils import write, flush
 
-num_iters = 200      # Number of iterations of the message passing algorithm to run
+num_iters = 2000     # Number of iterations of the message passing algorithm to run
 neighbors_k = 1    # The value of 'k' used for k-nearest-neighbors
 num_points = 2   # Number of data points
 data_noise = 0.00001 # How much noise is added to the data
 num_samples = 100   # Numbers of samples used in the belief propagation algorithm
-explore_perc = 0.5 # Fraction of uniform samples to keep exploring
+explore_perc = 0.1 # Fraction of uniform samples to keep exploring
 initial_dim = 2    # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1     # The number of dimensions the data is being reduced to
 
-message_resample_cov = np.eye(target_dim) * 0.1 # TODO: Change
+message_resample_cov = np.eye(target_dim) * 0.01 # TODO: Change
 
 output_dir = "results/"
 
@@ -46,7 +45,7 @@ write("\n")
 write("Generating dataset...")
 flush()
 t0 = time.time()
-points = np.array([[0, 0], [1, 1]])
+points = np.array([[0, 0], [0, 1]])
 color = np.array([0.0, 1.0])
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
@@ -134,6 +133,9 @@ def weightFromNeighbor(m_next, m_prev, current, neighbor):
 	weights_prior = np.zeros(num_samples)
 	weights = np.zeros(num_samples)
 
+	t = neighbor
+	s = current
+
 	neighbors = neighbor_dict[t][:]
 	neighbors.remove(s)
 	num_neighbors = len(neighbors)
@@ -145,8 +147,13 @@ def weightFromNeighbor(m_next, m_prev, current, neighbor):
 
 		# TODO: Possibly check that pos_s[i] is valid (do we even have to?)
 		# For now, assume pos_s[i] is indeed valid
-		weights_unary[i] = 1.0 # For now, we don't actually have a unary potential
-		                       # It's not even clear if we have an observation
+
+		if s != 0:
+			weights_unary[i] = 1.0 # For now, we don't actually have a unary potential
+			                       # It's not even clear if we have an observation
+		else:
+			dist2 = np.sum(np.asarray(pos_t, dtype=float) ** 2)
+			weights_unary[i] = 1.0 / (1.0 + (10.0 * dist2))
 
 		if num_neighbors > 0:
 			# In theory, we don't need this check, since we're using k-nearest neighbors, so
@@ -231,8 +238,9 @@ for iter_num in range(1, num_iters+1):
 			messages_next[t][s].weights[0:start_ind] = 1.0 / num_samples
 
 			# Sample [start_int, end_rand_in) uniformly across the state space, each with uniform weight
-			messages_next[t][s].pos[start_ind:end_rand_ind] = np.random.uniform(-2, 2, (end_rand_ind - start_ind, 1))
-			messages_next[t][s].weights[start_ind:end_rand_ind] = 1.0 / num_samples
+			if start_ind < end_rand_ind:
+				messages_next[t][s].pos[start_ind:end_rand_ind] = np.random.uniform(-2, 2, (end_rand_ind - start_ind, 1))
+				messages_next[t][s].weights[start_ind:end_rand_ind] = 1.0 / num_samples
 
 			# Sample [end_rand_in, num_samples) based on the belief, with added noise
 			num_samples_left = num_samples - end_rand_ind
@@ -269,10 +277,19 @@ for iter_num in range(1, num_iters+1):
 	flush()
 	t0 = time.time()
 
+	for neighbor in neighbor_dict[0]:
+		for i in range(0, num_samples):
+			pos = messages_next[neighbor][0].pos[i]
+			dist2 = np.sum(np.asarray(pos, dtype=float) ** 2)
+			unary_weight = 1.0 / (1.0 + (10.0 * dist2))
+			messages_next[neighbor][0].weights[i] = messages_next[neighbor][0].weights[i] * unary_weight
+		messages_next[neighbor][0].weights = messages_next[neighbor][0].weights / np.sum(messages_next[neighbor][0].weights)
+
 	for i in range(0, num_points):
 		# First, update weights of every sample w_ts based on the unary potential
 		# Because we don't have a unary potential, we don't actually do this step!
 		pass
+		# ACTUALLY this is being done a few lines up
 
 		# Now, combine all incoming messages
 		s = i
