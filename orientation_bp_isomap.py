@@ -22,6 +22,8 @@ write("\n")
 # Load Dataset #
 ################
 from datasets.dim_2.arc_curve import make_arc_curve
+# from datasets.dim_2.s_curve import make_s_curve
+# from datasets.dim_2.o_curve import make_o_curve
 
 write("Generating dataset...")
 flush()
@@ -44,7 +46,10 @@ neighbor_graph = kneighbors_graph(points, neighbors_k, mode="distance", n_jobs=-
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
-# NOTE: this is not a symmetric matrix.
+# neighbor_graph is stored as a sparse matrix.
+# Note that neighbor_graph is not necessarily symmetric, such as the case where point x
+# is a nearest neighbor of point y, but point y is *not* a nearest neighbor of point x.
+# We fix this later on...
 
 write("Saving nearest neighbors plot...")
 flush()
@@ -62,15 +67,18 @@ flush()
 ####################
 from utils import sparseMatrixToDict, sparseMaximum
 
-# Make the matrix symmetric, and convert it to a dictionary
 write("Initializing graph data structures...")
 flush()
 t0 = time.time()
+# Make the matrix symmetric by taking max(G, G^T)
 neighbor_graph = sparseMaximum(neighbor_graph, neighbor_graph.T)
+# This dictionary will have the structure point_idx: [list, of, neighbor_idx]
 neighbor_dict = sparseMatrixToDict(neighbor_graph)
+# This extracts all pairs of neighbors from the dictionary and stores them as a list of tuples.
+# neighbor_pair_list represents the identification of the messages, i.e., "message 0" is
+# so defined by being at index 0 of neighbor_pair_list.
 neighbor_pair_list = [(key, value) for key, arr in neighbor_dict.items() for value in arr]
 num_messages = len(neighbor_pair_list)
-# neighbor_pair_list represents the identification of the messages, i.e., "message 0" is at index 0
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
@@ -81,6 +89,7 @@ flush()
 from sklearn.decomposition import PCA
 from visualization.plot_pca import plot_pca_2d
 
+# n_components is the number of principal components pca will compute
 pca = PCA(n_components=target_dim)
 observations = [None for i in range(num_points)]
 
@@ -115,16 +124,31 @@ flush()
 #######################
 class Message():
 	def __init__(self, num_samples, source_dim, target_dim):
+		# If num_samples=N, source_dim=n, and target_dim=m, then:
+		# self.pos is a list of N points in R^m, so it's of shape (N, m)
+		# self.orien is a list of ordered bases of m-dimensional (i.e. spanned by m
+		# unit vectors) subspaces in R^n, so it's of shape (N, m, n)
+		# self.weights is a list of weights, so it's of shape (N)
 		self.pos = np.zeros((num_samples, target_dim))
 		self.orien = np.zeros((num_samples, target_dim, source_dim))
 		self.weights = np.zeros(num_samples)
 
 def randomPos(num_samples, target_dim):
+	# Our current dataset has a length of pi/2=1.57, so no matter which point is "anchored" at
+	# 0, the furthest point will definitely be somewhere in the interval (-2, 2).
+	# The shape of the output matches the dimension of a Message or Belief
 	return np.random.uniform(-2, 2, (num_samples, target_dim))
 
 def randomOrien(num_samples, source_dim, target_dim, observed_orien):
+	# For now, for the message m_t->s, we expect s to have the same orientation as t. This will
+	# almost certainly be changed sometime in the future.
+	# np.tile(vec, (a, b, 1)) creates an array of shape(a, b, len(vec)), so the output shape
+	# matches the definition of a Message or Belief. For more details, see
+	# https://stackoverflow.com/questions/22634265/python-concatenate-or-clone-a-numpy-array-n-times
 	return np.tile(observed_orien, (num_samples, target_dim, 1))
 
+# This initializes messages_prev and messages_next as num_points by num_points arrays of Nones.
+# Where appropriate, the Nones will be replaced by Message objects
 messages_prev = [[None for __ in range(num_points)] for _ in range(num_points)]
 messages_next = [[None for __ in range(num_points)] for _ in range(num_points)]
 for key, value in neighbor_pair_list:
@@ -133,10 +157,10 @@ for key, value in neighbor_pair_list:
 	messages_prev[key][value] = Message(num_samples, source_dim, target_dim)
 	messages_prev[key][value].pos = randomPos(num_samples, target_dim)
 	messages_prev[key][value].orien = randomOrien(num_samples, source_dim, target_dim, observations[key])
-	messages_prev[key][value].weights = np.zeros(num_samples) + (1.0 / num_samples)
+	messages_prev[key][value].weights = np.zeros(num_samples) + (1.0 / num_samples) # Evenly weight each sample for now
 
-	messages_next[key][value] = Message(num_samples, source_dim, target_dim)
 	# We don't initialize any values into messages_next
+	messages_next[key][value] = Message(num_samples, source_dim, target_dim)
 
 ###################
 # Message Passing #
@@ -145,6 +169,11 @@ from utils import weightedSample, list_mvn
 
 class Belief():
 	def __init__(self, num_samples, source_dim, target_dim):
+		# If num_samples=N, source_dim=n, and target_dim=m, then:
+		# self.pos is a list of N points in R^m, so it's of shape (N, m)
+		# self.orien is a list of ordered bases of m-dimensional (i.e. spanned by m
+		# unit vectors) subspaces in R^n, so it's of shape (N, m, n)
+		# self.weights is a list of weights, so it's of shape (N)
 		self.pos = np.zeros((num_samples, target_dim))
 		self.orien = np.zeros((num_samples, target_dim, source_dim))
 		self.weights = np.zeros(num_samples)
