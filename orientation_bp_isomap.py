@@ -8,7 +8,7 @@ from utils import write, flush
 num_iters = 200     # Number of iterations of the message passing algorithm to run
 neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
 num_points = 500    # Number of data points
-data_noise = 0.0001 # How much noise is added to the data
+data_noise = 0.00001 # How much noise is added to the data
 num_samples = 200   # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
 initial_dim = 2     # The dimensionality of the incoming dataset (see "Load Dataset" below)
@@ -50,7 +50,7 @@ write("Saving nearest neighbors plot...")
 flush()
 t0 = time.time()
 fig, ax = plt.subplots()
-plot_neighbors_2d(points, color, neighbor_graph, ax, point_size=3, line_width=0.25, edge_thickness=0.25, show_labels=True)
+plot_neighbors_2d(points, color, neighbor_graph, ax, point_size=1, line_width=0.1, edge_thickness=0.1, show_labels=False)
 plt.savefig(output_dir + "nearest_neighbors.svg")
 plt.close(fig)
 t1 = time.time()
@@ -71,6 +71,41 @@ neighbor_dict = sparseMatrixToDict(neighbor_graph)
 neighbor_pair_list = [(key, value) for key, arr in neighbor_dict.items() for value in arr]
 num_messages = len(neighbor_pair_list)
 # neighbor_pair_list represents the identification of the messages, i.e., "message 0" is at index 0
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+###############
+# Measure PCA #
+###############
+from sklearn.decomposition import PCA
+from visualization.plot_pca import plot_pca_2d
+
+pca = PCA(n_components=target_dim)
+observations = [None for i in range(num_points)]
+
+write("Computing PCA observations...")
+flush()
+t0 = time.time()
+for i in range(num_points):
+	og_point = points[i]
+	row = neighbor_graph.toarray()[i]
+	neighbors = np.nonzero(row)[0]
+	neighborhood = points[neighbors]
+	pca.fit(neighborhood)
+	# vec1 = pca.components_[0]
+	observations[i] = pca.components_[0:target_dim]
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+write("Saving PCA observations plot...")
+flush()
+t0 = time.time()
+fig, ax = plt.subplots()
+plot_pca_2d(points, color, observations, ax, point_size=1, point_line_width=0.1, line_width=0.1, line_length=0.05)
+plt.savefig(output_dir + "pca_observations.svg")
+plt.close(fig)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
