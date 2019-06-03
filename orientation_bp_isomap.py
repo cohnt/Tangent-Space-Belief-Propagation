@@ -125,8 +125,8 @@ def randomPos(num_samples, target_dim):
 def randomOrien(num_samples, source_dim, target_dim, observed_orien):
 	return np.tile(observed_orien, (num_samples, target_dim, 1))
 
-messages_prev = [[None for j in range(num_points)] for i in range(num_points)]
-messages_next = [[None for j in range(num_points)] for i in range(num_points)]
+messages_prev = [[None for __ in range(num_points)] for _ in range(num_points)]
+messages_next = [[None for __ in range(num_points)] for _ in range(num_points)]
 for key, value in neighbor_pair_list:
 	# Note that key represents where the message is coming from and value represents where the message is going to
 	# In other words, messages[key][value] === m_key->value
@@ -141,3 +141,62 @@ for key, value in neighbor_pair_list:
 ###################
 # Message Passing #
 ###################
+from utils import weightedSample, list_mvn
+
+class Belief():
+	def __init__(self, num_samples, source_dim, target_dim):
+		self.pos = np.zeros((num_samples, target_dim))
+		self.orien = np.zeros((num_samples, target_dim, source_dim))
+		self.weights = np.zeros(num_samples)
+
+belief = [Belief(num_samples, source_dim, target_dim) for _ in range(num_points)]
+
+for iter_num in range(1, num_iters+1):
+	write("\nIteration %d\n" % iter_num)
+
+	message_time = 0
+	belief_time = 0
+	image_time = 0
+	total_time = 0
+
+	##################
+	# Message Update #
+	##################
+	write("Performing message update...")
+	flush()
+	t0 = time.time()
+
+	pass # TODO
+
+	t1 = time.time()
+	message_time = t1-t0
+	write("Done! dt=%f\n" % message_time)
+
+	#################
+	# Belief Update #
+	#################
+	write("Performing belief update...")
+	flush()
+	t0 = time.time()
+
+	pass # TODO
+
+	t1 = time.time()
+	belief_time = t1-t0
+	write("Done! dt=%f\n" % belief_time)
+
+	################
+	# Write Images #
+	################
+	write("Writing images...")
+	flush()
+	t0 = time.time()
+
+	pass # TODO
+
+	t1 = time.time()
+	image_time = t1-t0
+	write("Done! dt=%f\n" % image_time)
+
+	total_time = message_time + belief_time + image_time
+	write("Total iteration time: %f\n" % total_time)
