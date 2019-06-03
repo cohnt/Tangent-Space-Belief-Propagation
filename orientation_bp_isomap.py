@@ -11,7 +11,7 @@ num_points = 500    # Number of data points
 data_noise = 0.00001 # How much noise is added to the data
 num_samples = 200   # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
-initial_dim = 2     # The dimensionality of the incoming dataset (see "Load Dataset" below)
+source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1      # The number of dimensions the data is being reduced to
 
 output_dir = "results/"
@@ -109,3 +109,35 @@ plt.close(fig)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
+
+#######################
+# Initialize Messages #
+#######################
+class Message():
+	def __init__(self, num_samples, source_dim, target_dim):
+		self.pos = np.zeros((num_samples, target_dim))
+		self.orien = np.zeros((num_samples, target_dim, source_dim))
+		self.weights = np.zeros(num_samples)
+
+def randomPos(num_samples, target_dim):
+	return np.random.uniform(-2, 2, (num_samples, target_dim))
+
+def randomOrien(num_samples, source_dim, target_dim, observed_orien):
+	return np.tile(observed_orien, (num_samples, target_dim, 1))
+
+messages_prev = [[None for j in range(num_points)] for i in range(num_points)]
+messages_next = [[None for j in range(num_points)] for i in range(num_points)]
+for key, value in neighbor_pair_list:
+	# Note that key represents where the message is coming from and value represents where the message is going to
+	# In other words, messages[key][value] === m_key->value
+	messages_prev[key][value] = Message(num_samples, source_dim, target_dim)
+	messages_prev[key][value].pos = randomPos(num_samples, target_dim)
+	messages_prev[key][value].orien = randomOrien(num_samples, source_dim, target_dim, observations[key])
+	messages_prev[key][value].weights = np.zeros(num_samples) + (1.0 / num_samples)
+
+	messages_next[key][value] = Message(num_samples, source_dim, target_dim)
+	# We don't initialize any values into messages_next
+
+###################
+# Message Passing #
+###################
