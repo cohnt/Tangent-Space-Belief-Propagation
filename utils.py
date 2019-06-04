@@ -54,3 +54,10 @@ def sphereRand(pos, radius, var=0.01):
 	d = np.sum(u ** 2) ** (0.5)
 	D = np.random.normal(d, var)
 	return pos + (radius * u / D)
+
+def projSubspace(orthonormal_basis, point):
+	individual_components = np.zeros(len(orthonormal_basis))
+	for i in range(len(orthonormal_basis)):
+		basis_vec = orthonormal_basis[i]
+		individual_components[i] = np.dot(basis_vec, point)
+	return individual_components

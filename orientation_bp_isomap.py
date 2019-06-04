@@ -167,7 +167,7 @@ for key, value in neighbor_pair_list:
 ###################
 # Message Passing #
 ###################
-from utils import weightedSample, list_mvn
+from utils import weightedSample, list_mvn, projSubspace
 from scipy.linalg import subspace_angles
 
 class Belief():
@@ -212,7 +212,7 @@ def weightMessage(m_next, m_prev, neighbor, current):
 			weights_from_priors = np.zeros(num_neighbors)
 			for j in range(num_neighbors):
 				u = neighbors[j]
-				weights_from_priors[j] = weightPrior(pos_t, orien_t, m_prev, u, t)
+				weights_from_priors[j] = weightPrior(pos_s, orien_s, m_prev, u, t, s)
 			weights_prior[i] = np.prod(weights_from_priors)
 
 	# Finally, we normalize the weights. We have to check that we don't have all weights zero. This
@@ -274,13 +274,32 @@ def weightUnary(pos, orien, idx):
 	weight_unary = weight_unary * angle_weight
 	return weight_unary
 
-def weightPrior(pos, orien, m_prev, neighbor_neighbor, neighbor):
+def weightPrior(pos_s, orien_s, m_prev, neighbor_neighbor, neighbor, current):
 	u = neighbor_neighbor
 	t = neighbor
+	s = current
 	# Use m_u->t to help weight m_t->s. Really, we're just worried about weighting
 	# a given sample right now, based on m_u->t from a previous iteration.
-	pass # TODO
-	return 1.0 / num_samples
+	weight_prior = 0.0
+	for i in range(num_samples):
+		pos_t = m_prev[u][t].pos[i]
+		orien_t = m_prev[u][t].orien[i]
+		# dist2 = (np.asarray(pos, dtype=float) - np.asarray(pos_pred, dtype=float)) ** 2
+		# weight_pairwise = 1/(1+dist2)
+		
+		# We have a relation between the orientations of adjacent nodes -- they should be similar
+		principal_angles = subspace_angles(orien_s.transpose(), orien_t.transpose())
+		orien_weight = 1.0 / (1.0 + np.sum(principal_angles))
+
+		# We have a relation between the orientations and predicted positions of adjacent nodes
+		d_st = np.sum((pos_t - projSubspace(orien_t, pos_s)) ** 2)
+		d_ts = np.sum((pos_s - projSubspace(orien_s, pos_t)) ** 2)
+		distance_weight = 1.0 / (1.0 + ((d_st + d_ts) / 2.0))
+
+		weight_4tuplewise = orien_weight * distance_weight
+
+		weight_prior = weight_prior + (m_prev[u][t].weights[i] * weight_4tuplewise)
+	return weight_prior
 
 for iter_num in range(1, num_iters+1):
 	write("\nIteration %d\n" % iter_num)
