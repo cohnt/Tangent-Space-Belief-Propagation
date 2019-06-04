@@ -5,14 +5,16 @@ import sys
 import copy
 from utils import write, flush
 
-num_iters = 200     # Number of iterations of the message passing algorithm to run
+num_iters = 5     # Number of iterations of the message passing algorithm to run
 neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
 num_points = 500    # Number of data points
 data_noise = 0.00001 # How much noise is added to the data
-num_samples = 200   # Numbers of samples used in the belief propagation algorithm
+num_samples = 25   # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1      # The number of dimensions the data is being reduced to
+
+message_resample_cov = np.eye(target_dim) * 0.01 # TODO: Change
 
 output_dir = "results/"
 
@@ -180,6 +182,80 @@ class Belief():
 
 belief = [Belief(num_samples, source_dim, target_dim) for _ in range(num_points)]
 
+def weightMessage(m_next, m_prev, neighbor, current):
+	t = neighbor
+	s = current
+	# Weight m_t->s
+
+	# We will compute the unary and prior weights separately, then multiply them together
+	weights_unary = np.zeros(num_samples)
+	weights_prior = np.zeros(num_samples)
+	weights = np.zeros(num_samples)
+
+	# Get all of the neighbors of t, but don't include s in the list.
+	neighbors = neighbor_dict[t][:]
+	neighbors.remove(s)
+	num_neighbors = len(neighbors)
+
+	for i in range(num_samples):
+		pos_s = m_next[t][s].pos[i]
+		orien_s = m_next[t][s].orien[i]
+		pos_t, orien_t = sampleNeighbor(pos_s, orien_s, t, s)
+
+		weights_unary[i] = weightUnary(pos_t, orien_t, t)
+
+		if num_neighbors > 0:
+			# Since we're doing k-nearest neighbors, this is always true. But if we used another
+			# neighbor-finding algorithm, this might not necessarily be true. In theory, this would
+			# still work even if num_neighbors were 0, since np.prod of an empty list returns 1.0.
+			weights_from_priors = np.zeros(num_neighbors)
+			for j in range(num_neighbors):
+				u = neighbors[j]
+				weights_from_priors[j] = weightPrior(pos_t, orien_t, m_prev, u, t, s)
+			weights_prior[i] = np.prod(weights_from_priors)
+
+	# Finally, we normalize the weights. We have to check that we don't have all weights zero. This
+	# shouldn't ever happen, but the check is here just in case.
+	max_weight_unary = np.max(weights_unary)
+	max_weight_prior = np.max(weights_prior)
+
+	if max_weight_unary != 0:
+		weights_unary = weights_unary / max_weight_unary
+	else:
+		# All of weights_unary is 0 (since negative weights aren't possible). To make
+		# every element 1/num_samples, we just add that value and numpy does the rest.
+		weights_unary = weights_unary + (1.0 / num_samples)
+
+	if max_weight_prior != 0:
+		weights_prior = weights_prior / max_weight_prior
+	else:
+		# All of weights_prior is 0 (since negative weights aren't possible). To make
+		# every element 1/num_samples, we just add that value and numpy does the rest.
+		weights_prior = weights_prior + (1.0 / num_samples)
+
+	# np.multiply does an element-by-element multiplication.
+	weights = np.multiply(weights_unary, weights_prior)
+	return weights
+
+def sampleNeighbor(pos, orien, neighbor, current):
+	pass # TODO
+	n_pos, n_orien = pos, orien
+	return n_pos, n_orien
+
+def weightUnary(pos, orien, idx):
+	pass # TODO
+	return 1.0 / num_samples
+
+def weightPrior(pos, orien, m_prev, neighbor_neighbor, neighbor, current):
+	u = neighbor_neighbor
+	t = neighbor
+	s = current
+	# Use m_u->t to help weight m_t->s. Really, we're just worried about weighting
+	# a given sample right now, based on m_u->t from a previous iteration. s isn't
+	# even used, but it's here anyways.
+	pass # TODO
+	return 1.0 / num_samples
+
 for iter_num in range(1, num_iters+1):
 	write("\nIteration %d\n" % iter_num)
 
@@ -195,7 +271,75 @@ for iter_num in range(1, num_iters+1):
 	flush()
 	t0 = time.time()
 
-	pass # TODO
+	if iter_num == 1:
+		messages_next = copy.deepcopy(messages_prev)
+	else:
+		# Resample messages from previous belief using importance sampling. The key function used here
+		# is weightedSample, from utils.py, uses stratified resampling, a resampling method common for
+		# particle filters and similar probabilistic methods.
+		for neighbor_pair in neighbor_pair_list:
+			t = neighbor_pair[0]
+			s = neighbor_pair[1]
+			# We will update m_t->s
+
+			start_ind = 0
+			max_weight_ind = np.argmax(belief[s].weights)
+			max_weight = belief[s].weights[max_weight_ind]
+			if max_weight != 1.0 / num_samples:
+				# Not all samples have the same weight, so we keep the highest weighted sample
+				start_ind = 1
+
+			# Note that we don't actually care about the weights we are assigning in this step, since
+			# all the samples will be properly weighted later on. In theory, we don't have to assign
+			# the samples weights at all, but it seems natural to at least give them the "default"
+			# weight of 1.0 / num_samples.
+
+			# If there is a best sample, keep it. In theory, this could be expanded to take the best
+			# n samples, with only a little modification. One could use argsort to sort the array, but
+			# this would be a pretty big performance hit. This stackoverflow answer suggests using
+			# argpartition instead: https://stackoverflow.com/a/23734295/
+			if start_ind == 1:
+				messages_next[t][s].pos[0:start_ind] = belief[s].pos[max_weight_ind][:]
+				messages_next[t][s].orien[0:start_ind] = belief[s].orien[max_weight_ind][:]
+				messages_next[t][s].weights[0:start_ind] = 1.0 / num_samples
+
+			# Some samples will be randomly seeded across the state space. Specifically, the
+			# interval [start_ind, end_rand_in). This will be slightly less than explore_perc
+			# if a maximum weight value is kept from the previous iteration.
+			end_rand_ind = int(np.floor(num_samples * explore_perc))
+			this_section_num_samples = end_rand_ind - start_ind
+			# If explore_perc is so small (or just zero) that the number of random samples
+			# is 0, then we don't need to do this step.
+			if this_section_num_samples > 0:
+				messages_next[t][s].pos[start_ind:end_rand_ind] = randomPos(this_section_num_samples, target_dim)
+				messages_next[t][s].orien[start_ind:end_rand_ind] = randomOrien(this_section_num_samples, source_dim, target_dim, observations[t])
+				messages_next[t][s].weights[start_ind:end_rand_ind] = 1.0 / num_samples
+
+			# Finally, we generate the remaining samples (i.e. the interval [end_rand_in, num_samples))
+			# by resampling from the belief of the previous iteration, with a little added noise.
+			num_samples_left = num_samples - end_rand_ind
+			belief_inds = weightedSample(belief[s].weights, num_samples_left) # Importance sampling by weight
+			messages_next[t][s].pos[end_rand_ind:num_samples] = list_mvn(belief[s].pos[belief_inds], message_resample_cov, single_cov=True) # Add multivariate noise to the mean
+			messages_next[t][s].orien[end_rand_ind:num_samples] = belief[s].orien[belief_inds] # Don't add any noise to the orientation (yet)
+			messages_next[t][s].weights[end_rand_ind:num_samples] = 1.0 / num_samples
+
+	# Weight messages based on their neighbors. If it's the first iteration, then no weighting is performed.
+	if iter_num != 1:
+		raw_weights = np.zeros((num_messages, num_samples))
+		for i in range(0, num_messages):
+			t = neighbor_pair_list[i][0]
+			s = neighbor_pair_list[i][1]
+			# Weight m_t->s
+			raw_weights[i][:] = weightMessage(messages_next, messages_prev, t, s)
+		# Normalize for each message (each row is for a message, so we sum along axis 1)
+		raw_weights = raw_weights / raw_weights.sum(axis=1, keepdims=True)
+		# Assign weights to the samples in messages_next
+		for i in range(0, num_messages):
+			t = neighbor_pair_list[i][0]
+			s = neighbor_pair_list[i][1]
+			messages_next[t][s].weights = raw_weights[i][:]
+
+	messages_prev = copy.deepcopy(messages_next)
 
 	t1 = time.time()
 	message_time = t1-t0
@@ -208,7 +352,39 @@ for iter_num in range(1, num_iters+1):
 	flush()
 	t0 = time.time()
 
-	pass # TODO
+	for neighbor in neighbor_dict[0]:
+		for i in range(0, num_samples):
+			pos = messages_next[neighbor][0].pos[i]
+			dist2 = np.sum(np.asarray(pos, dtype=float) ** 2)
+			unary_weight = 1.0 / (1.0 + (10.0 * dist2))
+			messages_next[neighbor][0].weights[i] = messages_next[neighbor][0].weights[i] * unary_weight
+		messages_next[neighbor][0].weights = messages_next[neighbor][0].weights / np.sum(messages_next[neighbor][0].weights)
+
+	for i in range(0, num_points):
+		# First, update weights of every sample w_ts based on the unary potential
+		# Because we don't have a unary potential, we don't actually do this step!
+		pass
+		# ACTUALLY this is being done a few lines up
+
+		# Now, combine all incoming messages
+		s = i
+		neighbors = neighbor_dict[s][:]
+		num_neighbors = len(neighbors)
+		combined_message = Message(num_samples*num_neighbors, source_dim, target_dim)
+		for j in range(0, num_neighbors):
+			t = neighbors[j]
+			start = j*num_samples
+			stop = j*num_samples + num_samples
+			combined_message.pos[start:stop] = messages_next[t][s].pos[:]
+			combined_message.orien[start:stop] = messages_next[t][s].orien[:]
+			combined_message.weights[start:stop] = messages_next[t][s].weights[:]
+		combined_message.weights = combined_message.weights / sum(combined_message.weights) # Normalize
+
+		# Resample from combined_message to get the belief
+		message_inds = weightedSample(combined_message.weights, num_samples)
+		belief[i].pos = combined_message.pos[message_inds]
+		belief[i].orien = combined_message.orien[message_inds]
+		belief[i].weights = combined_message.weights[message_inds]
 
 	t1 = time.time()
 	belief_time = t1-t0
