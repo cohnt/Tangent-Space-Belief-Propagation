@@ -238,8 +238,19 @@ def weightMessage(m_next, m_prev, neighbor, current):
 	return weights
 
 def sampleNeighbor(pos, orien, neighbor, current):
-	pass # TODO
-	n_pos, n_orien = pos, orien
+	displacement_vec = points[neighbor] - points[current]
+	# We now want to project this displacement vector onto the subspace spanned by
+	# orien. Because we require orien to be orthonormal, we can use vector space
+	# projection as defined by http://mathworld.wolfram.com/VectorSpaceProjection.html
+	# For each basis_vec of orien, the component of displacement_vec along that component
+	# is given by <basis_vec, displacement_vec>. We can then add that to the position of
+	# the current node (pos) to get the predicted position of the neighbor
+	individual_components = np.zeros(target_dim)
+	for i in range(target_dim):
+		basis_vec = orien[i]
+		individual_components[i] = np.dot(basis_vec, displacement_vec)
+	n_pos = pos + individual_components
+	n_orien = orien
 	return n_pos, n_orien
 
 def weightUnary(pos, orien, idx):
