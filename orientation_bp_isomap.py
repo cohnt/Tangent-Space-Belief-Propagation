@@ -168,6 +168,7 @@ for key, value in neighbor_pair_list:
 # Message Passing #
 ###################
 from utils import weightedSample, list_mvn
+from scipy.linalg import subspace_angles
 
 class Belief():
 	def __init__(self, num_samples, source_dim, target_dim):
@@ -254,8 +255,24 @@ def sampleNeighbor(pos, orien, neighbor, current):
 	return n_pos, n_orien
 
 def weightUnary(pos, orien, idx):
-	pass # TODO
-	return 1.0 / num_samples
+	weight_unary = 1.0
+	if idx == 0:
+		# The point at index 0 is fixed at the origin of the projected space, so
+		# that there will actually be a single ground truth (in theory).
+		dist2 = np.sum(np.asarray(pos, dtype=float) ** 2)
+		weight_unary = 1.0 / (1.0 + (10.0 * dist2))
+
+	# Now, we compute the principal angles between the observation (via PCA on the
+	# neighborhood), and our prediction. We use scipy.linalg.subspace_angles. This
+	# function expects that the inputs will be matrices, with the basis vectors as
+	# columns. orien is stored as a list of basis vectors (read: rows), so we have
+	# to transpose it. The same is true for the observation
+	principal_angles = subspace_angles(orien.transpose(), observations[i].transpose())
+	total_angle_error = np.sum(principal_angles)
+	angle_weight = 1.0 / (1.0 + total_angle_error)
+
+	weight_unary = weight_unary * angle_weight
+	return weight_unary
 
 def weightPrior(pos, orien, m_prev, neighbor_neighbor, neighbor, current):
 	u = neighbor_neighbor
