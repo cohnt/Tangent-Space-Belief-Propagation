@@ -267,7 +267,7 @@ def weightUnary(pos, orien, idx):
 	# function expects that the inputs will be matrices, with the basis vectors as
 	# columns. orien is stored as a list of basis vectors (read: rows), so we have
 	# to transpose it. The same is true for the observation
-	principal_angles = subspace_angles(orien.transpose(), observations[i].transpose())
+	principal_angles = subspace_angles(orien.transpose(), observations[idx].transpose())
 	total_angle_error = np.sum(principal_angles)
 	angle_weight = 1.0 / (1.0 + total_angle_error)
 
@@ -292,8 +292,8 @@ def weightPrior(pos_s, orien_s, m_prev, neighbor_neighbor, neighbor, current):
 		orien_weight = 1.0 / (1.0 + np.sum(principal_angles))
 
 		# We have a relation between the orientations and predicted positions of adjacent nodes
-		d_st = np.sum((pos_t - projSubspace(orien_t, pos_s)) ** 2)
-		d_ts = np.sum((pos_s - projSubspace(orien_s, pos_t)) ** 2)
+		d_st = np.sum((pos_t - projSubspace(orien_t, points[s])) ** 2)
+		d_ts = np.sum((pos_s - projSubspace(orien_s, points[t])) ** 2)
 		distance_weight = 1.0 / (1.0 + ((d_st + d_ts) / 2.0))
 
 		weight_4tuplewise = orien_weight * distance_weight
