@@ -212,7 +212,7 @@ def weightMessage(m_next, m_prev, neighbor, current):
 			weights_from_priors = np.zeros(num_neighbors)
 			for j in range(num_neighbors):
 				u = neighbors[j]
-				weights_from_priors[j] = weightPrior(pos_t, orien_t, m_prev, u, t, s)
+				weights_from_priors[j] = weightPrior(pos_t, orien_t, m_prev, u, t)
 			weights_prior[i] = np.prod(weights_from_priors)
 
 	# Finally, we normalize the weights. We have to check that we don't have all weights zero. This
@@ -274,13 +274,11 @@ def weightUnary(pos, orien, idx):
 	weight_unary = weight_unary * angle_weight
 	return weight_unary
 
-def weightPrior(pos, orien, m_prev, neighbor_neighbor, neighbor, current):
+def weightPrior(pos, orien, m_prev, neighbor_neighbor, neighbor):
 	u = neighbor_neighbor
 	t = neighbor
-	s = current
 	# Use m_u->t to help weight m_t->s. Really, we're just worried about weighting
-	# a given sample right now, based on m_u->t from a previous iteration. s isn't
-	# even used, but it's here anyways.
+	# a given sample right now, based on m_u->t from a previous iteration.
 	pass # TODO
 	return 1.0 / num_samples
 
