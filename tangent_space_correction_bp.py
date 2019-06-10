@@ -9,7 +9,7 @@ num_iters = 100     # Number of iterations of the message passing algorithm to r
 neighbors_k = 4    # The value of 'k' used for k-nearest-neighbors
 num_points = 25    # Number of data points
 data_noise = 0 # How much noise is added to the data
-num_samples = 5   # Numbers of samples used in the belief propagation algorithm
+num_samples = 25   # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1      # The number of dimensions the data is being reduced to
@@ -263,6 +263,16 @@ def weightPrior(ts_s, m_prev, neighbor_neighbor, neighbor, current):
 		weight_prior = weight_prior + (m_prev[u][t].weights[i] * weight)
 	return weight_prior
 
+def noisifyTS(ts):
+	theta = np.random.uniform(-10, 10) * np.pi / 180.0
+	rotMat = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
+	return np.array([np.dot(rotMat, ts[0])])
+
+def noisifyTSList(ts_list):
+	for i in range(len(ts_list)):
+		ts_list[i] = noisifyTS(ts_list[i])
+	return ts_list
+
 for iter_num in range(1, num_iters+1):
 	write("\nIteration %d\n" % iter_num)
 
@@ -324,7 +334,7 @@ for iter_num in range(1, num_iters+1):
 			# by resampling from the belief of the previous iteration, with a little added noise.
 			num_samples_left = num_samples - end_rand_ind
 			belief_inds = weightedSample(belief[s].weights, num_samples_left) # Importance sampling by weight
-			messages_next[t][s].ts[end_rand_ind:num_samples] = belief[s].ts[belief_inds] # Don't add any noise to the orientation (yet)
+			messages_next[t][s].ts[end_rand_ind:num_samples] = noisifyTSList(belief[s].ts[belief_inds]) # Don't add any noise to the orientation (yet)
 			messages_next[t][s].weights[end_rand_ind:num_samples] = 1.0 / num_samples
 
 	# Weight messages based on their neighbors. If it's the first iteration, then no weighting is performed.
