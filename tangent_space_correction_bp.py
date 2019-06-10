@@ -391,3 +391,27 @@ for iter_num in range(1, num_iters+1):
 	t1 = time.time()
 	belief_time = t1-t0
 	write("Done! dt=%f\n" % belief_time)
+
+	################
+	# Write Images #
+	################
+	write("Writing images...")
+	flush()
+	t0 = time.time()
+
+	mle_bases = np.zeros((num_points, target_dim, source_dim))
+	for i in range(num_points):
+		max_ind = np.argmax(belief[i].weights)
+		mle_bases[i] = belief[i].ts[max_ind]
+
+	fig, ax = plt.subplots()
+	plot_pca_2d(points, color, mle_bases, ax, point_size=1, point_line_width=0.1, line_width=0.1, line_length=0.05)
+	plt.savefig(output_dir + ("ts_mle_iter%d.svg" % iter_num))
+	plt.close(fig)
+
+	t1 = time.time()
+	image_time = t1-t0
+	write("Done! dt=%f\n" % image_time)
+
+	total_time = message_time + belief_time + image_time
+	write("Total iteration time: %f\n" % total_time)
