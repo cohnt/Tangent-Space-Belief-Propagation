@@ -123,7 +123,7 @@ flush()
 #######################
 # Initialize Messages #
 #######################
-from utils import randomBasis
+from scipy.stats import special_ortho_group
 
 class Message():
 	def __init__(self, num_samples, source_dim, target_dim):
@@ -140,7 +140,7 @@ def randomTangentSpace(num_samples, source_dim, target_dim):
 	# the higher dimensional space of dimension source_dim
 	ts = np.zeros((num_samples, target_dim, source_dim))
 	for i in range(num_samples):
-		ts[i][:] = randomBasis(source_dim)[0:target_dim];
+		ts[i][:] = special_ortho_group.rvs(dim=source_dim)[0:target_dim]
 	return ts
 
 # This initializes messages_prev and messages_next as num_points by num_points arrays of Nones.
