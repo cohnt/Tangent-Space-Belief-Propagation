@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import time
 import sys
 import copy
+from joblib import Parallel, delayed
 from utils import write, flush
 
 num_iters = 25     # Number of iterations of the message passing algorithm to run
@@ -134,7 +135,7 @@ class Message():
 		self.ts = np.zeros((num_samples, target_dim, source_dim))
 		self.weights = np.zeros(num_samples)
 
-def randomTangentSpace(num_samples, source_dim, target_dim):
+def randomTangentSpaceList(num_samples, source_dim, target_dim):
 	# Return a random list of size target_dim orthonormal vectors in source_dim.
 	# This represents the basis of a random subspace of dimension target_dim in
 	# the higher dimensional space of dimension source_dim
@@ -151,7 +152,7 @@ for key, value in neighbor_pair_list:
 	# Note that key represents where the message is coming from and value represents where the message is going to
 	# In other words, messages[key][value] === m_key->value
 	messages_prev[key][value] = Message(num_samples, source_dim, target_dim)
-	messages_prev[key][value].ts = randomTangentSpace(num_samples, source_dim, target_dim)
+	messages_prev[key][value].ts = randomTangentSpaceList(num_samples, source_dim, target_dim)
 	messages_prev[key][value].weights = np.zeros(num_samples) + (1.0 / num_samples) # Evenly weight each sample for now
 
 	# We don't initialize any values into messages_next
@@ -327,8 +328,7 @@ for iter_num in range(1, num_iters+1):
 			# If explore_perc is so small (or just zero) that the number of random samples
 			# is 0, then we don't need to do this step.
 			if this_section_num_samples > 0:
-				for i in range(start_ind, end_rand_ind):
-					messages_next[t][s].ts[i] = randomTangentSpace(this_section_num_samples, source_dim, target_dim)
+				messages_next[t][s].ts[start_ind:end_rand_ind] = randomTangentSpaceList(this_section_num_samples, source_dim, target_dim)
 				messages_next[t][s].weights[start_ind:end_rand_ind] = 1.0 / num_samples
 
 			# Finally, we generate the remaining samples (i.e. the interval [end_rand_in, num_samples))
