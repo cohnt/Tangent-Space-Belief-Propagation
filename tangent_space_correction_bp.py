@@ -5,7 +5,7 @@ import sys
 import copy
 from utils import write, flush
 
-num_iters = 100     # Number of iterations of the message passing algorithm to run
+num_iters = 25     # Number of iterations of the message passing algorithm to run
 neighbors_k = 4    # The value of 'k' used for k-nearest-neighbors
 num_points = 25    # Number of data points
 data_noise = 0 # How much noise is added to the data
@@ -327,7 +327,8 @@ for iter_num in range(1, num_iters+1):
 			# If explore_perc is so small (or just zero) that the number of random samples
 			# is 0, then we don't need to do this step.
 			if this_section_num_samples > 0:
-				messages_next[t][s].ts[start_ind:end_rand_ind] = randomTangentSpace(this_section_num_samples, source_dim, target_dim)
+				for i in range(start_ind, end_rand_ind):
+					messages_next[t][s].ts[i] = randomTangentSpace(this_section_num_samples, source_dim, target_dim)
 				messages_next[t][s].weights[start_ind:end_rand_ind] = 1.0 / num_samples
 
 			# Finally, we generate the remaining samples (i.e. the interval [end_rand_in, num_samples))
