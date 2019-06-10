@@ -5,10 +5,10 @@ import sys
 import copy
 from utils import write, flush
 
-num_iters = 2     # Number of iterations of the message passing algorithm to run
+num_iters = 100     # Number of iterations of the message passing algorithm to run
 neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
 num_points = 500    # Number of data points
-data_noise = 0.00001 # How much noise is added to the data
+data_noise = 0.0001 # How much noise is added to the data
 num_samples = 25   # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
@@ -25,27 +25,27 @@ write("\n")
 ################
 # from datasets.dim_2.arc_curve import make_arc_curve
 # # from datasets.dim_2.s_curve import make_s_curve
-# # from datasets.dim_2.o_curve import make_o_curve
-
-# write("Generating dataset...")
-# flush()
-# t0 = time.time()
-# points, color = make_arc_curve(num_points, data_noise)
-# t1 = time.time()
-# write("Done! dt=%f\n" % (t1-t0))
-# flush()
+from datasets.dim_2.o_curve import make_o_curve
 
 write("Generating dataset...")
 flush()
 t0 = time.time()
-points = np.array([[0, 0], [1, 1], [2, 2.5], [3, 4], [4, 4.5], [5, 7]])
-color = np.array([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
+points, color = make_o_curve(num_points, data_noise)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
-num_points = 6
-neighbors_k = 3
+# write("Generating dataset...")
+# flush()
+# t0 = time.time()
+# points = np.array([[0, 0], [1, 1], [2, 2.5], [3, 4], [4, 4.5], [5, 7]])
+# color = np.array([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
+# t1 = time.time()
+# write("Done! dt=%f\n" % (t1-t0))
+# flush()
+
+# num_points = 6
+# neighbors_k = 3
 
 #######################
 # k-Nearest-Neighbors #
@@ -456,6 +456,8 @@ for iter_num in range(1, num_iters+1):
 
 	from visualization.plot_belief import plot_belief_1d, plot_mle_1d, plot_mean_1d
 	from visualization.plot_message import plot_message_1d
+	from matplotlib.collections import LineCollection
+	from mpl_toolkits.mplot3d.art3d import Line3DCollection
 
 	fig, ax = plt.subplots()
 	plot_belief_1d(belief, 0, ax, show_mle=True, show_mean=True)
@@ -490,6 +492,27 @@ for iter_num in range(1, num_iters+1):
 	fig, ax = plt.subplots()
 	plot_message_1d(messages_next, 2, 1, ax)
 	plt.savefig(output_dir + ("m2-1_iter%d.svg" % iter_num))
+	plt.close(fig)
+
+	point_size=3
+	point_line_width=0.5
+	line_width=0.25
+	line_length=0.25
+	line_color="black"
+
+	fig, ax = plt.subplots()
+	coordinates = np.zeros((num_points*num_samples, 2, 2))
+	for i in range(num_points):
+		for j in range(num_samples):
+			c_idx = i*num_points + j
+			coordinates[c_idx][0][0] = points[i][0]
+			coordinates[c_idx][0][1] = points[i][1]
+			coordinates[c_idx][1][0] = points[i][0] + (line_length * belief[i].orien[j][0][0])
+			coordinates[c_idx][1][1] = points[i][1] + (line_length * belief[i].orien[j][0][1])
+	ax.scatter(points[:,0], points[:,1], c=color, cmap=plt.cm.Spectral, s=point_size**2, zorder=2, linewidth=point_line_width)
+	lines = LineCollection(coordinates, color=line_color, linewidths=line_width)
+	ax.add_collection(lines)
+	plt.savefig(output_dir + ("orien_iter%d.svg" % iter_num))
 	plt.close(fig)
 
 	t1 = time.time()
