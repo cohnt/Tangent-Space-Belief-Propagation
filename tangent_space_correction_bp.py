@@ -313,6 +313,7 @@ def resampleMessage(t, s):
 	messages_next[t][s].ts[end_rand_ind:num_samples] = noisifyTSList(belief[s].ts[belief_inds]) # Don't add any noise to the orientation (yet)
 	messages_next[t][s].weights[end_rand_ind:num_samples] = 1.0 / num_samples
 
+parallel = Parallel(n_jobs=-1, verbose=10, backend="threading")
 for iter_num in range(1, num_iters+1):
 	write("\nIteration %d\n" % iter_num)
 
@@ -324,7 +325,7 @@ for iter_num in range(1, num_iters+1):
 	##################
 	# Message Update #
 	##################
-	write("Performing message update...")
+	write("Performing message update...\n")
 	flush()
 	t0 = time.time()
 
@@ -340,15 +341,17 @@ for iter_num in range(1, num_iters+1):
 			# We will update m_t->s
 			resampleMessage(t, s)
 
-
 	# Weight messages based on their neighbors. If it's the first iteration, then no weighting is performed.
 	if iter_num != 1:
-		raw_weights = np.zeros((num_messages, num_samples))
-		for i in range(0, num_messages):
-			t = neighbor_pair_list[i][0]
-			s = neighbor_pair_list[i][1]
-			# Weight m_t->s
-			raw_weights[i][:] = weightMessage(messages_next, messages_prev, t, s)
+		# raw_weights = np.zeros((num_messages, num_samples))
+		# for i in range(0, num_messages):
+		# 	t = neighbor_pair_list[i][0]
+		# 	s = neighbor_pair_list[i][1]
+		# 	# Weight m_t->s
+		# 	raw_weights[i][:] = weightMessage(messages_next, messages_prev, t, s)
+
+		raw_weights = np.asarray(parallel(delayed(weightMessage)(messages_next, messages_prev, neighbor_pair_list[i][0], neighbor_pair_list[i][1]) for i in range(num_messages)))
+
 		# Normalize for each message (each row is for a message, so we sum along axis 1)
 		raw_weights = raw_weights / raw_weights.sum(axis=1, keepdims=True)
 		# Assign weights to the samples in messages_next
