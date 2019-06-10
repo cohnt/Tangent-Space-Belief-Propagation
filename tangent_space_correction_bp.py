@@ -151,7 +151,7 @@ for key, value in neighbor_pair_list:
 	# Note that key represents where the message is coming from and value represents where the message is going to
 	# In other words, messages[key][value] === m_key->value
 	messages_prev[key][value] = Message(num_samples, source_dim, target_dim)
-	messages_prev[key][value].ts = randomTangentSpace(num_samples, source_dim, target_dim, observations[key])
+	messages_prev[key][value].ts = randomTangentSpace(num_samples, source_dim, target_dim)
 	messages_prev[key][value].weights = np.zeros(num_samples) + (1.0 / num_samples) # Evenly weight each sample for now
 
 	# We don't initialize any values into messages_next
@@ -191,9 +191,9 @@ def weightMessage(m_next, m_prev, neighbor, current):
 
 	for i in range(num_samples):
 		ts_s = m_next[t][s].ts[i]
-		ts_t = sampleNeighbor(pos_s, ts_s, t, s)
+		ts_t = sampleNeighbor(ts_s, t, s)
 
-		weights_unary[i] = weightUnary(pos_t, ts_t, t)
+		weights_unary[i] = weightUnary(ts_t, t)
 
 		if num_neighbors > 0:
 			# Since we're doing k-nearest neighbors, this is always true. But if we used another
@@ -355,14 +355,6 @@ for iter_num in range(1, num_iters+1):
 	write("Performing belief update...")
 	flush()
 	t0 = time.time()
-
-	for neighbor in neighbor_dict[0]:
-		for i in range(0, num_samples):
-			pos = messages_next[neighbor][0].pos[i]
-			dist2 = np.sum(np.asarray(pos, dtype=float) ** 2)
-			unary_weight = 1.0 / (1.0 + (10.0 * dist2))
-			messages_next[neighbor][0].weights[i] = messages_next[neighbor][0].weights[i] * unary_weight
-		messages_next[neighbor][0].weights = messages_next[neighbor][0].weights / np.sum(messages_next[neighbor][0].weights)
 
 	for i in range(0, num_points):
 		# First, update weights of every sample w_ts based on the unary potential
