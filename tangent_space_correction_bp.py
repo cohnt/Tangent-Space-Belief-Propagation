@@ -344,3 +344,50 @@ for iter_num in range(1, num_iters+1):
 			messages_next[t][s].weights = raw_weights[i][:]
 
 	messages_prev = copy.deepcopy(messages_next)
+
+	t1 = time.time()
+	message_time = t1-t0
+	write("Done! dt=%f\n" % message_time)
+
+	#################
+	# Belief Update #
+	#################
+	write("Performing belief update...")
+	flush()
+	t0 = time.time()
+
+	for neighbor in neighbor_dict[0]:
+		for i in range(0, num_samples):
+			pos = messages_next[neighbor][0].pos[i]
+			dist2 = np.sum(np.asarray(pos, dtype=float) ** 2)
+			unary_weight = 1.0 / (1.0 + (10.0 * dist2))
+			messages_next[neighbor][0].weights[i] = messages_next[neighbor][0].weights[i] * unary_weight
+		messages_next[neighbor][0].weights = messages_next[neighbor][0].weights / np.sum(messages_next[neighbor][0].weights)
+
+	for i in range(0, num_points):
+		# First, update weights of every sample w_ts based on the unary potential
+		# Because we don't have a unary potential, we don't actually do this step!
+		pass
+		# ACTUALLY this is being done a few lines up
+
+		# Now, combine all incoming messages
+		s = i
+		neighbors = neighbor_dict[s][:]
+		num_neighbors = len(neighbors)
+		combined_message = Message(num_samples*num_neighbors, source_dim, target_dim)
+		for j in range(0, num_neighbors):
+			t = neighbors[j]
+			start = j*num_samples
+			stop = j*num_samples + num_samples
+			combined_message.ts[start:stop] = messages_next[t][s].ts[:]
+			combined_message.weights[start:stop] = messages_next[t][s].weights[:]
+		combined_message.weights = combined_message.weights / sum(combined_message.weights) # Normalize
+
+		# Resample from combined_message to get the belief
+		message_inds = weightedSample(combined_message.weights, num_samples)
+		belief[i].ts = combined_message.ts[message_inds]
+		belief[i].weights = combined_message.weights[message_inds]
+
+	t1 = time.time()
+	belief_time = t1-t0
+	write("Done! dt=%f\n" % belief_time)
