@@ -262,3 +262,85 @@ def weightPrior(ts_s, m_prev, neighbor_neighbor, neighbor, current):
 
 		weight_prior = weight_prior + (m_prev[u][t].weights[i] * weight)
 	return weight_prior
+
+for iter_num in range(1, num_iters+1):
+	write("\nIteration %d\n" % iter_num)
+
+	message_time = 0
+	belief_time = 0
+	image_time = 0
+	total_time = 0
+
+	##################
+	# Message Update #
+	##################
+	write("Performing message update...")
+	flush()
+	t0 = time.time()
+
+	if iter_num == 1:
+		messages_next = copy.deepcopy(messages_prev)
+	else:
+		# Resample messages from previous belief using importance sampling. The key function used here
+		# is weightedSample, from utils.py, uses stratified resampling, a resampling method common for
+		# particle filters and similar probabilistic methods.
+		for neighbor_pair in neighbor_pair_list:
+			t = neighbor_pair[0]
+			s = neighbor_pair[1]
+			# We will update m_t->s
+
+			start_ind = 0
+			max_weight_ind = np.argmax(belief[s].weights)
+			max_weight = belief[s].weights[max_weight_ind]
+			if max_weight != 1.0 / num_samples:
+				# Not all samples have the same weight, so we keep the highest weighted sample
+				start_ind = 1
+
+			# Note that we don't actually care about the weights we are assigning in this step, since
+			# all the samples will be properly weighted later on. In theory, we don't have to assign
+			# the samples weights at all, but it seems natural to at least give them the "default"
+			# weight of 1.0 / num_samples.
+
+			# If there is a best sample, keep it. In theory, this could be expanded to take the best
+			# n samples, with only a little modification. One could use argsort to sort the array, but
+			# this would be a pretty big performance hit. This stackoverflow answer suggests using
+			# argpartition instead: https://stackoverflow.com/a/23734295/
+			if start_ind == 1:
+				messages_next[t][s].ts[0:start_ind] = belief[s].ts[max_weight_ind][:]
+				messages_next[t][s].weights[0:start_ind] = 1.0 / num_samples
+
+			# Some samples will be randomly seeded across the state space. Specifically, the
+			# interval [start_ind, end_rand_in). This will be slightly less than explore_perc
+			# if a maximum weight value is kept from the previous iteration.
+			end_rand_ind = int(np.floor(num_samples * explore_perc))
+			this_section_num_samples = end_rand_ind - start_ind
+			# If explore_perc is so small (or just zero) that the number of random samples
+			# is 0, then we don't need to do this step.
+			if this_section_num_samples > 0:
+				messages_next[t][s].ts[start_ind:end_rand_ind] = randomTangentSpace(this_section_num_samples, source_dim, target_dim)
+				messages_next[t][s].weights[start_ind:end_rand_ind] = 1.0 / num_samples
+
+			# Finally, we generate the remaining samples (i.e. the interval [end_rand_in, num_samples))
+			# by resampling from the belief of the previous iteration, with a little added noise.
+			num_samples_left = num_samples - end_rand_ind
+			belief_inds = weightedSample(belief[s].weights, num_samples_left) # Importance sampling by weight
+			messages_next[t][s].ts[end_rand_ind:num_samples] = belief[s].ts[belief_inds] # Don't add any noise to the orientation (yet)
+			messages_next[t][s].weights[end_rand_ind:num_samples] = 1.0 / num_samples
+
+	# Weight messages based on their neighbors. If it's the first iteration, then no weighting is performed.
+	if iter_num != 1:
+		raw_weights = np.zeros((num_messages, num_samples))
+		for i in range(0, num_messages):
+			t = neighbor_pair_list[i][0]
+			s = neighbor_pair_list[i][1]
+			# Weight m_t->s
+			raw_weights[i][:] = weightMessage(messages_next, messages_prev, t, s)
+		# Normalize for each message (each row is for a message, so we sum along axis 1)
+		raw_weights = raw_weights / raw_weights.sum(axis=1, keepdims=True)
+		# Assign weights to the samples in messages_next
+		for i in range(0, num_messages):
+			t = neighbor_pair_list[i][0]
+			s = neighbor_pair_list[i][1]
+			messages_next[t][s].weights = raw_weights[i][:]
+
+	messages_prev = copy.deepcopy(messages_next)
