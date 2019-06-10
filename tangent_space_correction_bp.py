@@ -142,3 +142,17 @@ def randomTangentSpace(num_samples, source_dim, target_dim):
 	for i in range(num_samples):
 		ts[i][:] = randomBasis(source_dim)[0:target_dim];
 	return ts
+
+# This initializes messages_prev and messages_next as num_points by num_points arrays of Nones.
+# Where appropriate, the Nones will be replaced by Message objects
+messages_prev = [[None for __ in range(num_points)] for _ in range(num_points)]
+messages_next = [[None for __ in range(num_points)] for _ in range(num_points)]
+for key, value in neighbor_pair_list:
+	# Note that key represents where the message is coming from and value represents where the message is going to
+	# In other words, messages[key][value] === m_key->value
+	messages_prev[key][value] = Message(num_samples, source_dim, target_dim)
+	messages_prev[key][value].ts = randomTangentSpace(num_samples, source_dim, target_dim, observations[key])
+	messages_prev[key][value].weights = np.zeros(num_samples) + (1.0 / num_samples) # Evenly weight each sample for now
+
+	# We don't initialize any values into messages_next
+	messages_next[key][value] = Message(num_samples, source_dim, target_dim)
