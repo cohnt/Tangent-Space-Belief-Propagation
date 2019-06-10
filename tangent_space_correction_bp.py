@@ -139,7 +139,10 @@ def randomTangentSpaceList(num_samples, source_dim, target_dim):
 	# Return a random list of size target_dim orthonormal vectors in source_dim.
 	# This represents the basis of a random subspace of dimension target_dim in
 	# the higher dimensional space of dimension source_dim
-	return np.asarray(Parallel(n_jobs=-1)(delayed(special_ortho_group.rvs)(dim=source_dim, random_state=np.random.randint(0,100000)) for _ in range(num_samples)))[:,0:target_dim]
+	ts = np.zeros((num_samples, target_dim, source_dim))
+	for i in range(num_samples):
+		ts[i][:] = special_ortho_group.rvs(dim=source_dim)[0:target_dim]
+	return ts
 
 # This initializes messages_prev and messages_next as num_points by num_points arrays of Nones.
 # Where appropriate, the Nones will be replaced by Message objects
