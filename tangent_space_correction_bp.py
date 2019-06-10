@@ -6,10 +6,10 @@ import copy
 from utils import write, flush
 
 num_iters = 100     # Number of iterations of the message passing algorithm to run
-neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
-num_points = 500    # Number of data points
-data_noise = 0.0001 # How much noise is added to the data
-num_samples = 25   # Numbers of samples used in the belief propagation algorithm
+neighbors_k = 4    # The value of 'k' used for k-nearest-neighbors
+num_points = 25    # Number of data points
+data_noise = 0 # How much noise is added to the data
+num_samples = 5   # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1      # The number of dimensions the data is being reduced to
