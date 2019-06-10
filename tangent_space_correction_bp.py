@@ -398,6 +398,7 @@ for iter_num in range(1, num_iters+1):
 	# Write Images #
 	################
 	from matplotlib.collections import LineCollection
+	from matplotlib.cm import coolwarm
 	write("Writing images...")
 	flush()
 	t0 = time.time()
@@ -416,14 +417,17 @@ for iter_num in range(1, num_iters+1):
 	ax.scatter(points[:,0], points[:,1], c=color, cmap=plt.cm.Spectral, s=1, zorder=2, linewidth=0.1)
 
 	coordinates = np.zeros((num_points*num_samples, 2, 2))
+	colors = np.zeros((num_points*num_samples, 4))
 	for i in range(num_points):
+		max_weight = np.max(belief[i].weights)
 		for j in range(num_samples):
 			c_idx = i*num_samples + j
 			coordinates[c_idx][0][0] = points[i][0]
 			coordinates[c_idx][0][1] = points[i][1]
 			coordinates[c_idx][1][0] = points[i][0] + (0.25 * belief[i].ts[j][0][0])
 			coordinates[c_idx][1][1] = points[i][1] + (0.25 * belief[i].ts[j][0][1])
-	lines = LineCollection(coordinates, color="black", linewidths=1)
+			colors[c_idx][:] = coolwarm(belief[i].weights[j] * (1.0 / max_weight))
+	lines = LineCollection(coordinates, color=colors, linewidths=1)
 	ax.add_collection(lines)
 	plt.savefig(output_dir + ("ts_bel_iter%d.svg" % iter_num))
 	plt.close(fig)
