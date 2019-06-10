@@ -387,6 +387,7 @@ for iter_num in range(1, num_iters+1):
 	################
 	# Write Images #
 	################
+	from matplotlib.collections import LineCollection
 	write("Writing images...")
 	flush()
 	t0 = time.time()
@@ -397,8 +398,24 @@ for iter_num in range(1, num_iters+1):
 		mle_bases[i] = belief[i].ts[max_ind]
 
 	fig, ax = plt.subplots()
-	plot_pca_2d(points, color, mle_bases, ax, point_size=1, point_line_width=0.1, line_width=0.1, line_length=0.05)
+	plot_pca_2d(points, color, mle_bases, ax, point_size=5, point_line_width=1., line_width=1, line_length=0.25)
 	plt.savefig(output_dir + ("ts_mle_iter%d.svg" % iter_num))
+	plt.close(fig)
+
+	fig, ax = plt.subplots()
+	ax.scatter(points[:,0], points[:,1], c=color, cmap=plt.cm.Spectral, s=1, zorder=2, linewidth=0.1)
+
+	coordinates = np.zeros((num_points*num_samples, 2, 2))
+	for i in range(num_points):
+		for j in range(num_samples):
+			c_idx = i*num_samples + j
+			coordinates[c_idx][0][0] = points[i][0]
+			coordinates[c_idx][0][1] = points[i][1]
+			coordinates[c_idx][1][0] = points[i][0] + (0.25 * belief[i].ts[j][0][0])
+			coordinates[c_idx][1][1] = points[i][1] + (0.25 * belief[i].ts[j][0][1])
+	lines = LineCollection(coordinates, color="black", linewidths=1)
+	ax.add_collection(lines)
+	plt.savefig(output_dir + ("ts_bel_iter%d.svg" % iter_num))
 	plt.close(fig)
 
 	t1 = time.time()
