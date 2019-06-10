@@ -12,6 +12,8 @@ data_noise = 0.0001 # How much noise is added to the data
 num_samples = 25   # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
+target_dim = 1      # The number of dimensions the data is being reduced to
+
 message_resample_cov = np.eye(target_dim) * 0.01 # TODO: Change
 
 output_dir = "results/"
@@ -118,3 +120,25 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
+#######################
+# Initialize Messages #
+#######################
+from utils import randomBasis
+
+class Message():
+	def __init__(self, num_samples, source_dim, target_dim):
+		# If num_samples=N and source_dim=n, and target_dim=m, then:
+		# self.ts is a list of ordered bases of m-dimensional (i.e. spanned by m
+		# unit vectors) subspaces in R^n, so it's of shape (N, m, n)
+		# self.weights is a list of weights, so it's of shape (N)
+		self.ts = np.zeros((num_samples, target_dim, source_dim))
+		self.weights = np.zeros(num_samples)
+
+def randomTangentSpace(num_samples, source_dim, target_dim):
+	# Return a random list of size target_dim orthonormal vectors in source_dim.
+	# This represents the basis of a random subspace of dimension target_dim in
+	# the higher dimensional space of dimension source_dim
+	ts = np.zeros((num_samples, target_dim, source_dim))
+	for i in range(num_samples):
+		ts[i][:] = randomBasis(source_dim)[0:target_dim];
+	return ts
