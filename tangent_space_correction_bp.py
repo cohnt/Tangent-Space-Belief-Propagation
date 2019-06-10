@@ -156,3 +156,20 @@ for key, value in neighbor_pair_list:
 
 	# We don't initialize any values into messages_next
 	messages_next[key][value] = Message(num_samples, source_dim, target_dim)
+
+###################
+# Message Passing #
+###################
+from utils import weightedSample, list_mvn, projSubspace
+from scipy.linalg import subspace_angles
+
+class Belief():
+	def __init__(self, num_samples, source_dim, target_dim):
+		# If num_samples=N and source_dim=n, and target_dim=m, then:
+		# self.ts is a list of ordered bases of m-dimensional (i.e. spanned by m
+		# unit vectors) subspaces in R^n, so it's of shape (N, m, n)
+		# self.weights is a list of weights, so it's of shape (N)
+		self.ts = np.zeros((num_samples, target_dim, source_dim))
+		self.weights = np.zeros(num_samples)
+
+belief = [Belief(num_samples, source_dim, target_dim) for _ in range(num_points)]
