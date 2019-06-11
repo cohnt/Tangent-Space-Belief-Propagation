@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import time
 import sys
@@ -7,9 +9,9 @@ from joblib import Parallel, delayed
 from utils import write, flush
 
 num_iters = 25     # Number of iterations of the message passing algorithm to run
-neighbors_k = 4    # The value of 'k' used for k-nearest-neighbors
-num_points = 25    # Number of data points
-data_noise = 0 # How much noise is added to the data
+neighbors_k = 8    # The value of 'k' used for k-nearest-neighbors
+num_points = 250    # Number of data points
+data_noise = 0.00001 # How much noise is added to the data
 num_samples = 5   # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
@@ -20,17 +22,18 @@ message_resample_cov = np.eye(target_dim) * 0.01 # TODO: Change
 output_dir = "results/"
 
 write("\n")
+
 ################
 # Load Dataset #
 ################
 from datasets.dim_2.arc_curve import make_arc_curve
-# from datasets.dim_2.s_curve import make_s_curve
-# from datasets.dim_2.o_curve import make_o_curve
+from datasets.dim_2.s_curve import make_s_curve
+from datasets.dim_2.o_curve import make_o_curve
 
 write("Generating dataset...")
 flush()
 t0 = time.time()
-points, color = make_arc_curve(num_points, data_noise)
+points, color = make_o_curve(num_points, data_noise)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
@@ -57,7 +60,7 @@ write("Saving nearest neighbors plot...")
 flush()
 t0 = time.time()
 fig, ax = plt.subplots()
-plot_neighbors_2d(points, color, neighbor_graph, ax, point_size=1, line_width=0.1, edge_thickness=0.1, show_labels=False)
+plot_neighbors_2d(points, color, neighbor_graph, ax, point_size=2, line_width=0.25, edge_thickness=0.5, show_labels=False)
 plt.savefig(output_dir + "nearest_neighbors.svg")
 plt.close(fig)
 t1 = time.time()
@@ -114,7 +117,7 @@ write("Saving PCA observations plot...")
 flush()
 t0 = time.time()
 fig, ax = plt.subplots()
-plot_pca_2d(points, color, observations, ax, point_size=1, point_line_width=0.1, line_width=0.1, line_length=0.05)
+plot_pca_2d(points, color, observations, ax, point_size=2, point_line_width=0.25, line_width=0.5, line_length=0.05)
 plt.savefig(output_dir + "pca_observations.svg")
 plt.close(fig)
 t1 = time.time()
@@ -239,9 +242,12 @@ def weightUnary(ts, idx):
 	# function expects that the inputs will be matrices, with the basis vectors as
 	# columns. ts is stored as a list of basis vectors (read: rows), so we have
 	# to transpose it. The same is true for the observation
-	principal_angles = subspace_angles(ts.transpose(), observations[idx].transpose())
-	total_angle_error = np.sum(principal_angles)
-	weight = 1.0 / (1.0 + total_angle_error)
+	# principal_angles = subspace_angles(ts.transpose(), observations[idx].transpose())
+	# total_angle_error = np.sum(principal_angles)
+	# weight = 1.0 / (1.0 + total_angle_error)
+
+	dprod = 1 - np.abs(np.dot(ts[0], observations[idx][0]))
+	weight = 1.0 / (1.0 + dprod)
 
 	return weight
 
@@ -258,8 +264,10 @@ def weightPrior(ts_s, m_prev, neighbor_neighbor, neighbor, current):
 		# weight_pairwise = 1/(1+dist2)
 		
 		# We have a relation between the orientations of adjacent nodes -- they should be similar
-		principal_angles = subspace_angles(ts_s.transpose(), ts_t.transpose())
-		weight = 1.0 / (1.0 + np.sum(principal_angles))
+		# principal_angles = subspace_angles(ts_s.transpose(), ts_t.transpose())
+		# weight = 1.0 / (1.0 + np.sum(principal_angles))
+		dprod = 1 - np.abs(np.dot(ts_s[0], ts_t[0]))
+		weight = 1.0 / (1.0 + dprod)
 
 		weight_prior = weight_prior + (m_prev[u][t].weights[i] * weight)
 	return weight_prior
@@ -416,12 +424,12 @@ for iter_num in range(1, num_iters+1):
 		mle_bases[i] = belief[i].ts[max_ind]
 
 	fig, ax = plt.subplots()
-	plot_pca_2d(points, color, mle_bases, ax, point_size=5, point_line_width=1., line_width=1, line_length=0.25)
+	plot_pca_2d(points, color, mle_bases, ax, point_size=2, point_line_width=0.25, line_width=0.5, line_length=0.05)
 	plt.savefig(output_dir + ("ts_mle_iter%d.svg" % iter_num))
 	plt.close(fig)
 
 	fig, ax = plt.subplots()
-	ax.scatter(points[:,0], points[:,1], c=color, cmap=plt.cm.Spectral, s=1, zorder=2, linewidth=0.1)
+	ax.scatter(points[:,0], points[:,1], c=color, cmap=plt.cm.Spectral, s=2**2, zorder=2, linewidth=0.25)
 
 	coordinates = np.zeros((num_points*num_samples, 2, 2))
 	colors = np.zeros((num_points*num_samples, 4))
@@ -431,10 +439,10 @@ for iter_num in range(1, num_iters+1):
 			c_idx = i*num_samples + j
 			coordinates[c_idx][0][0] = points[i][0]
 			coordinates[c_idx][0][1] = points[i][1]
-			coordinates[c_idx][1][0] = points[i][0] + (0.25 * belief[i].ts[j][0][0])
-			coordinates[c_idx][1][1] = points[i][1] + (0.25 * belief[i].ts[j][0][1])
+			coordinates[c_idx][1][0] = points[i][0] + (0.05 * belief[i].ts[j][0][0])
+			coordinates[c_idx][1][1] = points[i][1] + (0.05 * belief[i].ts[j][0][1])
 			colors[c_idx][:] = coolwarm(belief[i].weights[j] * (1.0 / max_weight))
-	lines = LineCollection(coordinates, color=colors, linewidths=1)
+	lines = LineCollection(coordinates, color=colors, linewidths=0.5)
 	ax.add_collection(lines)
 	plt.savefig(output_dir + ("ts_bel_iter%d.svg" % iter_num))
 	plt.close(fig)
