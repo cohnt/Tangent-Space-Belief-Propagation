@@ -425,7 +425,7 @@ for iter_num in range(1, num_iters+1):
 
 	fig, ax = plt.subplots()
 	plot_pca_2d(points, color, mle_bases, ax, point_size=2, point_line_width=0.25, line_width=0.5, line_length=0.05)
-	plt.savefig(output_dir + ("ts_mle_iter%d.svg" % iter_num))
+	plt.savefig(output_dir + ("ts_mle_iter%s.svg" % str(iter_num).zfill(4)))
 	plt.close(fig)
 
 	fig, ax = plt.subplots()
@@ -444,7 +444,7 @@ for iter_num in range(1, num_iters+1):
 			colors[c_idx][:] = coolwarm(belief[i].weights[j] * (1.0 / max_weight))
 	lines = LineCollection(coordinates, color=colors, linewidths=0.5)
 	ax.add_collection(lines)
-	plt.savefig(output_dir + ("ts_bel_iter%d.svg" % iter_num))
+	plt.savefig(output_dir + ("ts_bel_iter%s.svg" % str(iter_num).zfill(4)))
 	plt.close(fig)
 
 	t1 = time.time()
