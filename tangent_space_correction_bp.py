@@ -12,7 +12,7 @@ num_iters = 25     # Number of iterations of the message passing algorithm to ru
 neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
 num_points = 250    # Number of data points
 data_noise = 0.00025 # How much noise is added to the data
-num_samples = 10   # Numbers of samples used in the belief propagation algorithm
+num_samples = 5   # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1      # The number of dimensions the data is being reduced to
@@ -88,6 +88,9 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
+write("Number of points: %d\n" % num_points)
+write("Number of edges: %d\n" % len(neighbor_pair_list))
+
 ###############
 # Measure PCA #
 ###############
@@ -147,6 +150,16 @@ def randomTangentSpaceList(num_samples, source_dim, target_dim):
 		ts[i][:] = special_ortho_group.rvs(dim=source_dim)[0:target_dim]
 	return ts
 
+def noisifyTS(ts, var):
+	theta = np.random.normal(0, var) * np.pi / 180.0
+	rotMat = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
+	return np.array([np.dot(rotMat, ts[0])])
+
+def noisifyTSList(ts_list, var=5):
+	for i in range(len(ts_list)):
+		ts_list[i] = noisifyTS(ts_list[i], var)
+	return ts_list
+
 # This initializes messages_prev and messages_next as num_points by num_points arrays of Nones.
 # Where appropriate, the Nones will be replaced by Message objects
 messages_prev = [[None for __ in range(num_points)] for _ in range(num_points)]
@@ -155,7 +168,8 @@ for key, value in neighbor_pair_list:
 	# Note that key represents where the message is coming from and value represents where the message is going to
 	# In other words, messages[key][value] === m_key->value
 	messages_prev[key][value] = Message(num_samples, source_dim, target_dim)
-	messages_prev[key][value].ts = randomTangentSpaceList(num_samples, source_dim, target_dim)
+	# messages_prev[key][value].ts = randomTangentSpaceList(num_samples, source_dim, target_dim)
+	messages_prev[key][value].ts = noisifyTSList(np.repeat([observations[value]], num_samples, axis=0), var=30)
 	messages_prev[key][value].weights = np.zeros(num_samples) + (1.0 / num_samples) # Evenly weight each sample for now
 
 	# We don't initialize any values into messages_next
@@ -278,16 +292,6 @@ def weightPrior(ts_s, m_prev, neighbor_neighbor, neighbor, current):
 
 		weight_prior = weight_prior + (m_prev[u][t].weights[i] * weight)
 	return weight_prior
-
-def noisifyTS(ts, var):
-	theta = np.random.normal(0, var) * np.pi / 180.0
-	rotMat = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
-	return np.array([np.dot(rotMat, ts[0])])
-
-def noisifyTSList(ts_list, var=5):
-	for i in range(len(ts_list)):
-		ts_list[i] = noisifyTS(ts_list[i], var)
-	return ts_list
 
 def compareSubspaces(basis1, basis2):
 	total = 0
