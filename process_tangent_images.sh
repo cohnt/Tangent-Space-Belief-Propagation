@@ -2,7 +2,7 @@ mkdir svg;
 mkdir png;
 mkdir gif;
 
-for file in *.svg; do inkscape -z -e ${file%svg}png -w 1920 $file; done
+for file in *.svg; do inkscape -z -e ${file%svg}png -h 1080 $file; done
 
 mv *.png png
 mv *.svg svg
