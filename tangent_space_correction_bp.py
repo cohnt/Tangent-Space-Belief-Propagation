@@ -246,8 +246,11 @@ def weightUnary(ts, idx):
 	# total_angle_error = np.sum(principal_angles)
 	# weight = 1.0 / (1.0 + total_angle_error)
 
-	dprod = 1 - np.abs(np.dot(ts[0], observations[idx][0]))
-	weight = 1.0 / (1.0 + dprod)
+	# dprod = 1 - np.abs(np.dot(ts[0], observations[idx][0]))
+	# weight = 1.0 / (1.0 + dprod)
+
+	dist = compareSubspaces(ts, observations[idx])
+	weight = 1.0 / (1.0 + dist)
 
 	return weight
 
@@ -266,8 +269,12 @@ def weightPrior(ts_s, m_prev, neighbor_neighbor, neighbor, current):
 		# We have a relation between the orientations of adjacent nodes -- they should be similar
 		# principal_angles = subspace_angles(ts_s.transpose(), ts_t.transpose())
 		# weight = 1.0 / (1.0 + np.sum(principal_angles))
-		dprod = 1 - np.abs(np.dot(ts_s[0], ts_t[0]))
-		weight = 1.0 / (1.0 + dprod)
+		
+		# dprod = 1 - np.abs(np.dot(ts_s[0], ts_t[0]))
+		# weight = 1.0 / (1.0 + dprod)
+
+		dist = compareSubspaces(ts_s, ts_t)
+		weight = 1.0 / (1.0 + dist)
 
 		weight_prior = weight_prior + (m_prev[u][t].weights[i] * weight)
 	return weight_prior
@@ -281,6 +288,14 @@ def noisifyTSList(ts_list, var=5):
 	for i in range(len(ts_list)):
 		ts_list[i] = noisifyTS(ts_list[i], var)
 	return ts_list
+
+def compareSubspaces(basis1, basis2):
+	total = 0
+	for vec in basis1:
+		p_vec = projSubspace(basis2, vec)
+		diff = vec - p_vec
+		total = total + np.dot(diff, diff)
+	return total
 
 def resampleMessage(t, s):
 	start_ind = 0
