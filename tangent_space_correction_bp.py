@@ -38,6 +38,17 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
+write("Saving dataset plot...")
+flush()
+t0 = time.time()
+fig, ax = plt.subplots()
+ax.scatter(points[:,0], points[:,1], c=color, cmap=plt.cm.Spectral, s=2**2, zorder=2, linewidth=0.25)
+plt.savefig(output_dir + "dataset.svg")
+plt.close(fig)
+t1 = time.time()
+write("Done! dt%f\n" % (t1-t0))
+flush()
+
 #######################
 # k-Nearest-Neighbors #
 #######################
