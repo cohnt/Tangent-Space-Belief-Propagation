@@ -33,7 +33,7 @@ from datasets.dim_2.o_curve import make_o_curve
 write("Generating dataset...")
 flush()
 t0 = time.time()
-points, color = make_o_curve(num_points, data_noise)
+points, color, ts = make_o_curve(num_points, data_noise)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
@@ -55,6 +55,7 @@ flush()
 #######################
 from sklearn.neighbors import kneighbors_graph
 from visualization.plot_neighbors import plot_neighbors_2d
+from visualization.plot_pca import plot_pca_2d
 
 write("Computing nearest neighbors...")
 flush()
@@ -75,6 +76,17 @@ fig, ax = plt.subplots()
 plot_neighbors_2d(points, color, neighbor_graph, ax, point_size=2, line_width=0.25, edge_thickness=0.5, show_labels=False)
 ax.set_title("Nearest Neighbors (k=%d)" % neighbors_k)
 plt.savefig(output_dir + "nearest_neighbors.svg")
+plt.close(fig)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+write("Saving ground truth tangent plot...")
+flush()
+t0 = time.time()
+fig, ax = plt.subplots()
+plot_pca_2d(points, color, ts, ax, point_size=2, point_line_width=0.25, line_width=0.5, line_length=0.05)
+plt.savefig(output_dir + "true_tangents.svg")
 plt.close(fig)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
@@ -108,7 +120,6 @@ write("Number of edges: %d\n" % len(neighbor_pair_list))
 # Measure PCA #
 ###############
 from sklearn.decomposition import PCA
-from visualization.plot_pca import plot_pca_2d
 
 # n_components is the number of principal components pca will compute
 pca = PCA(n_components=target_dim)
