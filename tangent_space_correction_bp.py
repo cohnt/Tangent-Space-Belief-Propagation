@@ -521,9 +521,9 @@ try:
 		flush()
 		t0 = time.time()
 
-		max_errors = np.array(max_errors)
-		mean_errors = np.array(mean_errors)
-		median_errors = np.array(median_errors)
+		# max_errors = np.array(max_errors)
+		# mean_errors = np.array(mean_errors)
+		# median_errors = np.array(median_errors)
 
 		raw_max_error, raw_mean_error, raw_median_error = evalError(true_tangents, observations)
 		iters_array = np.arange(1, len(max_errors)+1)
