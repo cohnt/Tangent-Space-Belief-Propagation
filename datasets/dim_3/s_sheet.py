@@ -17,11 +17,26 @@ def make_s_sheet(n_samples, noise_factor):
 	sUpperBound = 1.0
 	tLowerBound = 3.0 * np.pi / 4.0
 	tUpperBound = 9.0 * np.pi / 4.0
-	
+
+	# For computing the Jacobian, we have
+	# dx/dt = cos(t)cos(t) - sin(t)sin(t)
+	# dy/dt = -0.5sin(t)
+	# dz/dt = 0
+	# 
+	# dx/ds = 0
+	# dy/ds = 0
+	# dz/ds = 1
+
 	s = np.random.uniform(sLowerBound, sUpperBound, n_samples)
 	t = np.random.uniform(tLowerBound, tUpperBound, n_samples)
 	data = np.array([0.5 + np.multiply(np.sin(t), np.cos(t)), 0.5 + (0.5 * np.cos(t)), s]).transpose()
 	# data.shape will be (n_samples, 3), so we can interpret it as a list of n_samples 3D points
+	ts = np.array([[(np.cos(t) ** 2) - (np.sin(t) ** 2), -0.5 * np.sin(t), np.full(t.shape, 0)], [np.full(t.shape, 0), np.full(t.shape, 0), np.full(t.shape, 1)]])
+	# ts is currently of shape (2, 3, n_samples)
+	ts = ts.transpose()
+	# ts is currently of shape (n_samples, 3, 2)
+	ts = np.swapaxes(ts, 1, 2)
+	# ts is finally of shape (n_samples, 2, 3)
 
 	# Add Gaussian noise to the samples
 	mean = [0, 0, 0]
@@ -32,12 +47,12 @@ def make_s_sheet(n_samples, noise_factor):
 
 	color = (t - tLowerBound) / (tUpperBound - tLowerBound)
 
-	return (data + noise, color)
+	return (data + noise, color, ts)
 
 if __name__ == "__main__":
 	from mpl_toolkits.mplot3d import Axes3D
 	import matplotlib.pyplot as plt
-	data, color = make_s_sheet(500, 0.001)
+	data, color, ts = make_s_sheet(500, 0.001)
 	fig = plt.figure()
 	ax = fig.add_subplot(111, projection='3d')
 	ax.scatter(data[:,0], data[:,1], data[:,2], c=color, cmap=plt.cm.Spectral)

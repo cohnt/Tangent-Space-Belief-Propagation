@@ -15,10 +15,15 @@ def make_o_curve(n_samples, noise_factor):
 	# See for graph: https://www.desmos.com/calculator/ete1b4p535
 	lowerBound = -1.0 * np.pi / 4.0
 	upperBound = 9.0 * np.pi / 4.0
+
+	# For computing the Jacobian, we have
+	# dx/dt = 0.5cos(t)
+	# dy/dt = -0.5sin(t) + 0.02
 	
 	t = np.random.uniform(lowerBound, upperBound, n_samples)
 	data = np.array([0.5 + (0.5 * np.sin(t)), 0.5 + (0.5 * np.cos(t)) + (0.02 * t)]).transpose()
 	# data.shape will be (n_samples, 2), so we can interpret it as a list of n_samples 2D points
+	ts = np.array([0.5 * np.cos(t), 0.02 - (0.5 * np.sin(t))]).transpose().reshape(n_samples, 1, 2)
 
 	# Add Gaussian noise to the samples
 	mean = [0, 0]
@@ -27,10 +32,10 @@ def make_o_curve(n_samples, noise_factor):
 
 	color = (t - lowerBound) / (upperBound - lowerBound)
 
-	return (data + noise, color)
+	return (data + noise, color, ts)
 
 if __name__ == "__main__":
 	import matplotlib.pyplot as plt
-	data, color = make_o_curve(500, 0.0005)
+	data, color, ts = make_o_curve(500, 0.0005)
 	plt.scatter(data[:,0], data[:,1], c=color, cmap=plt.cm.Spectral)
 	plt.show()

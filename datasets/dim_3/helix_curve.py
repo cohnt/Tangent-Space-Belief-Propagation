@@ -16,9 +16,15 @@ def make_helix_curve(n_samples, noise_factor):
 	lowerBound = 0.0
 	upperBound = 4.0 * np.pi
 	
+	# For computing the Jacobian, we have
+	# dx/dt = -sin(t)
+	# dy/dt = cos(t)
+	# dz/dt = 1/4pi
+
 	t = np.random.uniform(lowerBound, upperBound, n_samples)
 	data = np.array([np.cos(t), np.sin(t), t / (4*np.pi)]).transpose()
 	# data.shape will be (n_samples, 3), so we can interpret it as a list of n_samples 3D points
+	ts = np.array([-np.sin(t), np.cos(t), np.full(t.shape, 1 / (4*np.pi))]).transpose().reshape(n_samples, 1, 3)
 
 	# Add Gaussian noise to the samples
 	mean = [0, 0, 0]
@@ -29,12 +35,12 @@ def make_helix_curve(n_samples, noise_factor):
 
 	color = (t - lowerBound) / (upperBound - lowerBound)
 
-	return (data + noise, color)
+	return (data + noise, color, ts)
 
 if __name__ == "__main__":
 	from mpl_toolkits.mplot3d import Axes3D
 	import matplotlib.pyplot as plt
-	data, color = make_helix_curve(500, 0.001)
+	data, color, ts = make_helix_curve(500, 0.001)
 	fig = plt.figure()
 	ax = fig.add_subplot(111, projection='3d')
 	ax.scatter(data[:,0], data[:,1], data[:,2], c=color, cmap=plt.cm.Spectral)
