@@ -514,6 +514,10 @@ for iter_num in range(1, num_iters+1):
 
 	max_errors[iter_num-1], mean_errors[iter_num-1], median_errors[iter_num-1] = evalError(true_tangents, mle_bases)
 
+write("Generating final graphs...")
+flush()
+t0 = time.time()
+
 raw_max_error, raw_mean_error, raw_median_error = evalError(true_tangents, observations)
 iters_array = np.arange(1, num_iters+1)
 
@@ -558,3 +562,7 @@ plt.xlabel("Iteration Number")
 plt.ylabel("Median Error")
 plt.savefig(output_dir + "median_error.svg")
 plt.close(fig)
+
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
