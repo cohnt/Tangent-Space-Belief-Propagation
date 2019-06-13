@@ -33,7 +33,7 @@ from datasets.dim_2.o_curve import make_o_curve
 write("Generating dataset...")
 flush()
 t0 = time.time()
-points, color, ts = make_o_curve(num_points, data_noise)
+points, color, true_tangents = make_o_curve(num_points, data_noise)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
@@ -85,7 +85,7 @@ write("Saving ground truth tangent plot...")
 flush()
 t0 = time.time()
 fig, ax = plt.subplots()
-plot_pca_2d(points, color, ts, ax, point_size=2, point_line_width=0.25, line_width=0.5, line_length=0.05)
+plot_pca_2d(points, color, true_tangents, ax, point_size=2, point_line_width=0.25, line_width=0.5, line_length=0.05)
 plt.savefig(output_dir + "true_tangents.svg")
 plt.close(fig)
 t1 = time.time()
@@ -365,7 +365,19 @@ def resampleMessage(t, s):
 	messages_next[t][s].ts[end_rand_ind:num_samples] = noisifyTSList(belief[s].ts[belief_inds]) # Don't add any noise to the orientation (yet)
 	messages_next[t][s].weights[end_rand_ind:num_samples] = 1.0 / num_samples
 
+def evalError(true_tangents, estimated_tangents):
+	error_arr = np.zeros(len(true_tangents))
+	for i in range(len(true_tangents)):
+		error_arr[i] = compareSubspaces(true_tangents[i], estimated_tangents[i])
+	max_error = np.max(error_arr)
+	mean_error = np.mean(error_arr)
+	median_error = np.median(error_arr)
+	return (max_error, mean_error, median_error)
+
 parallel = Parallel(n_jobs=-1, verbose=10, backend="threading")
+max_errors = np.zeros(num_iters)
+mean_errors = np.zeros(num_iters)
+median_errors = np.zeros(num_iters)
 for iter_num in range(1, num_iters+1):
 	write("\nIteration %d\n" % iter_num)
 
@@ -499,3 +511,50 @@ for iter_num in range(1, num_iters+1):
 
 	total_time = message_time + belief_time + image_time
 	write("Total iteration time: %f\n" % total_time)
+
+	max_errors[iter_num-1], mean_errors[iter_num-1], median_errors[iter_num-1] = evalError(true_tangents, mle_bases)
+
+raw_max_error, raw_mean_error, raw_median_error = evalError(true_tangents, observations)
+iters_array = np.arange(1, num_iters+1)
+
+# Max error plot
+fig, ax = plt.subplots()
+ax.plot(iters_array, max_errors)
+ax.axhline(y=raw_max_error)
+label_text = "Raw Error=%f" % raw_max_error
+ax.text(0.05, raw_max_error+0.05, label_text)
+ax.set_xlim(left=0)
+ax.set_ylim(bottom=0)
+ax.set_title("Maximum Error")
+plt.xlabel("Iteration Number")
+plt.ylabel("Maximum Error")
+plt.savefig(output_dir + "max_error.svg")
+plt.close(fig)
+
+# Mean error plot
+fig, ax = plt.subplots()
+ax.plot(iters_array, mean_errors)
+ax.axhline(y=raw_mean_error)
+label_text = "Raw Error=%f" % raw_mean_error
+ax.text(0.05, raw_mean_error+0.05, label_text)
+ax.set_xlim(left=0)
+ax.set_ylim(bottom=0)
+ax.set_title("Mean Error")
+plt.xlabel("Iteration Number")
+plt.ylabel("Mean Error")
+plt.savefig(output_dir + "mean_error.svg")
+plt.close(fig)
+
+# Median error plot
+fig, ax = plt.subplots()
+ax.plot(iters_array, median_errors)
+ax.axhline(y=raw_median_error)
+label_text = "Raw Error=%f" % raw_median_error
+ax.text(0.05, raw_median_error+0.05, label_text)
+ax.set_xlim(left=0)
+ax.set_ylim(bottom=0)
+ax.set_title("Median Error")
+plt.xlabel("Iteration Number")
+plt.ylabel("Median Error")
+plt.savefig(output_dir + "median_error.svg")
+plt.close(fig)
