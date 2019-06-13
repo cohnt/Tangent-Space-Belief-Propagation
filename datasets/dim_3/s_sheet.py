@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.linalg import orth
 
 def make_s_sheet(n_samples, noise_factor):
 	"""
@@ -37,8 +38,8 @@ def make_s_sheet(n_samples, noise_factor):
 	# ts is currently of shape (n_samples, 3, 2)
 	ts = np.swapaxes(ts, 1, 2)
 	# ts is finally of shape (n_samples, 2, 3)
-	ts_norm = np.apply_along_axis(np.linalg.norm, 2, ts).reshape(n_samples, 2, 1)
-	ts = ts / ts_norm
+	for i in range(n_samples):
+		ts[i] = orth(ts[i].T).T
 
 	# Add Gaussian noise to the samples
 	mean = [0, 0, 0]

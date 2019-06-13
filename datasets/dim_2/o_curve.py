@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.linalg import orth
 
 def make_o_curve(n_samples, noise_factor):
 	"""
@@ -24,8 +25,8 @@ def make_o_curve(n_samples, noise_factor):
 	data = np.array([0.5 + (0.5 * np.sin(t)), 0.5 + (0.5 * np.cos(t)) + (0.02 * t)]).transpose()
 	# data.shape will be (n_samples, 2), so we can interpret it as a list of n_samples 2D points
 	ts = np.array([0.5 * np.cos(t), 0.02 - (0.5 * np.sin(t))]).transpose().reshape(n_samples, 1, 2)
-	ts_norm = np.apply_along_axis(np.linalg.norm, 2, ts).reshape(n_samples, 1, 1)
-	ts = ts / ts_norm
+	for i in range(n_samples):
+		ts[i] = orth(ts[i].T).T
 
 	# Add Gaussian noise to the samples
 	mean = [0, 0]
