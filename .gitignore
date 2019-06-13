@@ -4,3 +4,10 @@ results_triangle/*
 *.svg
 *.png
 *.gif
+
+# LaTeX
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.synctex.gz
