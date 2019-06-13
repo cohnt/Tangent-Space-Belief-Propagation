@@ -386,6 +386,7 @@ try:
 		message_time = 0
 		belief_time = 0
 		image_time = 0
+		graph_time = 0
 		total_time = 0
 
 		##################
@@ -511,71 +512,72 @@ try:
 		image_time = t1-t0
 		write("Done! dt=%f\n" % image_time)
 
-		total_time = message_time + belief_time + image_time
-		write("Total iteration time: %f\n" % total_time)
-
 		max_error, mean_error, median_error = evalError(true_tangents, mle_bases)
 		max_errors.append(max_error)
 		mean_errors.append(mean_error)
 		median_errors.append(median_error)
+
+		write("Updating graphs...")
+		flush()
+		t0 = time.time()
+
+		max_errors = np.array(max_errors)
+		mean_errors = np.array(mean_errors)
+		median_errors = np.array(median_errors)
+
+		raw_max_error, raw_mean_error, raw_median_error = evalError(true_tangents, observations)
+		iters_array = np.arange(1, len(max_errors)+1)
+
+		# Max error plot
+		fig, ax = plt.subplots()
+		ax.plot(iters_array, max_errors)
+		ax.axhline(y=raw_max_error, linewidth=3, color="red", linestyle="--")
+		label_text = "Raw Error=%f" % raw_max_error
+		ax.text(0.05, raw_max_error+(0.05 * max_errors[0]), label_text)
+		ax.set_xlim(left=0)
+		ax.set_ylim(bottom=0)
+		ax.set_title("Maximum Error")
+		plt.xlabel("Iteration Number")
+		plt.ylabel("Maximum Error")
+		plt.savefig(output_dir + "max_error.svg")
+		plt.close(fig)
+
+		# Mean error plot
+		fig, ax = plt.subplots()
+		ax.plot(iters_array, mean_errors)
+		ax.axhline(y=raw_mean_error, linewidth=3, color="red", linestyle="--")
+		label_text = "Raw Error=%f" % raw_mean_error
+		ax.text(0.05, raw_mean_error+(0.05 * mean_errors[0]), label_text)
+		ax.set_xlim(left=0)
+		ax.set_ylim(bottom=0)
+		ax.set_title("Mean Error")
+		plt.xlabel("Iteration Number")
+		plt.ylabel("Mean Error")
+		plt.savefig(output_dir + "mean_error.svg")
+		plt.close(fig)
+
+		# Median error plot
+		fig, ax = plt.subplots()
+		ax.plot(iters_array, median_errors)
+		ax.axhline(y=raw_median_error, linewidth=3, color="red", linestyle="--")
+		label_text = "Raw Error=%f" % raw_median_error
+		ax.text(0.05, raw_median_error+(0.05 * median_errors[0]), label_text)
+		ax.set_xlim(left=0)
+		ax.set_ylim(bottom=0)
+		ax.set_title("Median Error")
+		plt.xlabel("Iteration Number")
+		plt.ylabel("Median Error")
+		plt.savefig(output_dir + "median_error.svg")
+		plt.close(fig)
+
+		t1 = time.time()
+		graph_time = t1-t0
+		write("Done! dt=%f\n" % graph_time)
+		flush()
+
+		total_time = message_time + belief_time + image_time + graph_time
+		write("Total iteration time: %f\n" % total_time)
 except KeyboardInterrupt:
 	write("Terminating early after %d iterations.\n" % (iter_num-1))
 	write("Iteration %d not completed.\n" % iter_num)
 	flush()
-
-write("Generating final graphs...")
-flush()
-t0 = time.time()
-
-max_errors = np.array(max_errors)
-mean_errors = np.array(mean_errors)
-median_errors = np.array(median_errors)
-
-raw_max_error, raw_mean_error, raw_median_error = evalError(true_tangents, observations)
-iters_array = np.arange(1, len(max_errors)+1)
-
-# Max error plot
-fig, ax = plt.subplots()
-ax.plot(iters_array, max_errors)
-ax.axhline(y=raw_max_error, linewidth=3, color="red", linestyle="--")
-label_text = "Raw Error=%f" % raw_max_error
-ax.text(0.05, raw_max_error+(0.05 * max_errors[0]), label_text)
-ax.set_xlim(left=0)
-ax.set_ylim(bottom=0)
-ax.set_title("Maximum Error")
-plt.xlabel("Iteration Number")
-plt.ylabel("Maximum Error")
-plt.savefig(output_dir + "max_error.svg")
-plt.close(fig)
-
-# Mean error plot
-fig, ax = plt.subplots()
-ax.plot(iters_array, mean_errors)
-ax.axhline(y=raw_mean_error, linewidth=3, color="red", linestyle="--")
-label_text = "Raw Error=%f" % raw_mean_error
-ax.text(0.05, raw_mean_error+(0.05 * mean_errors[0]), label_text)
-ax.set_xlim(left=0)
-ax.set_ylim(bottom=0)
-ax.set_title("Mean Error")
-plt.xlabel("Iteration Number")
-plt.ylabel("Mean Error")
-plt.savefig(output_dir + "mean_error.svg")
-plt.close(fig)
-
-# Median error plot
-fig, ax = plt.subplots()
-ax.plot(iters_array, median_errors)
-ax.axhline(y=raw_median_error, linewidth=3, color="red", linestyle="--")
-label_text = "Raw Error=%f" % raw_median_error
-ax.text(0.05, raw_median_error+(0.05 * median_errors[0]), label_text)
-ax.set_xlim(left=0)
-ax.set_ylim(bottom=0)
-ax.set_title("Median Error")
-plt.xlabel("Iteration Number")
-plt.ylabel("Median Error")
-plt.savefig(output_dir + "median_error.svg")
-plt.close(fig)
-
-t1 = time.time()
-write("Done! dt=%f\n" % (t1-t0))
-flush()
