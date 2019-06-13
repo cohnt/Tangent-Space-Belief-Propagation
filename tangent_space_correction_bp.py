@@ -375,151 +375,164 @@ def evalError(true_tangents, estimated_tangents):
 	return (max_error, mean_error, median_error)
 
 parallel = Parallel(n_jobs=-1, verbose=10, backend="threading")
-max_errors = np.zeros(num_iters)
-mean_errors = np.zeros(num_iters)
-median_errors = np.zeros(num_iters)
-for iter_num in range(1, num_iters+1):
-	write("\nIteration %d\n" % iter_num)
+max_errors = []
+mean_errors = []
+median_errors = []
 
-	message_time = 0
-	belief_time = 0
-	image_time = 0
-	total_time = 0
+try:
+	for iter_num in range(1, num_iters+1):
+		write("\nIteration %d\n" % iter_num)
 
-	##################
-	# Message Update #
-	##################
-	write("Performing message update...\n")
+		message_time = 0
+		belief_time = 0
+		image_time = 0
+		total_time = 0
+
+		##################
+		# Message Update #
+		##################
+		write("Performing message update...\n")
+		flush()
+		t0 = time.time()
+
+		if iter_num == 1:
+			messages_next = copy.deepcopy(messages_prev)
+		else:
+			# Resample messages from previous belief using importance sampling. The key function used here
+			# is weightedSample, from utils.py, uses stratified resampling, a resampling method common for
+			# particle filters and similar probabilistic methods.
+			for neighbor_pair in neighbor_pair_list:
+				t = neighbor_pair[0]
+				s = neighbor_pair[1]
+				# We will update m_t->s
+				resampleMessage(t, s)
+
+		# Weight messages based on their neighbors. If it's the first iteration, then no weighting is performed.
+		if iter_num != 1:
+			# raw_weights = np.zeros((num_messages, num_samples))
+			# for i in range(0, num_messages):
+			# 	t = neighbor_pair_list[i][0]
+			# 	s = neighbor_pair_list[i][1]
+			# 	# Weight m_t->s
+			# 	raw_weights[i][:] = weightMessage(messages_next, messages_prev, t, s)
+
+			raw_weights = np.asarray(parallel(delayed(weightMessage)(messages_next, messages_prev, neighbor_pair_list[i][0], neighbor_pair_list[i][1]) for i in range(num_messages)))
+
+			# Normalize for each message (each row is for a message, so we sum along axis 1)
+			raw_weights = raw_weights / raw_weights.sum(axis=1, keepdims=True)
+			# Assign weights to the samples in messages_next
+			for i in range(0, num_messages):
+				t = neighbor_pair_list[i][0]
+				s = neighbor_pair_list[i][1]
+				messages_next[t][s].weights = raw_weights[i][:]
+
+		messages_prev = copy.deepcopy(messages_next)
+
+		t1 = time.time()
+		message_time = t1-t0
+		write("Done! dt=%f\n" % message_time)
+
+		#################
+		# Belief Update #
+		#################
+		write("Performing belief update...")
+		flush()
+		t0 = time.time()
+
+		for i in range(0, num_points):
+			# First, update weights of every sample w_ts based on the unary potential
+			# Because we don't have a unary potential, we don't actually do this step!
+			pass
+			# ACTUALLY this is being done a few lines up
+
+			# Now, combine all incoming messages
+			s = i
+			neighbors = neighbor_dict[s][:]
+			num_neighbors = len(neighbors)
+			combined_message = Message(num_samples*num_neighbors, source_dim, target_dim)
+			for j in range(0, num_neighbors):
+				t = neighbors[j]
+				start = j*num_samples
+				stop = j*num_samples + num_samples
+				combined_message.ts[start:stop] = messages_next[t][s].ts[:]
+				combined_message.weights[start:stop] = messages_next[t][s].weights[:]
+			combined_message.weights = combined_message.weights / sum(combined_message.weights) # Normalize
+
+			# Resample from combined_message to get the belief
+			message_inds = weightedSample(combined_message.weights, num_samples)
+			belief[i].ts = combined_message.ts[message_inds]
+			belief[i].weights = combined_message.weights[message_inds]
+
+		t1 = time.time()
+		belief_time = t1-t0
+		write("Done! dt=%f\n" % belief_time)
+
+		################
+		# Write Images #
+		################
+		from matplotlib.collections import LineCollection
+		from matplotlib.cm import coolwarm
+		write("Writing images...")
+		flush()
+		t0 = time.time()
+
+		mle_bases = np.zeros((num_points, target_dim, source_dim))
+		for i in range(num_points):
+			max_ind = np.argmax(belief[i].weights)
+			mle_bases[i] = belief[i].ts[max_ind]
+
+		fig, ax = plt.subplots()
+		plot_pca_2d(points, color, mle_bases, ax, point_size=2, point_line_width=0.25, line_width=0.5, line_length=0.05)
+		ax.set_title("Tangent Space MLE (iter %d)" % iter_num)
+		plt.savefig(output_dir + ("ts_mle_iter%s.svg" % str(iter_num).zfill(4)))
+		plt.close(fig)
+
+		fig, ax = plt.subplots()
+		ax.scatter(points[:,0], points[:,1], c=color, cmap=plt.cm.Spectral, s=2**2, zorder=2, linewidth=0.25)
+
+		coordinates = np.zeros((num_points*num_samples, 2, 2))
+		colors = np.zeros((num_points*num_samples, 4))
+		for i in range(num_points):
+			max_weight = np.max(belief[i].weights)
+			for j in range(num_samples):
+				c_idx = i*num_samples + j
+				coordinates[c_idx][0][0] = points[i][0]
+				coordinates[c_idx][0][1] = points[i][1]
+				coordinates[c_idx][1][0] = points[i][0] + (0.05 * belief[i].ts[j][0][0])
+				coordinates[c_idx][1][1] = points[i][1] + (0.05 * belief[i].ts[j][0][1])
+				colors[c_idx][:] = coolwarm(belief[i].weights[j] * (1.0 / max_weight))
+		lines = LineCollection(coordinates, color=colors, linewidths=0.5)
+		ax.add_collection(lines)
+		ax.set_title("Tangent Space Belief (iter %d)" % iter_num)
+		plt.savefig(output_dir + ("ts_bel_iter%s.svg" % str(iter_num).zfill(4)))
+		plt.close(fig)
+
+		t1 = time.time()
+		image_time = t1-t0
+		write("Done! dt=%f\n" % image_time)
+
+		total_time = message_time + belief_time + image_time
+		write("Total iteration time: %f\n" % total_time)
+
+		max_error, mean_error, median_error = evalError(true_tangents, mle_bases)
+		max_errors.append(max_error)
+		mean_errors.append(mean_error)
+		median_errors.append(median_error)
+except KeyboardInterrupt:
+	write("Terminating early after %d iterations.\n" % (iter_num-1))
+	write("Iteration %d not completed.\n" % iter_num)
 	flush()
-	t0 = time.time()
-
-	if iter_num == 1:
-		messages_next = copy.deepcopy(messages_prev)
-	else:
-		# Resample messages from previous belief using importance sampling. The key function used here
-		# is weightedSample, from utils.py, uses stratified resampling, a resampling method common for
-		# particle filters and similar probabilistic methods.
-		for neighbor_pair in neighbor_pair_list:
-			t = neighbor_pair[0]
-			s = neighbor_pair[1]
-			# We will update m_t->s
-			resampleMessage(t, s)
-
-	# Weight messages based on their neighbors. If it's the first iteration, then no weighting is performed.
-	if iter_num != 1:
-		# raw_weights = np.zeros((num_messages, num_samples))
-		# for i in range(0, num_messages):
-		# 	t = neighbor_pair_list[i][0]
-		# 	s = neighbor_pair_list[i][1]
-		# 	# Weight m_t->s
-		# 	raw_weights[i][:] = weightMessage(messages_next, messages_prev, t, s)
-
-		raw_weights = np.asarray(parallel(delayed(weightMessage)(messages_next, messages_prev, neighbor_pair_list[i][0], neighbor_pair_list[i][1]) for i in range(num_messages)))
-
-		# Normalize for each message (each row is for a message, so we sum along axis 1)
-		raw_weights = raw_weights / raw_weights.sum(axis=1, keepdims=True)
-		# Assign weights to the samples in messages_next
-		for i in range(0, num_messages):
-			t = neighbor_pair_list[i][0]
-			s = neighbor_pair_list[i][1]
-			messages_next[t][s].weights = raw_weights[i][:]
-
-	messages_prev = copy.deepcopy(messages_next)
-
-	t1 = time.time()
-	message_time = t1-t0
-	write("Done! dt=%f\n" % message_time)
-
-	#################
-	# Belief Update #
-	#################
-	write("Performing belief update...")
-	flush()
-	t0 = time.time()
-
-	for i in range(0, num_points):
-		# First, update weights of every sample w_ts based on the unary potential
-		# Because we don't have a unary potential, we don't actually do this step!
-		pass
-		# ACTUALLY this is being done a few lines up
-
-		# Now, combine all incoming messages
-		s = i
-		neighbors = neighbor_dict[s][:]
-		num_neighbors = len(neighbors)
-		combined_message = Message(num_samples*num_neighbors, source_dim, target_dim)
-		for j in range(0, num_neighbors):
-			t = neighbors[j]
-			start = j*num_samples
-			stop = j*num_samples + num_samples
-			combined_message.ts[start:stop] = messages_next[t][s].ts[:]
-			combined_message.weights[start:stop] = messages_next[t][s].weights[:]
-		combined_message.weights = combined_message.weights / sum(combined_message.weights) # Normalize
-
-		# Resample from combined_message to get the belief
-		message_inds = weightedSample(combined_message.weights, num_samples)
-		belief[i].ts = combined_message.ts[message_inds]
-		belief[i].weights = combined_message.weights[message_inds]
-
-	t1 = time.time()
-	belief_time = t1-t0
-	write("Done! dt=%f\n" % belief_time)
-
-	################
-	# Write Images #
-	################
-	from matplotlib.collections import LineCollection
-	from matplotlib.cm import coolwarm
-	write("Writing images...")
-	flush()
-	t0 = time.time()
-
-	mle_bases = np.zeros((num_points, target_dim, source_dim))
-	for i in range(num_points):
-		max_ind = np.argmax(belief[i].weights)
-		mle_bases[i] = belief[i].ts[max_ind]
-
-	fig, ax = plt.subplots()
-	plot_pca_2d(points, color, mle_bases, ax, point_size=2, point_line_width=0.25, line_width=0.5, line_length=0.05)
-	ax.set_title("Tangent Space MLE (iter %d)" % iter_num)
-	plt.savefig(output_dir + ("ts_mle_iter%s.svg" % str(iter_num).zfill(4)))
-	plt.close(fig)
-
-	fig, ax = plt.subplots()
-	ax.scatter(points[:,0], points[:,1], c=color, cmap=plt.cm.Spectral, s=2**2, zorder=2, linewidth=0.25)
-
-	coordinates = np.zeros((num_points*num_samples, 2, 2))
-	colors = np.zeros((num_points*num_samples, 4))
-	for i in range(num_points):
-		max_weight = np.max(belief[i].weights)
-		for j in range(num_samples):
-			c_idx = i*num_samples + j
-			coordinates[c_idx][0][0] = points[i][0]
-			coordinates[c_idx][0][1] = points[i][1]
-			coordinates[c_idx][1][0] = points[i][0] + (0.05 * belief[i].ts[j][0][0])
-			coordinates[c_idx][1][1] = points[i][1] + (0.05 * belief[i].ts[j][0][1])
-			colors[c_idx][:] = coolwarm(belief[i].weights[j] * (1.0 / max_weight))
-	lines = LineCollection(coordinates, color=colors, linewidths=0.5)
-	ax.add_collection(lines)
-	ax.set_title("Tangent Space Belief (iter %d)" % iter_num)
-	plt.savefig(output_dir + ("ts_bel_iter%s.svg" % str(iter_num).zfill(4)))
-	plt.close(fig)
-
-	t1 = time.time()
-	image_time = t1-t0
-	write("Done! dt=%f\n" % image_time)
-
-	total_time = message_time + belief_time + image_time
-	write("Total iteration time: %f\n" % total_time)
-
-	max_errors[iter_num-1], mean_errors[iter_num-1], median_errors[iter_num-1] = evalError(true_tangents, mle_bases)
 
 write("Generating final graphs...")
 flush()
 t0 = time.time()
 
+max_errors = np.array(max_errors)
+mean_errors = np.array(mean_errors)
+median_errors = np.array(median_errors)
+
 raw_max_error, raw_mean_error, raw_median_error = evalError(true_tangents, observations)
-iters_array = np.arange(1, num_iters+1)
+iters_array = np.arange(1, len(max_errors)+1)
 
 # Max error plot
 fig, ax = plt.subplots()
