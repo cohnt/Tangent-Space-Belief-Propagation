@@ -37,6 +37,8 @@ def make_s_sheet(n_samples, noise_factor):
 	# ts is currently of shape (n_samples, 3, 2)
 	ts = np.swapaxes(ts, 1, 2)
 	# ts is finally of shape (n_samples, 2, 3)
+	ts_norm = np.apply_along_axis(np.linalg.norm, 2, ts).reshape(n_samples, 2, 1)
+	ts = ts / ts_norm
 
 	# Add Gaussian noise to the samples
 	mean = [0, 0, 0]
