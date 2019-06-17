@@ -2,6 +2,7 @@ import numpy as np
 import scipy
 import matplotlib
 matplotlib.use('Agg')
+from textwrap import wrap
 import matplotlib.pyplot as plt
 import time
 import sys
@@ -12,7 +13,7 @@ from utils import write, flush
 num_iters = 10     # Number of iterations of the message passing algorithm to run
 neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
 num_points = 500    # Number of data points
-data_noise = 0.0001 # How much noise is added to the data
+data_noise = 0.0005 # How much noise is added to the data
 num_samples = 5   # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
@@ -680,7 +681,7 @@ flush()
 
 fig, ax = plt.subplots()
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral)
-ax.set_title("Actual Parameter Value vs Embedded Coordinate from BP Tangent Correction for Edge Pruning")
+ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from BP Tangent Correction for Edge Pruning", 60)))
 plt.xlabel("Actual Parameter Value")
 plt.ylabel("Embedded Coordinate")
 plt.savefig(output_dir + "coord_bp.svg")
