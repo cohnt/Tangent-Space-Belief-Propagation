@@ -15,9 +15,9 @@ def compute_ltsa(points, neighbor_dict, tangents, source_dim, target_dim):
 		X_i_c = X_i.T - X_i_bar
 
 		Qi = tangents[i].T
-		print "Qi", i, Qi
+		# print "Qi", i, Qi
 		Theta_i = np.matmul(Qi.T, X_i_c)
-		print "Theta_i", Theta_i
+		# print "Theta_i", Theta_i
 		Thetas.append(Theta_i)
 		Thetas_inv.append(np.linalg.pinv(Theta_i))
 	
@@ -34,13 +34,13 @@ def compute_ltsa(points, neighbor_dict, tangents, source_dim, target_dim):
 		Wi_right = np.eye(k) - T_prod
 		Wi = np.matmul(Wi_left, Wi_right)
 		#
-		print "nbd", i, np.ix_(neighbors, neighbors)
+		# print "nbd", i, np.ix_(neighbors, neighbors)
 		B[np.ix_(neighbors, neighbors)] = B[np.ix_(neighbors, neighbors)] + Wi
 		#
 	# Compute T
 	eig_vals, eig_vecs = np.linalg.eig(B)
-	print eig_vals
-	print eig_vecs
+	# print eig_vals
+	# print eig_vecs
 	sort = eig_vals.argsort() # Sort smallest -> largest
 	eig_vals.sort()
 	eig_vecs = eig_vecs[:, sort]

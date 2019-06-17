@@ -586,7 +586,6 @@ from ltsa import compute_ltsa
 
 t0 = time.time()
 feature_coords = compute_ltsa(points, neighbor_dict, mle_bases, source_dim, target_dim)
-print feature_coords
 fig, ax = plt.subplots()
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral)
 plt.savefig(output_dir + "results.svg")
