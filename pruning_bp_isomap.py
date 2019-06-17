@@ -634,6 +634,23 @@ except KeyboardInterrupt:
 # write("Done! dt=%f\n" % (t1-t0))
 # flush()
 
+write("Saving PCA error histogram...")
+flush()
+t0 = time.time()
+raw_max_error, raw_mean_error, raw_median_error, raw_error_data = evalError(true_tangents, observations)
+fig, ax = plt.subplots()
+ax.hist(raw_error_data, np.arange(0, 1, 1.0/error_histogram_num_bins))
+ax.set_title("Histogram of PCA Error")
+ax.set_xlim(left=0, right=1)
+ax.set_ylim(top=num_points)
+plt.xlabel("PCA Error")
+plt.ylabel("Count")
+plt.savefig(output_dir + "pca_error_histogram.svg")
+plt.close(fig)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
 from sklearn.manifold import MDS
 mds = MDS(n_components=target_dim, max_iter=3000, eps=1e-9, dissimilarity="precomputed", n_jobs=-1)
 
