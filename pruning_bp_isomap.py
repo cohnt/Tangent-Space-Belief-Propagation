@@ -662,9 +662,22 @@ plt.savefig(output_dir + "pruned_nearest_neighbors.svg")
 plt.close(fig)
 
 from sklearn.utils.graph_shortest_path import graph_shortest_path
+write("Finding shortest paths...")
+flush()
+t0 = time.time()
 shortest_distances = graph_shortest_path(pruned_neighbors, directed=False)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
 
+write("Fitting MDS...")
+flush()
+t0 = time.time()
 feature_coords = mds.fit_transform(shortest_distances)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
 fig, ax = plt.subplots()
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral)
 ax.set_title("Actual Parameter Value vs Embedded Coordinate from BP Tangent Correction for Edge Pruning")
