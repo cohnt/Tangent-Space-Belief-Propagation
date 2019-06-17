@@ -576,6 +576,7 @@ try:
 		fig, ax = plt.subplots()
 		ax.hist(error_data, error_histogram_num_bins)
 		ax.set_title("Histogram of Tangent Space Error")
+		ax.set_xlim(left=0, right=1)
 		plt.xlabel("Tangent Space Error")
 		plt.ylabel("Count")
 		plt.savefig(output_dir + ("error_histogram%s.svg" % str(iter_num).zfill(4)))
