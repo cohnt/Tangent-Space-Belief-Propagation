@@ -1,5 +1,6 @@
 import numpy as np
 import sys
+from scipy.stats import special_ortho_group
 
 class Message:
 	def __init__(self, num_samples, target_dim):
@@ -61,3 +62,16 @@ def projSubspace(orthonormal_basis, point):
 		basis_vec = orthonormal_basis[i]
 		individual_components[i] = np.dot(basis_vec, point)
 	return individual_components
+
+def randomSmallRotation(dimension, variance=None):
+	if variance is None:
+		variance = 0.05 * dimension
+	theta = np.random.normal(0, variance)
+	rotMat = np.eye(dimension)
+	rotMat[0,0] = np.cos(theta)
+	rotMat[0,1] = -np.sin(theta)
+	rotMat[1,0] = np.sin(theta)
+	rotMat[1,1] = np.cos(theta)
+	basis = special_ortho_group.rvs(dimension)
+	basis_inv = np.linalg.inv(basis)
+	return basis.dot(rotMat).dot(basis_inv)
