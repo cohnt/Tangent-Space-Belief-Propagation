@@ -12,8 +12,8 @@ from joblib import Parallel, delayed
 from utils import write, flush
 
 num_iters = 10     # Number of iterations of the message passing algorithm to run
-neighbors_k = 2    # The value of 'k' used for k-nearest-neighbors
-num_points = 10    # Number of data points
+neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
+num_points = 500    # Number of data points
 data_noise = 0.0005 # How much noise is added to the data
 num_samples = 5   # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
@@ -38,7 +38,7 @@ from datasets.dim_2.o_curve import make_o_curve
 write("Generating dataset...")
 flush()
 t0 = time.time()
-points, color, true_tangents = make_arc_curve(num_points, data_noise)
+points, color, true_tangents = make_o_curve(num_points, data_noise)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
