@@ -10,6 +10,8 @@ def plot_neighbors_2d(points, color, neighbors_graph, ax, line_color="grey", poi
 	coordinates = np.zeros((num_points, num_neighbors, 2, 2))
 	for point_idx in range(num_points):
 		for neighbor_idx in range(num_neighbors):
+			if neighbor_idx >= len(np.where(neighbors_graph[point_idx].toarray()[0])[0]):
+				break
 			target_idx = (np.where(neighbors_graph[point_idx].toarray()[0])[0])[neighbor_idx] # Evil numpy f***ery because sparse matrices behave strangely
 			coordinates[point_idx, neighbor_idx, :, 0] = np.array([points[point_idx, :][0], points[target_idx, :][0]])
 			coordinates[point_idx, neighbor_idx, :, 1] = np.array([points[point_idx, :][1], points[target_idx, :][1]])
