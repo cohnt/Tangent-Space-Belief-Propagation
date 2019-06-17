@@ -374,7 +374,7 @@ def evalError(true_tangents, estimated_tangents):
 	median_error = np.median(error_arr)
 	return (max_error, mean_error, median_error)
 
-# parallel = Parallel(n_jobs=-1, verbose=10, backend="threading")
+parallel = Parallel(n_jobs=-1, verbose=10, backend="threading")
 max_errors = []
 mean_errors = []
 median_errors = []
@@ -410,14 +410,14 @@ try:
 
 		# Weight messages based on their neighbors. If it's the first iteration, then no weighting is performed.
 		if iter_num != 1:
-			raw_weights = np.zeros((num_messages, num_samples))
-			for i in range(0, num_messages):
-				t = neighbor_pair_list[i][0]
-				s = neighbor_pair_list[i][1]
-				# Weight m_t->s
-				raw_weights[i][:] = weightMessage(messages_next, messages_prev, t, s)
+			# raw_weights = np.zeros((num_messages, num_samples))
+			# for i in range(0, num_messages):
+			# 	t = neighbor_pair_list[i][0]
+			# 	s = neighbor_pair_list[i][1]
+			# 	# Weight m_t->s
+			# 	raw_weights[i][:] = weightMessage(messages_next, messages_prev, t, s)
 
-			# raw_weights = np.asarray(parallel(delayed(weightMessage)(messages_next, messages_prev, neighbor_pair_list[i][0], neighbor_pair_list[i][1]) for i in range(num_messages)))
+			raw_weights = np.asarray(parallel(delayed(weightMessage)(messages_next, messages_prev, neighbor_pair_list[i][0], neighbor_pair_list[i][1]) for i in range(num_messages)))
 
 			# Normalize for each message (each row is for a message, so we sum along axis 1)
 			raw_weights = raw_weights / raw_weights.sum(axis=1, keepdims=True)
