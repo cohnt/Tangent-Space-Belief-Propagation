@@ -578,7 +578,7 @@ try:
 		# Iteration error histogram
 		fig, ax = plt.subplots()
 		ax.hist(error_data, np.arange(0, 1, 1.0/error_histogram_num_bins))
-		ax.set_title("Histogram of Tangent Space Error")
+		ax.set_title("Histogram of Tangent Space Error (iter %d)" % iter_num)
 		ax.set_xlim(left=0, right=1)
 		ax.set_ylim(top=num_points)
 		plt.xlabel("Tangent Space Error")
