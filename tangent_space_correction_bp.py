@@ -8,7 +8,7 @@ import copy
 from joblib import Parallel, delayed
 from utils import write, flush
 
-num_iters = 25     # Number of iterations of the message passing algorithm to run
+num_iters = 10     # Number of iterations of the message passing algorithm to run
 neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
 num_points = 500    # Number of data points
 data_noise = 0.00025 # How much noise is added to the data
@@ -33,7 +33,7 @@ from datasets.dim_2.o_curve import make_o_curve
 write("Generating dataset...")
 flush()
 t0 = time.time()
-points, color, true_tangents = make_o_curve(num_points, data_noise)
+points, color, true_tangents = make_s_curve(num_points, data_noise)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
@@ -43,7 +43,7 @@ flush()
 t0 = time.time()
 fig, ax = plt.subplots()
 ax.scatter(points[:,0], points[:,1], c=color, cmap=plt.cm.Spectral, s=2**2, zorder=2, linewidth=0.25)
-ax.set_title("Dataset (num=%d)" % num_points)
+ax.set_title("Dataset (num=%d, variance=%f)" % (num_points, data_noise))
 plt.savefig(output_dir + "dataset.svg")
 plt.close(fig)
 t1 = time.time()
@@ -86,6 +86,7 @@ flush()
 t0 = time.time()
 fig, ax = plt.subplots()
 plot_pca_2d(points, color, true_tangents, ax, point_size=2, point_line_width=0.25, line_width=0.5, line_length=0.05)
+ax.set_title("Exact Tangents")
 plt.savefig(output_dir + "true_tangents.svg")
 plt.close(fig)
 t1 = time.time()
@@ -532,13 +533,13 @@ try:
 		fig, ax = plt.subplots()
 		ax.plot(iters_array, max_errors)
 		ax.axhline(y=raw_max_error, linewidth=3, color="red", linestyle="--")
-		label_text = "Raw Error=%f" % raw_max_error
-		ax.text(0.05, raw_max_error+(0.05 * max_errors[0]), label_text)
+		label_text = "Only PCA Error=%f" % raw_max_error
+		ax.text(len(max_errors)+0.05, raw_max_error, label_text)
 		ax.set_xlim(left=0)
 		ax.set_ylim(bottom=0)
-		ax.set_title("Maximum Error")
+		ax.set_title("Maximum Tangent Space Error by Iteration")
 		plt.xlabel("Iteration Number")
-		plt.ylabel("Maximum Error")
+		plt.ylabel("Maximum Tangent Space Error")
 		plt.savefig(output_dir + "max_error.svg")
 		plt.close(fig)
 
@@ -546,13 +547,13 @@ try:
 		fig, ax = plt.subplots()
 		ax.plot(iters_array, mean_errors)
 		ax.axhline(y=raw_mean_error, linewidth=3, color="red", linestyle="--")
-		label_text = "Raw Error=%f" % raw_mean_error
-		ax.text(0.05, raw_mean_error+(0.05 * mean_errors[0]), label_text)
+		label_text = "Only PCA Error=%f" % raw_mean_error
+		ax.text(len(max_errors)+0.05, raw_mean_error, label_text)
 		ax.set_xlim(left=0)
 		ax.set_ylim(bottom=0)
-		ax.set_title("Mean Error")
+		ax.set_title("Mean Tangent Space Error by Iteration")
 		plt.xlabel("Iteration Number")
-		plt.ylabel("Mean Error")
+		plt.ylabel("Mean Tangent Space Error")
 		plt.savefig(output_dir + "mean_error.svg")
 		plt.close(fig)
 
@@ -560,13 +561,13 @@ try:
 		fig, ax = plt.subplots()
 		ax.plot(iters_array, median_errors)
 		ax.axhline(y=raw_median_error, linewidth=3, color="red", linestyle="--")
-		label_text = "Raw Error=%f" % raw_median_error
-		ax.text(0.05, raw_median_error+(0.05 * median_errors[0]), label_text)
+		label_text = "Only PCA Error=%f" % raw_median_error
+		ax.text(len(max_errors)+0.05, raw_median_error, label_text)
 		ax.set_xlim(left=0)
 		ax.set_ylim(bottom=0)
-		ax.set_title("Median Error")
+		ax.set_title("Median Tangent Space Error by Iteration")
 		plt.xlabel("Iteration Number")
-		plt.ylabel("Median Error")
+		plt.ylabel("Median Tangent Space Error")
 		plt.savefig(output_dir + "median_error.svg")
 		plt.close(fig)
 
@@ -591,12 +592,18 @@ t0 = time.time()
 feature_coords = compute_ltsa(points, neighbor_dict, mle_bases, source_dim, target_dim)
 fig, ax = plt.subplots()
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral)
+ax.set_title("Actual Parameter Value vs Embedded Coordinate from Tangent Estimates")
+plt.xlabel("Actual Parameter Value")
+plt.ylabel("Embedded Coordinate")
 plt.savefig(output_dir + "results.svg")
 plt.close(fig)
 
 ideal_tangent_coords = compute_ltsa(points, neighbor_dict, true_tangents, source_dim, target_dim)
 fig, ax = plt.subplots()
 ax.scatter(color, ideal_tangent_coords, c=color, cmap=plt.cm.Spectral)
+ax.set_title("Actual Parameter Value vs Embedded Coordinate from Actual Tangents")
+plt.xlabel("Actual Parameter Value")
+plt.ylabel("Embedded Coordinate")
 plt.savefig(output_dir + "goal.svg")
 plt.close(fig)
 
