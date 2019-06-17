@@ -718,6 +718,7 @@ if len(connected_components.sets) == 1:
 	write("Graph already connected!\n")
 	flush()
 else:
+	write("There are %d connected components.\n" % len(connected_components.sets))
 	while len(connected_components.sets) > 1:
 		min_edge_idx = (-1, -1)
 		min_edge_length = np.Inf
