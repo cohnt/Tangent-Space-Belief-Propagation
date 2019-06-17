@@ -8,10 +8,10 @@ import copy
 from joblib import Parallel, delayed
 from utils import write, flush
 
-num_iters = 25     # Number of iterations of the message passing algorithm to run
-neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
-num_points = 250    # Number of data points
-data_noise = 0.00025 # How much noise is added to the data
+num_iters = 5     # Number of iterations of the message passing algorithm to run
+neighbors_k = 6    # The value of 'k' used for k-nearest-neighbors
+num_points = 50    # Number of data points
+data_noise = 0 # How much noise is added to the data
 num_samples = 5   # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
@@ -33,7 +33,7 @@ from datasets.dim_2.o_curve import make_o_curve
 write("Generating dataset...")
 flush()
 t0 = time.time()
-points, color, true_tangents = make_o_curve(num_points, data_noise)
+points, color, true_tangents = make_arc_curve(num_points, data_noise)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
@@ -229,7 +229,7 @@ def weightMessage(m_next, m_prev, neighbor, current):
 
 	# Get all of the neighbors of t, but don't include s in the list.
 	neighbors = neighbor_dict[t][:]
-	neighbors.remove(s)
+	# neighbors.remove(s)
 	num_neighbors = len(neighbors)
 
 	for i in range(num_samples):
@@ -374,7 +374,7 @@ def evalError(true_tangents, estimated_tangents):
 	median_error = np.median(error_arr)
 	return (max_error, mean_error, median_error)
 
-parallel = Parallel(n_jobs=-1, verbose=10, backend="threading")
+# parallel = Parallel(n_jobs=-1, verbose=10, backend="threading")
 max_errors = []
 mean_errors = []
 median_errors = []
@@ -410,14 +410,14 @@ try:
 
 		# Weight messages based on their neighbors. If it's the first iteration, then no weighting is performed.
 		if iter_num != 1:
-			# raw_weights = np.zeros((num_messages, num_samples))
-			# for i in range(0, num_messages):
-			# 	t = neighbor_pair_list[i][0]
-			# 	s = neighbor_pair_list[i][1]
-			# 	# Weight m_t->s
-			# 	raw_weights[i][:] = weightMessage(messages_next, messages_prev, t, s)
+			raw_weights = np.zeros((num_messages, num_samples))
+			for i in range(0, num_messages):
+				t = neighbor_pair_list[i][0]
+				s = neighbor_pair_list[i][1]
+				# Weight m_t->s
+				raw_weights[i][:] = weightMessage(messages_next, messages_prev, t, s)
 
-			raw_weights = np.asarray(parallel(delayed(weightMessage)(messages_next, messages_prev, neighbor_pair_list[i][0], neighbor_pair_list[i][1]) for i in range(num_messages)))
+			# raw_weights = np.asarray(parallel(delayed(weightMessage)(messages_next, messages_prev, neighbor_pair_list[i][0], neighbor_pair_list[i][1]) for i in range(num_messages)))
 
 			# Normalize for each message (each row is for a message, so we sum along axis 1)
 			raw_weights = raw_weights / raw_weights.sum(axis=1, keepdims=True)
@@ -581,3 +581,13 @@ except KeyboardInterrupt:
 	write("Terminating early after %d iterations.\n" % (iter_num-1))
 	write("Iteration %d not completed.\n" % iter_num)
 	flush()
+
+from ltsa import compute_ltsa
+
+t0 = time.time()
+feature_coords = compute_ltsa(points, neighbor_dict, mle_bases, source_dim, target_dim)
+print feature_coords
+fig, ax = plt.subplots()
+ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral)
+plt.savefig(output_dir + "results.svg")
+plt.close(fig)
