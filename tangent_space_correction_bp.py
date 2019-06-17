@@ -8,10 +8,10 @@ import copy
 from joblib import Parallel, delayed
 from utils import write, flush
 
-num_iters = 5     # Number of iterations of the message passing algorithm to run
+num_iters = 25     # Number of iterations of the message passing algorithm to run
 neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
 num_points = 500    # Number of data points
-data_noise = 0.0001 # How much noise is added to the data
+data_noise = 0.00025 # How much noise is added to the data
 num_samples = 5   # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
@@ -33,7 +33,7 @@ from datasets.dim_2.o_curve import make_o_curve
 write("Generating dataset...")
 flush()
 t0 = time.time()
-points, color, true_tangents = make_s_curve(num_points, data_noise)
+points, color, true_tangents = make_o_curve(num_points, data_noise)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
@@ -584,9 +584,22 @@ except KeyboardInterrupt:
 
 from ltsa import compute_ltsa
 
+write("Embedding...")
+flush()
 t0 = time.time()
+
 feature_coords = compute_ltsa(points, neighbor_dict, mle_bases, source_dim, target_dim)
 fig, ax = plt.subplots()
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral)
 plt.savefig(output_dir + "results.svg")
 plt.close(fig)
+
+ideal_tangent_coords = compute_ltsa(points, neighbor_dict, true_tangents, source_dim, target_dim)
+fig, ax = plt.subplots()
+ax.scatter(color, ideal_tangent_coords, c=color, cmap=plt.cm.Spectral)
+plt.savefig(output_dir + "goal.svg")
+plt.close(fig)
+
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
