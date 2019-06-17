@@ -534,7 +534,7 @@ try:
 		ax.plot(iters_array, max_errors)
 		ax.axhline(y=raw_max_error, linewidth=3, color="red", linestyle="--")
 		label_text = "Only PCA Error=%f" % raw_max_error
-		ax.text(len(max_errors)+0.05, raw_max_error, label_text)
+		ax.text(0.05, raw_max_error+(0.05 * max_errors[0]), label_text)
 		ax.set_xlim(left=0)
 		ax.set_ylim(bottom=0)
 		ax.set_title("Maximum Tangent Space Error by Iteration")
@@ -548,7 +548,7 @@ try:
 		ax.plot(iters_array, mean_errors)
 		ax.axhline(y=raw_mean_error, linewidth=3, color="red", linestyle="--")
 		label_text = "Only PCA Error=%f" % raw_mean_error
-		ax.text(len(max_errors)+0.05, raw_mean_error, label_text)
+		ax.text(0.05, raw_mean_error+(0.05 * mean_errors[0]), label_text)
 		ax.set_xlim(left=0)
 		ax.set_ylim(bottom=0)
 		ax.set_title("Mean Tangent Space Error by Iteration")
@@ -562,7 +562,7 @@ try:
 		ax.plot(iters_array, median_errors)
 		ax.axhline(y=raw_median_error, linewidth=3, color="red", linestyle="--")
 		label_text = "Only PCA Error=%f" % raw_median_error
-		ax.text(len(max_errors)+0.05, raw_median_error, label_text)
+		ax.text(0.05, raw_median_error+(0.05 * median_errors[0]), label_text)
 		ax.set_xlim(left=0)
 		ax.set_ylim(bottom=0)
 		ax.set_title("Median Tangent Space Error by Iteration")
