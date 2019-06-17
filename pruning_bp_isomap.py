@@ -1,5 +1,6 @@
 import numpy as np
 import scipy
+import random
 import matplotlib
 matplotlib.use('Agg')
 from textwrap import wrap
@@ -11,8 +12,8 @@ from joblib import Parallel, delayed
 from utils import write, flush
 
 num_iters = 10     # Number of iterations of the message passing algorithm to run
-neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
-num_points = 500    # Number of data points
+neighbors_k = 2    # The value of 'k' used for k-nearest-neighbors
+num_points = 10    # Number of data points
 data_noise = 0.0005 # How much noise is added to the data
 num_samples = 5   # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
@@ -37,7 +38,7 @@ from datasets.dim_2.o_curve import make_o_curve
 write("Generating dataset...")
 flush()
 t0 = time.time()
-points, color, true_tangents = make_o_curve(num_points, data_noise)
+points, color, true_tangents = make_arc_curve(num_points, data_noise)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
@@ -678,6 +679,66 @@ plot_neighbors_2d(points, color, pruned_neighbors, ax, point_size=2, line_width=
 ax.set_title("Pruned Nearest Neighbors (k=%d, thresh=%f)" % (neighbors_k, pruning_angle_thresh))
 plt.savefig(output_dir + "pruned_nearest_neighbors.svg")
 plt.close(fig)
+
+write("Connecting graph...\n")
+flush()
+t0 = time.time()
+
+# Uses the disjoint-set datatype
+# http://p-nand-q.com/python/data-types/general/disjoint-sets.html
+class DisjointSet():
+	def __init__(self, vals):
+		self.sets = set([self.makeSet(elt) for elt in vals])
+	def makeSet(self, elt):
+		return frozenset([elt])
+	def findSet(self, elt):
+		for subset in self.sets:
+			if elt in subset:
+				return subset
+	def union(self, set_a, set_b):
+		self.sets.add(frozenset.union(set_a, set_b))
+		self.sets.remove(set_a)
+		self.sets.remove(set_b)
+	def write(self):
+		for subset in self.sets:
+			print subset
+
+connected_components = DisjointSet(range(num_points))
+for i in range(num_points):
+	for j in range(num_points):
+		if pruned_neighbors[i,j] != 0:
+			set_i = connected_components.findSet(i)
+			if not j in set_i:
+				set_j = connected_components.findSet(j)
+				connected_components.union(set_i, set_j)
+
+if len(connected_components.sets) == 1:
+	write("Graph already connected!\n")
+	flush()
+else:
+	while len(connected_components.sets) > 1:
+		set_a, set_b = random.sample(connected_components.sets, 2)
+		min_edge_idx = (-1, -1)
+		min_edge_length = np.Inf
+		for i in set_a:
+			for j in set_b:
+				dist = np.linalg.norm(points[i] - points[j])
+				if dist < min_edge_length:
+					min_edge_length = dist
+					min_edge_idx = (i, j)
+		pruned_neighbors[i, j] = min_edge_length
+		pruned_neighbors[j, i] = min_edge_length
+		connected_components.union(set_a, set_b)
+
+fig, ax = plt.subplots()
+plot_neighbors_2d(points, color, pruned_neighbors, ax, point_size=2, line_width=0.25, edge_thickness=0.5, show_labels=False)
+ax.set_title("Added Edges after Pruning")
+plt.savefig(output_dir + "added_edges.svg")
+plt.close(fig)
+
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
 
 from sklearn.utils.graph_shortest_path import graph_shortest_path
 write("Finding shortest paths...")
