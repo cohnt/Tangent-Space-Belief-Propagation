@@ -594,8 +594,8 @@ try:
 		total_time = message_time + belief_time + image_time + graph_time
 		write("Total iteration time: %f\n" % total_time)
 except KeyboardInterrupt:
-	write("Terminating early after %d iterations.\n" % (iter_num-1))
-	write("Iteration %d not completed.\n" % iter_num)
+	write("\nTerminating early after %d iterations.\n" % (iter_num-1))
+	write("Iteration %d not completed.\n\n" % iter_num)
 	flush()
 
 # from ltsa import compute_ltsa
@@ -717,17 +717,23 @@ if len(connected_components.sets) == 1:
 	flush()
 else:
 	while len(connected_components.sets) > 1:
-		set_a, set_b = random.sample(connected_components.sets, 2)
 		min_edge_idx = (-1, -1)
 		min_edge_length = np.Inf
-		for i in set_a:
-			for j in set_b:
-				dist = np.linalg.norm(points[i] - points[j])
-				if dist < min_edge_length:
-					min_edge_length = dist
-					min_edge_idx = (i, j)
+		for set_a in connected_components.sets:
+			for set_b in connected_components.sets:
+				if set_a != set_b:
+					for i in set_a:
+						for j in set_b:
+							dist = np.linalg.norm(points[i] - points[j])
+							if dist < min_edge_length:
+								min_edge_length = dist
+								min_edge_idx = (i, j)
+		i = min_edge_idx[0]
+		j = min_edge_idx[1]
 		pruned_neighbors[i, j] = min_edge_length
 		pruned_neighbors[j, i] = min_edge_length
+		set_a = connected_components.findSet(i)
+		set_b = connected_components.findSet(j)
 		connected_components.union(set_a, set_b)
 
 fig, ax = plt.subplots()
