@@ -11,7 +11,7 @@ from utils import write, flush
 num_iters = 10     # Number of iterations of the message passing algorithm to run
 neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
 num_points = 500    # Number of data points
-data_noise = 0.00025 # How much noise is added to the data
+data_noise = 0.0005 # How much noise is added to the data
 num_samples = 5   # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
@@ -602,10 +602,19 @@ t0 = time.time()
 feature_coords = compute_ltsa(points, neighbor_dict, mle_bases, source_dim, target_dim)
 fig, ax = plt.subplots()
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral)
-ax.set_title("Actual Parameter Value vs Embedded Coordinate from Tangent Estimates")
+ax.set_title("Actual Parameter Value vs Embedded Coordinate from BP Tangent Estimates")
 plt.xlabel("Actual Parameter Value")
 plt.ylabel("Embedded Coordinate")
-plt.savefig(output_dir + "results.svg")
+plt.savefig(output_dir + "coord_bp.svg")
+plt.close(fig)
+
+pca_coords = compute_ltsa(points, neighbor_dict, observations, source_dim, target_dim)
+fig, ax = plt.subplots()
+ax.scatter(color, pca_coords, c=color, cmap=plt.cm.Spectral)
+ax.set_title("Actual Parameter Value vs Embedded Coordinate from Just PCA")
+plt.xlabel("Actual Parameter Value")
+plt.ylabel("Embedded Coordinate")
+plt.savefig(output_dir + "coord_pca.svg")
 plt.close(fig)
 
 ideal_tangent_coords = compute_ltsa(points, neighbor_dict, true_tangents, source_dim, target_dim)
@@ -614,7 +623,7 @@ ax.scatter(color, ideal_tangent_coords, c=color, cmap=plt.cm.Spectral)
 ax.set_title("Actual Parameter Value vs Embedded Coordinate from Actual Tangents")
 plt.xlabel("Actual Parameter Value")
 plt.ylabel("Embedded Coordinate")
-plt.savefig(output_dir + "goal.svg")
+plt.savefig(output_dir + "coord_actual_tangent.svg")
 plt.close(fig)
 
 t1 = time.time()
