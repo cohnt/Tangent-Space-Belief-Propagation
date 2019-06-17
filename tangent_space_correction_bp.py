@@ -20,6 +20,7 @@ target_dim = 1      # The number of dimensions the data is being reduced to
 message_resample_cov = np.eye(target_dim) * 0.01 # TODO: Change
 
 output_dir = "results/"
+error_histogram_num_bins = num_points / 10
 
 write("\n")
 
@@ -573,7 +574,7 @@ try:
 
 		# Iteration error histogram
 		fig, ax = plt.subplots()
-		ax.hist(error_data, "auto")
+		ax.hist(error_data, error_histogram_num_bins)
 		ax.set_title("Histogram of Tangent Space Error")
 		plt.xlabel("Tangent Space Error")
 		plt.ylabel("Count")
