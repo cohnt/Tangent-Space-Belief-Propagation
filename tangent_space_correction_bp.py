@@ -373,7 +373,7 @@ def evalError(true_tangents, estimated_tangents):
 	max_error = np.max(error_arr)
 	mean_error = np.mean(error_arr)
 	median_error = np.median(error_arr)
-	return (max_error, mean_error, median_error)
+	return (max_error, mean_error, median_error, error_arr)
 
 parallel = Parallel(n_jobs=-1, verbose=10, backend="threading")
 max_errors = []
@@ -513,7 +513,7 @@ try:
 		image_time = t1-t0
 		write("Done! dt=%f\n" % image_time)
 
-		max_error, mean_error, median_error = evalError(true_tangents, mle_bases)
+		max_error, mean_error, median_error, error_data = evalError(true_tangents, mle_bases)
 		max_errors.append(max_error)
 		mean_errors.append(mean_error)
 		median_errors.append(median_error)
@@ -526,7 +526,7 @@ try:
 		# mean_errors = np.array(mean_errors)
 		# median_errors = np.array(median_errors)
 
-		raw_max_error, raw_mean_error, raw_median_error = evalError(true_tangents, observations)
+		raw_max_error, raw_mean_error, raw_median_error, raw_error_data = evalError(true_tangents, observations)
 		iters_array = np.arange(1, len(max_errors)+1)
 
 		# Max error plot
@@ -570,6 +570,14 @@ try:
 		plt.ylabel("Median Tangent Space Error")
 		plt.savefig(output_dir + "median_error.svg")
 		plt.close(fig)
+
+		# Iteration error histogram
+		fig, ax = plt.subplots()
+		ax.hist(error_data, "auto")
+		ax.set_title("Histogram of Tangent Space Error")
+		plt.xlabel("Tangent Space Error")
+		plt.ylabel("Count")
+		plt.savefig(output_dir + ("error_histogram%s.svg" % str(iter_num).zfill(4)))
 
 		t1 = time.time()
 		graph_time = t1-t0
