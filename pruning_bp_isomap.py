@@ -654,9 +654,6 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
-from sklearn.manifold import MDS
-mds = MDS(n_components=target_dim, max_iter=3000, eps=1e-9, dissimilarity="precomputed", n_jobs=-1)
-
 write("Pruning edges...")
 flush()
 t0 = time.time()
@@ -761,7 +758,11 @@ flush()
 write("Fitting MDS...")
 flush()
 t0 = time.time()
+
+from sklearn.manifold import MDS
+mds = MDS(n_components=target_dim, max_iter=3000, eps=1e-9, n_init=25, dissimilarity="precomputed", n_jobs=-1)
 feature_coords = mds.fit_transform(shortest_distances)
+
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
