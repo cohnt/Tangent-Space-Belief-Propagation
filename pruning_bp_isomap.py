@@ -664,7 +664,7 @@ for i in range(0, num_points):
 		if i != j:
 			vec = points[j] - points[i]
 			proj_vec = projSubspace(mle_bases[i], vec)
-			dprod = np.abs(np.dot(vec, np.dot(proj_vec, true_tangents[i])) / (np.linalg.norm(vec) * np.linalg.norm(proj_vec)))
+			dprod = np.abs(np.dot(vec, np.dot(proj_vec, mle_bases[i])) / (np.linalg.norm(vec) * np.linalg.norm(proj_vec)))
 			if dprod < pruning_angle_thresh:
 				pruned_neighbors[i,j] = 0
 				pruned_neighbors[j,i] = 0
