@@ -9,6 +9,7 @@ import time
 import sys
 import copy
 from joblib import Parallel, delayed
+from tqdm import tqdm
 from utils import write, flush
 
 dataset_seed = None
@@ -389,7 +390,7 @@ def evalError(true_tangents, estimated_tangents):
 	median_error = np.median(error_arr)
 	return (max_error, mean_error, median_error, error_arr)
 
-parallel = Parallel(n_jobs=-1, verbose=10, backend="threading")
+parallel = Parallel(n_jobs=-1, verbose=0, backend="threading")
 max_errors = []
 mean_errors = []
 median_errors = []
@@ -432,7 +433,7 @@ try:
 			# 	# Weight m_t->s
 			# 	raw_weights[i][:] = weightMessage(messages_next, messages_prev, t, s)
 
-			raw_weights = np.asarray(parallel(delayed(weightMessage)(messages_next, messages_prev, neighbor_pair_list[i][0], neighbor_pair_list[i][1]) for i in range(num_messages)))
+			raw_weights = np.asarray(parallel(delayed(weightMessage)(messages_next, messages_prev, neighbor_pair_list[i][0], neighbor_pair_list[i][1]) for i in tqdm(range(num_messages))))
 
 			# Normalize for each message (each row is for a message, so we sum along axis 1)
 			raw_weights = raw_weights / raw_weights.sum(axis=1, keepdims=True)
