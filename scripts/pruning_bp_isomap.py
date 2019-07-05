@@ -580,7 +580,7 @@ try:
 
 		# Iteration error histogram
 		fig, ax = plt.subplots()
-		ax.hist(error_data, np.arange(0, 1, 1.0/error_histogram_num_bins))
+		ax.hist(error_data, np.arange(0, 1, 1.0/error_histogram_num_bins), log=True)
 		ax.set_title("Histogram of Tangent Space Error (iter %d)" % iter_num)
 		ax.set_xlim(left=0, right=1)
 		ax.set_ylim(top=num_points)
@@ -642,7 +642,7 @@ flush()
 t0 = time.time()
 raw_max_error, raw_mean_error, raw_median_error, raw_error_data = evalError(true_tangents, observations)
 fig, ax = plt.subplots()
-ax.hist(raw_error_data, np.arange(0, 1, 1.0/error_histogram_num_bins))
+ax.hist(raw_error_data, np.arange(0, 1, 1.0/error_histogram_num_bins), log=True)
 ax.set_title("Histogram of PCA Error")
 ax.set_xlim(left=0, right=1)
 ax.set_ylim(top=num_points)
