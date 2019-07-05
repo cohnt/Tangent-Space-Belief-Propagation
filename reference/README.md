@@ -25,7 +25,9 @@
 * https://pdfs.semanticscholar.org/9cd5/fa5f0bac6e8ea9a14b169cd4b4a7ed2f9f13.pdf
 * https://en.wikipedia.org/wiki/Local_tangent_space_alignment
 
-### Linear Algebra and Other Mathematics
+### Mathematics
+
+##### Linear Algebra
 
 * https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse
 * https://en.wikipedia.org/wiki/Matrix_norm#Frobenius_norm
@@ -33,7 +35,15 @@
 * https://en.wikipedia.org/wiki/Singular_value_decomposition
 * https://en.wikipedia.org/wiki/Singular_value
 * https://stats.stackexchange.com/questions/134282/relationship-between-svd-and-pca-how-to-use-svd-to-perform-pca
+
+##### Differential Geometry
+
 * https://en.wikipedia.org/wiki/Laplace%E2%80%93Beltrami_operator
+* https://en.wikipedia.org/wiki/Laplace_operator
+
+##### Statistics and Probability
+
+* https://en.wikipedia.org/wiki/Bingham_distribution
 
 ### matplotlib
 
