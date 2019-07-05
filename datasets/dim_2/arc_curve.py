@@ -9,8 +9,9 @@ def make_arc_curve(n_samples, noise_factor, rs_seed=None):
 		For best results, noise_factor should be pretty small (at most 0.001)
 	"""
 
-	if rs_seed != None:
-		print "Using dataset seed=%d" % rs_seed
+	if rs_seed == None:
+		rs_seed = np.random.randint(0, 2**32)
+	print "Using dataset seed=%d" % rs_seed
 	rs = np.random.RandomState(seed=rs_seed)
 
 	# The arc curve is parameterized by 
