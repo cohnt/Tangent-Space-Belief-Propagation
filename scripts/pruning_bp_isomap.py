@@ -525,7 +525,7 @@ try:
 		mean_errors.append(mean_error)
 		median_errors.append(median_error)
 
-		write("Updating graphs...")
+		write("Rewriting graphs...")
 		flush()
 		t0 = time.time()
 
