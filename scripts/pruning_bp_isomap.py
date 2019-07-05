@@ -50,7 +50,7 @@ flush()
 write("Saving dataset plot...")
 flush()
 t0 = time.time()
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(points[:,0], points[:,1], c=color, cmap=plt.cm.Spectral, s=2**2, zorder=2, linewidth=0.25)
 ax.set_title("Dataset (num=%d, variance=%f, seed=%d)" % (num_points, data_noise, dataset_seed))
 plt.savefig(output_dir + "dataset.svg")
@@ -81,7 +81,7 @@ flush()
 write("Saving nearest neighbors plot...")
 flush()
 t0 = time.time()
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 plot_neighbors_2d(points, color, neighbor_graph, ax, point_size=2, line_width=0.25, edge_thickness=0.5, show_labels=False)
 ax.set_title("Nearest Neighbors (k=%d)" % neighbors_k)
 plt.savefig(output_dir + "nearest_neighbors.svg")
@@ -93,7 +93,7 @@ flush()
 write("Saving ground truth tangent plot...")
 flush()
 t0 = time.time()
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 plot_pca_2d(points, color, true_tangents, ax, point_size=2, point_line_width=0.25, line_width=0.5, line_length=0.05)
 ax.set_title("Exact Tangents")
 plt.savefig(output_dir + "true_tangents.svg")
@@ -153,7 +153,7 @@ flush()
 write("Saving PCA observations plot...")
 flush()
 t0 = time.time()
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 plot_pca_2d(points, color, observations, ax, point_size=2, point_line_width=0.25, line_width=0.5, line_length=0.05)
 ax.set_title("Measured Tangent Spaces (PCA)")
 plt.savefig(output_dir + "pca_observations.svg")
@@ -161,6 +161,11 @@ plt.close(fig)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
+
+##############
+# Write Data #
+##############
+
 
 #######################
 # Initialize Messages #
@@ -492,13 +497,13 @@ try:
 			max_ind = np.argmax(belief[i].weights)
 			mle_bases[i] = belief[i].ts[max_ind]
 
-		fig, ax = plt.subplots()
+		fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 		plot_pca_2d(points, color, mle_bases, ax, point_size=2, point_line_width=0.25, line_width=0.5, line_length=0.05)
 		ax.set_title("Tangent Space MLE (iter %d)" % iter_num)
 		plt.savefig(output_dir + ("ts_mle_iter%s.svg" % str(iter_num).zfill(4)))
 		plt.close(fig)
 
-		fig, ax = plt.subplots()
+		fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 		ax.scatter(points[:,0], points[:,1], c=color, cmap=plt.cm.Spectral, s=2**2, zorder=2, linewidth=0.25)
 
 		coordinates = np.zeros((num_points*num_samples, 2, 2))
@@ -539,7 +544,7 @@ try:
 		iters_array = np.arange(1, len(max_errors)+1)
 
 		# Max error plot
-		fig, ax = plt.subplots()
+		fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 		ax.plot(iters_array, max_errors)
 		ax.axhline(y=raw_max_error, linewidth=3, color="red", linestyle="--")
 		label_text = "Only PCA Error=%f" % raw_max_error
@@ -553,7 +558,7 @@ try:
 		plt.close(fig)
 
 		# Mean error plot
-		fig, ax = plt.subplots()
+		fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 		ax.plot(iters_array, mean_errors)
 		ax.axhline(y=raw_mean_error, linewidth=3, color="red", linestyle="--")
 		label_text = "Only PCA Error=%f" % raw_mean_error
@@ -567,7 +572,7 @@ try:
 		plt.close(fig)
 
 		# Median error plot
-		fig, ax = plt.subplots()
+		fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 		ax.plot(iters_array, median_errors)
 		ax.axhline(y=raw_median_error, linewidth=3, color="red", linestyle="--")
 		label_text = "Only PCA Error=%f" % raw_median_error
@@ -581,7 +586,7 @@ try:
 		plt.close(fig)
 
 		# Iteration error histogram
-		fig, ax = plt.subplots()
+		fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 		ax.hist(error_data, np.arange(0, 1, 1.0/error_histogram_num_bins))
 		ax.set_title("Histogram of Tangent Space Error (iter %d)" % iter_num)
 		ax.set_xlim(left=0, right=1)
@@ -643,7 +648,7 @@ write("Saving PCA error histogram...")
 flush()
 t0 = time.time()
 raw_max_error, raw_mean_error, raw_median_error, raw_error_data = evalError(true_tangents, observations)
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.hist(raw_error_data, np.arange(0, 1, 1.0/error_histogram_num_bins))
 ax.set_title("Histogram of PCA Error")
 ax.set_xlim(left=0, right=1)
@@ -675,7 +680,7 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 plot_neighbors_2d(points, color, pruned_neighbors, ax, point_size=2, line_width=0.25, edge_thickness=0.5, show_labels=False)
 ax.set_title("Pruned Nearest Neighbors (k=%d, thresh=%f)" % (neighbors_k, pruning_angle_thresh))
 plt.savefig(output_dir + "pruned_nearest_neighbors.svg")
@@ -738,7 +743,7 @@ else:
 		set_b = connected_components.findSet(j)
 		connected_components.union(set_a, set_b)
 
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 plot_neighbors_2d(points, color, pruned_neighbors, ax, point_size=2, line_width=0.25, edge_thickness=0.5, show_labels=False)
 ax.set_title("Added Edges after Pruning")
 plt.savefig(output_dir + "added_edges.svg")
@@ -769,7 +774,7 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral)
 ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from BP Tangent Correction for Edge Pruning", 60)))
 plt.xlabel("Actual Parameter Value")
@@ -807,7 +812,7 @@ for i in range(num_methods):
 	write("Done! dt=%f\n" % (t1-t0))
 	flush()
 	
-	fig, ax = plt.subplots()
+	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 	ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral)
 	ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from %s" % name, 60)))
 	plt.xlabel("Actual Parameter Value")
@@ -823,7 +828,7 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral)
 ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Classical LTSA", 60)))
 plt.xlabel("Actual Parameter Value")
@@ -839,7 +844,7 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral)
 ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction", 60)))
 plt.xlabel("Actual Parameter Value")
@@ -856,7 +861,7 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral)
 ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction and Edge Pruning", 60)))
 plt.xlabel("Actual Parameter Value")
@@ -870,7 +875,7 @@ t0 = time.time()
 
 matplotlib.rcParams.update({'font.size': 6})
 
-fig, axes = plt.subplots(nrows=2, ncols=4)
+fig, axes = plt.subplots(nrows=2, ncols=4, figsize=(19.2, 10.8), dpi=100)
 plt.tight_layout(pad=5, h_pad=10, w_pad=5)
 axes_list = np.concatenate(axes)
 
