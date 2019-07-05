@@ -12,6 +12,8 @@ from joblib import Parallel, delayed
 from tqdm import tqdm
 from utils import write, flush
 
+global_t0 = time.time()
+
 dataset_seed = None
 
 num_iters = 10     # Number of iterations of the message passing algorithm to run
@@ -911,3 +913,6 @@ for i in range(8):
 
 plt.savefig(output_dir + "comparison_all.svg")
 plt.close(fig)
+
+global_t1 = time.time()
+write("\nTotal program runtime: %d seconds.\n" % (global_t1-global_t0))
