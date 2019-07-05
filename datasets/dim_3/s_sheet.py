@@ -1,13 +1,17 @@
 import numpy as np
 from scipy.linalg import orth
 
-def make_s_sheet(n_samples, noise_factor):
+def make_s_sheet(n_samples, noise_factor, rs_seed=None):
 	"""
 		n_samples: number of points to generate
 		noise_factor: variance of the noise added to each dimension
 		
 		For best results, noise_factor should be pretty small (at most 0.001)
 	"""
+
+	if rs_seed != None:
+		print "Using dataset seed=%d" % rs_seed
+	rs = np.random.RandomState(seed=rs_seed)
 
 	# The s curve is parameterized by 
 	# x(s,t) = 0.5 + sin(t)cos(t)
@@ -28,8 +32,8 @@ def make_s_sheet(n_samples, noise_factor):
 	# dy/ds = 0
 	# dz/ds = 1
 
-	s = np.random.uniform(sLowerBound, sUpperBound, n_samples)
-	t = np.random.uniform(tLowerBound, tUpperBound, n_samples)
+	s = rs.uniform(sLowerBound, sUpperBound, n_samples)
+	t = rs.uniform(tLowerBound, tUpperBound, n_samples)
 	data = np.array([0.5 + np.multiply(np.sin(t), np.cos(t)), 0.5 + (0.5 * np.cos(t)), s]).transpose()
 	# data.shape will be (n_samples, 3), so we can interpret it as a list of n_samples 3D points
 	ts = np.array([[(np.cos(t) ** 2) - (np.sin(t) ** 2), -0.5 * np.sin(t), np.full(t.shape, 0)], [np.full(t.shape, 0), np.full(t.shape, 0), np.full(t.shape, 1)]])
@@ -46,7 +50,7 @@ def make_s_sheet(n_samples, noise_factor):
 	cov = [[noise_factor, 0, 0],
 	       [0, noise_factor, 0],
 	       [0, 0, noise_factor]]
-	noise = np.random.multivariate_normal(mean, cov, n_samples)
+	noise = rs.multivariate_normal(mean, cov, n_samples)
 
 	color = (t - tLowerBound) / (tUpperBound - tLowerBound)
 

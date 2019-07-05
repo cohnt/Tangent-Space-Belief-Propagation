@@ -1,13 +1,17 @@
 import numpy as np
 from scipy.linalg import orth
 
-def make_arc_curve(n_samples, noise_factor):
+def make_arc_curve(n_samples, noise_factor, rs_seed=None):
 	"""
 		n_samples: number of points to generate
 		noise_factor: variance of the noise added to each dimension
 		
 		For best results, noise_factor should be pretty small (at most 0.001)
 	"""
+
+	if rs_seed != None:
+		print "Using dataset seed=%d" % rs_seed
+	rs = np.random.RandomState(seed=rs_seed)
 
 	# The arc curve is parameterized by 
 	# x(t) = 0.5 + 0.5cos(t)
@@ -21,7 +25,7 @@ def make_arc_curve(n_samples, noise_factor):
 	# dx/dt = -0.5sin(t)
 	# dy/dt = 0.5cos(t)
 	
-	t = np.random.uniform(lowerBound, upperBound, n_samples)
+	t = rs.uniform(lowerBound, upperBound, n_samples)
 	data = np.array([0.5 + (0.5 * np.cos(t)), 0.5 * np.sin(t)]).transpose()
 	# data.shape will be (n_samples, 2), so we can interpret it as a list of n_samples 2D points
 	ts = np.array([-0.5 * np.sin(t), 0.5 * np.cos(t)]).transpose().reshape(n_samples, 1, 2)
@@ -31,7 +35,7 @@ def make_arc_curve(n_samples, noise_factor):
 	# Add Gaussian noise to the samples
 	mean = [0, 0]
 	cov = [[noise_factor, 0], [0, noise_factor]]
-	noise = np.random.multivariate_normal(mean, cov, n_samples)
+	noise = rs.multivariate_normal(mean, cov, n_samples)
 
 	color = (t - lowerBound) / (upperBound - lowerBound)
 
