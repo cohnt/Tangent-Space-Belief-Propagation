@@ -1,6 +1,7 @@
 *.pyc
 results/*
 results_triangle/*
+testing_history/*
 *.svg
 *.png
 *.gif
