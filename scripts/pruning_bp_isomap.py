@@ -18,8 +18,8 @@ dataset_seed = None
 
 num_iters = 10     # Number of iterations of the message passing algorithm to run
 neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
-num_points = 500    # Number of data points
-data_noise = 0.00025 # How much noise is added to the data
+num_points = 1000    # Number of data points
+data_noise = 0.0025 # How much noise is added to the data
 num_samples = 5   # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
@@ -45,7 +45,7 @@ from datasets.dim_2.long_spiral_curve import make_long_spiral_curve
 write("Generating dataset...")
 flush()
 t0 = time.time()
-points, color, true_tangents, dataset_seed = make_o_curve(num_points, data_noise, rs_seed=dataset_seed)
+points, color, true_tangents, dataset_seed = make_long_spiral_curve(num_points, data_noise, rs_seed=dataset_seed)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
@@ -914,5 +914,10 @@ for i in range(8):
 plt.savefig(output_dir + "comparison_all.svg")
 plt.close(fig)
 
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
 global_t1 = time.time()
-write("\nTotal program runtime: %d seconds.\n" % (global_t1-global_t0))
+write("\nTotal program runtime: %d seconds.\n\n" % (global_t1-global_t0))
+flush()
