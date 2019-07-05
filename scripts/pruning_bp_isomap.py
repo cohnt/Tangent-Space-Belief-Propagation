@@ -11,6 +11,8 @@ import copy
 from joblib import Parallel, delayed
 from utils import write, flush
 
+dataset_seed = None
+
 num_iters = 10     # Number of iterations of the message passing algorithm to run
 neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
 num_points = 500    # Number of data points
@@ -40,7 +42,7 @@ from datasets.dim_2.long_spiral_curve import make_long_spiral_curve
 write("Generating dataset...")
 flush()
 t0 = time.time()
-points, color, true_tangents = make_o_curve(num_points, data_noise)
+points, color, true_tangents, dataset_seed = make_o_curve(num_points, data_noise, rs_seed=dataset_seed)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
@@ -50,7 +52,7 @@ flush()
 t0 = time.time()
 fig, ax = plt.subplots()
 ax.scatter(points[:,0], points[:,1], c=color, cmap=plt.cm.Spectral, s=2**2, zorder=2, linewidth=0.25)
-ax.set_title("Dataset (num=%d, variance=%f)" % (num_points, data_noise))
+ax.set_title("Dataset (num=%d, variance=%f, seed=%d)" % (num_points, data_noise, dataset_seed))
 plt.savefig(output_dir + "dataset.svg")
 plt.close(fig)
 t1 = time.time()
