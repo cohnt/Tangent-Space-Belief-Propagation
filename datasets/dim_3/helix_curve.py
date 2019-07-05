@@ -43,7 +43,7 @@ def make_helix_curve(n_samples, noise_factor, rs_seed=None):
 
 	color = (t - lowerBound) / (upperBound - lowerBound)
 
-	return (data + noise, color, ts)
+	return (data + noise, color, ts, rs_seed)
 
 if __name__ == "__main__":
 	from mpl_toolkits.mplot3d import Axes3D

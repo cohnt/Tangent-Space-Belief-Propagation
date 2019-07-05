@@ -40,7 +40,7 @@ def make_o_curve(n_samples, noise_factor, rs_seed=None):
 
 	color = (t - lowerBound) / (upperBound - lowerBound)
 
-	return (data + noise, color, ts)
+	return (data + noise, color, ts, rs_seed)
 
 if __name__ == "__main__":
 	import matplotlib.pyplot as plt

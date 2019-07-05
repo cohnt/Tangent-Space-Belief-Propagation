@@ -55,7 +55,7 @@ def make_s_sheet(n_samples, noise_factor, rs_seed=None):
 
 	color = (t - tLowerBound) / (tUpperBound - tLowerBound)
 
-	return (data + noise, color, ts)
+	return (data + noise, color, ts, rs_seed)
 
 if __name__ == "__main__":
 	from mpl_toolkits.mplot3d import Axes3D
