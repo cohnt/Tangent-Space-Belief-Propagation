@@ -15,14 +15,14 @@ from utils import write, flush
 global_t0 = time.time()
 
 dataset_name = "long_spiral_curve"
-dataset_seed = np.random.randint(0, 2**32)
-num_points = 1000    # Number of data points
-data_noise = 0.0025 # How much noise is added to the data
+dataset_seed = 2790004070
+num_points = 500    # Number of data points
+data_noise = 0 # How much noise is added to the data
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1      # The number of dimensions the data is being reduced to
 
 num_iters = 10     # Number of iterations of the message passing algorithm to run
-neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
+neighbors_k = 8    # The value of 'k' used for k-nearest-neighbors
 num_samples = 5   # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
 
@@ -58,6 +58,9 @@ f.write("num_neighbors=%d\n" % neighbors_k)
 f.write("num_samples=%d\n" % num_samples)
 f.write("explore=%f\n" % explore_perc)
 f.write("prune_thresh=%f\n" % pruning_angle_thresh)
+
+f.write("\n[Display]\n")
+f.write("; TODO\n")
 
 f.close()
 
@@ -192,11 +195,6 @@ plt.close(fig)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
-
-##############
-# Write Data #
-##############
-
 
 #######################
 # Initialize Messages #
@@ -793,13 +791,17 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
-write("Fitting MDS...")
+write("Fitting KernelPCA...")
 flush()
 t0 = time.time()
 
-from sklearn.manifold import MDS
-mds = MDS(n_components=target_dim, max_iter=3000, eps=1e-9, n_init=25, dissimilarity="precomputed", n_jobs=-1)
-feature_coords = mds.fit_transform(shortest_distances)
+# from sklearn.manifold import MDS
+# mds = MDS(n_components=target_dim, max_iter=3000, eps=1e-9, n_init=25, dissimilarity="precomputed", n_jobs=-1, metric=True)
+# feature_coords = mds.fit_transform(shortest_distances)
+
+from sklearn.decomposition import KernelPCA
+kpca = KernelPCA(n_components=target_dim, kernel="precomputed", eigen_solver="auto", tol=1e-3, max_iter=3000, n_jobs=-1)
+feature_coords = kpca.fit_transform(shortest_distances * -0.5)
 
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
@@ -930,8 +932,10 @@ feature_coords = compute_ltsa(points, pruned_neighbor_dict, mle_bases, source_di
 axes_list[6].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=2, linewidths=0.25)
 axes_list[6].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction and Edge Pruning", 25)))
 
-mds = MDS(n_components=target_dim, max_iter=3000, eps=1e-9, n_init=25, dissimilarity="precomputed", n_jobs=-1)
-feature_coords = mds.fit_transform(shortest_distances)
+# mds = MDS(n_components=target_dim, max_iter=3000, eps=1e-9, n_init=25, dissimilarity="precomputed", n_jobs=-1)
+# feature_coords = mds.fit_transform(shortest_distances)
+kpca = KernelPCA(n_components=target_dim, kernel="precomputed", eigen_solver="auto", tol=1e-3, max_iter=3000, n_jobs=-1)
+feature_coords = kpca.fit_transform(shortest_distances * -0.5)
 axes_list[7].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=2, linewidths=0.25)
 axes_list[7].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from BP Tangent Correction for Edge Pruning", 25)))
 
