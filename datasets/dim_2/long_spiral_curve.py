@@ -17,9 +17,9 @@ def make_long_spiral_curve(n_samples, noise_factor, b_val=0.05, rs_seed=None):
 	# The s curve is parameterized by 
 	# x(t) = btcos(t)
 	# y(t) = btsin(t)
-	# for 0 <= t <= 12pi
+	# for 2pi <= t <= 12pi
 	# See for graph: https://www.desmos.com/calculator/ete1b4p535
-	lowerBound = 0.0
+	lowerBound = 2.0 * np.pi
 	upperBound = 8.0 * np.pi
 	
 	# For computing the Jacobian, we have
