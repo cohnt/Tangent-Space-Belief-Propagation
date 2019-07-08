@@ -32,6 +32,11 @@ pruning_angle_thresh = np.cos(30.0 * np.pi / 180.0)
 output_dir = "results/"
 error_histogram_num_bins = num_points / 10
 
+embedding_name = "KernelPCA" # Could also be MDS
+kpca_eigen_solver = "auto"
+kpca_tol = 1e-9
+kpca_max_iter = 3000
+
 write("\n")
 
 ####################
@@ -58,6 +63,12 @@ f.write("num_neighbors=%d\n" % neighbors_k)
 f.write("num_samples=%d\n" % num_samples)
 f.write("explore=%f\n" % explore_perc)
 f.write("prune_thresh=%f\n" % pruning_angle_thresh)
+
+f.write("\n[Embedding]\n")
+f.write("embedding_method=%s\n" % embedding_name)
+f.write("embedding_eigen_solver=%s\n" % kpca_eigen_solver)
+f.write("embedding_tol=%f\n" % kpca_tol)
+f.write("embedding_max_iter=%d\n" % kpca_max_iter)
 
 f.write("\n[Display]\n")
 f.write("; TODO\n")
@@ -800,7 +811,7 @@ t0 = time.time()
 # feature_coords = mds.fit_transform(shortest_distances)
 
 from sklearn.decomposition import KernelPCA
-kpca = KernelPCA(n_components=target_dim, kernel="precomputed", eigen_solver="auto", tol=1e-9, max_iter=3000, n_jobs=-1)
+kpca = KernelPCA(n_components=target_dim, kernel="precomputed", eigen_solver=kpca_eigen_solver, tol=kpca_tol, max_iter=kpca_max_iter, n_jobs=-1)
 feature_coords = kpca.fit_transform((shortest_distances**2) * -0.5)
 
 t1 = time.time()
@@ -934,7 +945,7 @@ axes_list[6].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordi
 
 # mds = MDS(n_components=target_dim, max_iter=3000, eps=1e-9, n_init=25, dissimilarity="precomputed", n_jobs=-1)
 # feature_coords = mds.fit_transform(shortest_distances)
-kpca = KernelPCA(n_components=target_dim, kernel="precomputed", eigen_solver="auto", tol=1e-9, max_iter=3000, n_jobs=-1)
+kpca = KernelPCA(n_components=target_dim, kernel="precomputed", eigen_solver=kpca_eigen_solver, tol=kpca_tol, max_iter=kpca_max_iter, n_jobs=-1)
 feature_coords = kpca.fit_transform((shortest_distances**2) * -0.5)
 axes_list[7].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=2, linewidths=0.25)
 axes_list[7].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from BP Tangent Correction for Edge Pruning", 25)))
