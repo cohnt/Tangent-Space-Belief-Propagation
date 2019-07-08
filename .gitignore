@@ -12,3 +12,8 @@ testing_history/*
 *.fls
 *.log
 *.synctex.gz
+
+# IEEE Template for LaTeX
+*.bbl
+*.blg
+paper/*/*.out
