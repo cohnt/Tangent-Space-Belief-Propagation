@@ -45,7 +45,14 @@
 
 * https://en.wikipedia.org/wiki/Bingham_distribution
 
-### matplotlib
+### Python
+
+##### File I/O
+
+* https://en.wikipedia.org/wiki/INI_file
+* https://stackoverflow.com/questions/8884188/how-to-read-and-write-ini-file-with-python3
+
+##### matplotlib
 
 * https://stackoverflow.com/questions/3899980/how-to-change-the-font-size-on-a-matplotlib-plot
 * https://matplotlib.org/users/tight_layout_guide.html
