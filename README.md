@@ -1,0 +1,1 @@
+Run all scripts from the root of the repository as a module, i.e., to run ```pca_demo.py``` use the command ```python2 -m scripts/pca_demo```.

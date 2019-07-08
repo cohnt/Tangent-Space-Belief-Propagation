@@ -1,0 +1,303 @@
+\documentclass[10pt,letterpaper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[intlimits]{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{ragged2e}
+\usepackage[letterpaper, margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{cancel}
+\usepackage{mathtools}
+\usepackage{tabularx}
+\usepackage{arydshln}
+\usepackage{tensor}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage[boxed]{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{listings}
+\usepackage{textcomp}
+\usepackage{mathrsfs}
+\usepackage{bbm}
+\usepackage{tikz}
+\usepackage{enumitem}
+\usepackage{arydshln}
+\usepackage{relsize}
+\usepackage{multicol}
+
+\usetikzlibrary{bayesnet}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Formatting commands
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\n}{\hfill\break}
+\newcommand{\up}{\vspace{-\baselineskip}}
+\newcommand{\lemma}[1]{\par\noindent\settowidth{\hangindent}{\textbf{Lemma: }}\textbf{Lemma: }#1}
+\newcommand{\defn}[1]{\par\noindent\settowidth{\hangindent}{\textbf{Defn: }}\textbf{Defn: }#1\n}
+\newcommand{\thm}[1]{\par\noindent\settowidth{\hangindent}{\textbf{Thm: }}\textbf{Thm: }#1\n}
+\newcommand{\prop}[1]{\par\noindent\settowidth{\hangindent}{\textbf{Prop: }}\textbf{Prop: }#1\n}
+\newcommand{\cor}[1]{\par\noindent\settowidth{\hangindent}{\textbf{Cor: }}\textbf{Cor: }#1\n}
+\newcommand{\ex}[1]{\par\noindent\settowidth{\hangindent}{\textbf{Ex: }}\textbf{Ex: }#1\n}
+\newcommand{\exer}[1]{\par\noindent\settowidth{\hangindent}{\textbf{Exer: }}\textbf{Exer: }#1\n}
+\newcommand{\proven}{\;$\square$\n}
+\newcommand{\problem}[1]{\par\noindent{#1}\n}
+\newcommand{\problempart}[2]{\par\noindent\indent{}\settowidth{\hangindent}{\textbf{(#1)} \indent{}}\textbf{(#1)} #2\n}
+\newcommand{\ptxt}[1]{\textrm{\textnormal{#1}}}
+\newcommand{\inlineeq}[1]{\centerline{$\displaystyle #1$}}
+\newcommand{\pageline}{\noindent\rule{\textwidth}{0.1pt}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Math commands
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Set Theory
+\newcommand{\card}[1]{\left|#1\right|}
+\newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\setmid}{\;\middle|\;}
+\newcommand{\ps}[1]{\mathcal{P}\left(#1\right)}
+\newcommand{\pfinite}[1]{\mathcal{P}^{\ptxt{finite}}\left(#1\right)}
+\newcommand{\naturals}{\mathbb{N}}
+\newcommand{\N}{\naturals}
+\newcommand{\integers}{\mathbb{Z}}
+\newcommand{\Z}{\integers}
+\newcommand{\rationals}{\mathbb{Q}}
+\newcommand{\Q}{\rationals}
+\newcommand{\reals}{\mathbb{R}}
+\newcommand{\R}{\reals}
+\newcommand{\complex}{\mathbb{C}}
+\newcommand{\C}{\complex}
+\newcommand{\halfPlane}{\mathbb{H}}
+\let\H\relax
+\newcommand{\H}{\halfPlane}
+\newcommand{\comp}{^{\complement}}
+\DeclareMathOperator{\Hom}{Hom}
+\newcommand{\Ind}{\mathbbm{1}}
+\newcommand{\cut}{\setminus}
+\DeclareMathOperator{\elem}{elem}
+
+% Graph Theory
+\let\deg\relax
+\DeclareMathOperator{\deg}{deg}
+\newcommand{\degp}{\ptxt{deg}^{+}}
+\newcommand{\degn}{\ptxt{deg}^{-}}
+\newcommand{\precdot}{\mathrel{\ooalign{$\prec$\cr\hidewidth\hbox{$\cdot\mkern0.5mu$}\cr}}}
+\newcommand{\succdot}{\mathrel{\ooalign{$\cdot\mkern0.5mu$\cr\hidewidth\hbox{$\succ$}\cr\phantom{$\succ$}}}}
+\DeclareMathOperator{\cl}{cl}
+\DeclareMathOperator{\affdim}{affdim}
+
+% Probability
+\newcommand{\parSymbol}{\P}
+\newcommand{\Prob}{\mathbb{P}}
+\renewcommand{\P}{\Prob}
+\newcommand{\Avg}{\mathbb{E}}
+\newcommand{\E}{\Avg}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\cov}{cov}
+\DeclareMathOperator{\Unif}{Unif}
+\DeclareMathOperator{\Binom}{Binom}
+\newcommand{\CI}{\mathrel{\text{\scalebox{1.07}{$\perp\mkern-10mu\perp$}}}}
+
+% Standard Math
+\newcommand{\inv}{^{-1}}
+\newcommand{\abs}[1]{\left|#1\right|}
+\newcommand{\ceil}[1]{\left\lceil{}#1\right\rceil{}}
+\newcommand{\floor}[1]{\left\lfloor{}#1\right\rfloor{}}
+\newcommand{\conj}[1]{\overline{#1}}
+\newcommand{\of}{\circ}
+\newcommand{\tri}{\triangle}
+\newcommand{\inj}{\hookrightarrow}
+\newcommand{\surj}{\twoheadrightarrow}
+\newcommand{\ndiv}{\nmid}
+\newcommand{\divides}{\mid}
+\newcommand{\ndivides}{\nmid}
+\DeclareMathOperator{\lcm}{lcm}
+\DeclareMathOperator{\sgn}{sgn}
+\newcommand{\map}[4]{\!\!\!\begin{array}[t]{rcl}#1 & \!\!\!\!\to & \!\!\!\!#2\\ #3 & \!\!\!\!\mapsto & \!\!\!\!#4\end{array}}
+\newcommand{\bigsum}[2]{\smashoperator[lr]{\sum_{\scalebox{#1}{$#2$}}}}
+
+% Linear Algebra
+\newcommand{\Id}{\textrm{\textnormal{Id}}}
+\newcommand{\im}{\textrm{\textnormal{im}}}
+\newcommand{\norm}[1]{\abs{\abs{#1}}}
+\newcommand{\tpose}{^{T}}
+\newcommand{\iprod}[1]{\left<#1\right>}
+\DeclareMathOperator{\trace}{tr}
+\newcommand{\chgBasMat}[3]{\!\!\tensor*[_{#1}]{\left[#2\right]}{_{#3}}}
+\newcommand{\vecBas}[2]{\tensor*[]{\left[#1\right]}{_{#2}}}
+\DeclareMathOperator{\GL}{GL}
+\DeclareMathOperator{\Mat}{Mat}
+\DeclareMathOperator{\vspan}{span}
+\DeclareMathOperator{\rank}{rank}
+\newcommand{\V}[1]{\vec{#1}}
+\DeclareMathOperator{\proj}{proj}
+\DeclareMathOperator{\compProj}{comp}
+\DeclareMathOperator{\row}{row}
+\newcommand{\smallPMatrix}[1]{\paren{\begin{smallmatrix}#1\end{smallmatrix}}}
+\newcommand{\smallBMatrix}[1]{\brack{\begin{smallmatrix}#1\end{smallmatrix}}}
+
+% Multilinear Algebra
+\newcommand{\Lsym}{\L}
+\let\L\relax
+\DeclareMathOperator{\L}{\mathscr{L}}
+\DeclareMathOperator{\A}{\mathcal{A}}
+\DeclareMathOperator{\Alt}{Alt}
+\DeclareMathOperator{\Sym}{Sym}
+\newcommand{\ot}{\otimes}
+\newcommand{\ox}{\otimes}
+\DeclareMathOperator{\asc}{asc}
+\DeclareMathOperator{\asSet}{set}
+\DeclareMathOperator{\sort}{sort}
+\DeclareMathOperator{\ringA}{\mathring{A}}
+
+% Topology
+\newcommand{\closure}[1]{\overline{#1}}
+\newcommand{\uball}{\mathcal{U}}
+\DeclareMathOperator{\Int}{Int}
+\DeclareMathOperator{\Ext}{Ext}
+\DeclareMathOperator{\Bd}{Bd}
+\DeclareMathOperator{\rInt}{rInt}
+\DeclareMathOperator{\ch}{ch}
+\DeclareMathOperator{\ah}{ah}
+\newcommand{\LargerTau}{\mathlarger{\mathlarger{\mathlarger{\mathlarger{\tau}}}}}
+\newcommand{\Tau}{\mathcal{T}}
+
+% Analysis
+\DeclareMathOperator{\Graph}{Graph}
+\DeclareMathOperator{\epi}{epi}
+\DeclareMathOperator{\hypo}{hypo}
+\DeclareMathOperator{\supp}{supp}
+\newcommand{\lint}[2]{\underset{#1}{\overset{#2}{{\color{black}\underline{{\color{white}\overline{{\color{black}\int}}\color{black}}}}}}}
+\newcommand{\uint}[2]{\underset{#1}{\overset{#2}{{\color{white}\underline{{\color{black}\overline{{\color{black}\int}}\color{black}}}}}}}
+\newcommand{\alignint}[2]{\underset{#1}{\overset{#2}{{\color{white}\underline{{\color{white}\overline{{\color{black}\int}}\color{black}}}}}}}
+\newcommand{\extint}{\ptxt{ext}\int}
+\newcommand{\extalignint}[2]{\ptxt{ext}\alignint{#1}{#2}}
+\newcommand{\conv}{\ast}
+\newcommand{\pd}[2]{\frac{\partial{}#1}{\partial{}#2}}
+\newcommand{\del}{\nabla}
+\DeclareMathOperator{\grad}{grad}
+\DeclareMathOperator{\curl}{curl}
+\let\div\relax
+\DeclareMathOperator{\div}{div}
+\DeclareMathOperator{\vol}{vol}
+
+% Complex Analysis
+\let\Re\relax
+\DeclareMathOperator{\Re}{Re}
+\let\Im\relax
+\DeclareMathOperator{\Im}{Im}
+\DeclareMathOperator{\Res}{Res}
+
+% Proofs
+\newcommand{\st}{s.t.}
+\newcommand{\unique}{!}
+\newcommand{\iffdef}{\overset{\ptxt{def}}{\Leftrightarrow}}
+\newcommand{\eqdef}{\overset{\ptxt{def}}{=}}
+\newcommand{\eqVertical}{\rotatebox[origin=c]{90}{=}}
+\newcommand{\mapsfrom}{\mathrel{\reflectbox{\ensuremath{\mapsto}}}}
+\newcommand{\mapsdown}{\rotatebox[origin=c]{-90}{$\mapsto$}\mkern2mu}
+\newcommand{\mapsup}{\rotatebox[origin=c]{90}{$\mapsto$}\mkern2mu}
+\newcommand{\from}{\!\mathrel{\reflectbox{\ensuremath{\to}}}}
+
+% Brackets
+\newcommand{\paren}[1]{\left(#1\right)}
+\renewcommand{\brack}[1]{\left[#1\right]}
+\renewcommand{\brace}[1]{\left\{#1\right\}}
+\newcommand{\ang}[1]{\left<#1\right>}
+
+% Algorithms
+\algrenewcommand{\algorithmiccomment}[1]{\hskip 1em \texttt{// #1}}
+\algrenewcommand\algorithmicrequire{\textbf{Input:}}
+\algrenewcommand\algorithmicensure{\textbf{Output:}}
+\newcommand{\algP}{\ptxt{\textbf{P}}}
+\newcommand{\algNP}{\ptxt{\textbf{NP}}}
+\newcommand{\algNPC}{\ptxt{\textbf{NP-Complete}}}
+\newcommand{\algNPH}{\ptxt{\textbf{NP-Hard}}}
+\newcommand{\algEXP}{\ptxt{\textbf{EXP}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Other commands
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\flag}[1]{\textbf{\textcolor{red}{#1}}}
+\newcommand{\uSym}{\u}
+\let\u\relax
+\newcommand{\u}[1]{\underline{#1}}
+\newcommand{\bSym}{\b}
+\let\b\relax
+\newcommand{\b}[1]{\textbf{#1}}
+\newcommand{\iSym}{\i}
+\let\i\relax
+\newcommand{\i}[1]{\textit{#1}}
+\newcommand{\rvline}{\hspace*{-\arraycolsep}\vline\hspace*{-\arraycolsep}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Make l's curvy in math environments
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\mathcode`l="8000
+\begingroup
+\makeatletter
+\lccode`\~=`\l
+\DeclareMathSymbol{\lsb@l}{\mathalpha}{letters}{`l}
+\lowercase{\gdef~{\ifnum\the\mathgroup=\m@ne \ell \else \lsb@l \fi}}%
+\endgroup
+
+\newcommand{\B}{
+    \begin{tikzpicture}
+    \filldraw [fill=red, draw=black] (0, 0) rectangle (0.37, 0.45);
+    \draw [line width=0.5mm, white ] (0.1,0.08) -- (0.1,0.38);
+    \draw[line width=0.5mm, white ] (0.1, 0.35) .. controls (0.2, 0.35) and (0.4, 0.2625) .. (0.1, 0.225);
+    \draw[line width=0.5mm, white ] (0.1, 0.225) .. controls (0.2, 0.225) and (0.4, 0.1625) .. (0.1, 0.1);
+    \end{tikzpicture}
+}
+
+\author{Thomas Cohn}
+\title{Local Tangent Space Alignment Symbol Glossary}
+\date{\today} % Can also use \today
+
+\begin{document}
+\maketitle
+\setlength\RaggedRightParindent{\parindent}
+\RaggedRight
+
+\begin{tabularx}{\linewidth}{|l|>{\raggedright\arraybackslash}X|} \hline
+	$\mathcal{F}$ & The data manifold. $\mathcal{F}$ is a parameterizable $d$-manifold in $\R^{m}$, with $d<m$.\\ \hline
+	$d$ & The underlying dimension of the data manifold $\mathcal{F}$, i.e., the ``feature'' space.\\ \hline
+	$m$ & The dimension of the higher dimensional ``input'' space.\\ \hline
+	$f$ & $f:C\subset\R^{d}\to\R^{m}$ is a smooth map which parameterizes $\mathcal{F}$.\\ \hline
+	$C$ & $C\subset\R^{d}$ is a compact subset of $\R^{d}$.\\ \hline
+	$x_{i}$ & $x_{1},\ldots,x_{N}\in\R^{m}$ are the data points in the higher dimensional space.\\ \hline
+	$\tau_{i}$ & $\tau_{1},\ldots,\tau_{N}\in\R^{d}$ are the corresponding feature space coordinates of the $x_{i}$'s, where $x_{i}=f(\tau_{i})+\epsilon_{i}$.\\ \hline
+	$\epsilon_{i}$ & $\epsilon_{1},\ldots,\epsilon_{N}\in\R^{d}$ is the added noise to $f(\tau_{i})$ to obtain $x_{i}$.\\ \hline
+	$X$ & $X=\smallBMatrix{| & & |\\ x_{1} & \cdots & x_{N}\\ | & & |}$ is the matrix form of the data.\\ \hline
+	$J_{f}$ & $J_{f}(\tau)=\smallBMatrix{\partial{}f_{1}/\partial\tau_{1} & \cdots & \partial{}f_{1}/\partial\tau_{d}\\ \vdots & \ddots & \vdots\\ \partial{}f_{m}/\partial\tau_{1} & \cdots & \partial{}f_{m}/\partial\tau_{d}}$ is the Jacobi matrix of $f$ at $\tau$.\\ \hline
+	$\overline{\tau}$ & $\overline{\tau}$ is some point near $\tau$ used for the following approximation via Taylor expansion: $f(\overline{\tau})=f(\tau)+J_{f}(\tau)\cdot(\overline{\tau}-\tau)+O(\norm{\overline{\tau}-\tau}^{2})$.\\ \hline
+	$\Tau_{\tau}$ & $\Tau_{\tau}=\vspan(J_{f}(\tau))$ is the tangent space of $f$ at $\tau$.\\ \hline
+	$Q_{\tau}$ & $Q_{\tau}$ is a matrix forming some orthonormal basis of $\Tau_{\tau}$, allowing us to write $J_{f}(\tau)(\overline{\tau}-\tau)=Q_{\tau}\theta_{\tau}^{*}$.\\ \hline
+	$\theta_{\tau}^{*}$ & ??? Possibly defined by $Q_{\tau}\theta_{\tau}^{*}=f(\overline{\tau})-f(\tau)$?\\ \hline
+	$P_{\tau}$ & Defined by $\theta_{\tau}^{*}=Q_{\tau}\tpose{}J_{f}(\tau)(\tau-\overline{\tau})\equiv{}P_{\tau}(\overline{\tau}-\tau)$.\\ \hline
+	$\theta_{\tau}$ & The mapping from $\tau$ to $\theta^{*}_{\tau}$ is a local affine transformation. $\theta_{\tau}$ is the orthogonal projection of $f(\overline{\tau})-f(\tau)$ onto $\Tau_{\tau}$. $\theta_{\tau}\equiv{}Q_{\tau}\tpose(f(\overline{\tau})-f(\tau))=\theta_{\tau}^{*}+O(\norm{\overline{\tau}-\tau}^{2})\approx\theta_{\tau}^{*}$.\\ \hline
+	$\Omega(\tau)$ & $\Omega(\tau)$ defines the neighborhood of $\tau$.\\ \hline
+	$X_{i}$ & $X_{i}=\smallBMatrix{| & & |\\ x_{i_{1}} & \cdots & x_{i_{k}}\\ | & & |}$ is a matrix consisting of the $k$-nearest neighbors of $x_{i}$.\\ \hline
+	$x$ & $x$ is part of the minimization problem\n
+	$\displaystyle\underset{x,\Theta,Q}{\min}\sum_{j=1}^{k}\norm{x_{i_{j}}-(x+Q\theta_{j})}_{2}^{2}=\underset{x,\Theta,Q}{\min}\norm{X_{i}-(xe\tpose+Q\Theta)}_{2}^{2}$.\n
+	The optimal $x$ is $\overline{x}_{i}$ -- the mean of all the $x_{i_{j}}$'s.\\ \hline
+	$Q$ & $Q$ is another term in the minimzation (but what is it???). It is of $d$ columns. Optimal $Q$ is given by the $d$ singular vectors of $X_{i}(I-ee\tpose/k)$ corresponding with the $d$ largest singular values.\\ \hline
+	$\Theta$ & $\Theta=\smallBMatrix{| & & |\\ \theta_{1} & \cdots & \theta_{k}\\ | & & |}$ is a matrix consisting of the orthogonal projections of each $x_{i_{j}}-x$ onto $\Tau_{x_{i}}$. $\Theta$ is given by $\Theta_{i}=Q_{i}\tpose{}X_{i}(I-\frac{1}{k}ee\tpose)=\smallBMatrix{| & & |\\ \theta_{1}^{(i)} & \cdots & \theta_{k}^{(i)}\\ | & & |},\theta_{j}^{(i)}=Q_{i}\tpose(x_{i_{j}}-\overline{x}_{i})$.\\ \hline
+	$\xi_{j}^{(i)}$ & $\xi_{j}^{(i)}=(I-Q_{i}Q_{i}\tpose)(x_{i_{j}}-\overline{x}_{i})$ is the global reconstruction error of $x_{i_{j}}$, with $x_{i_{j}}=\overline{x}_{i}+Q_{i}\theta_{j}^{(i)}+\xi_{j}^{(i)}$.\\ \hline
+	$\tau_{i_{j}}$ & $\tau_{i_{j}}$ is the feature space coordinate of $x_{i_{j}}$. We want $\tau_{i_{j}}=\overline{\tau_{i}}+L_{i}\theta_{j}^{(i)}+\epsilon_{j}^{(i)}$, for $j\in\set{1,\ldots,k}$ and $i\in\set{1,\ldots,N}$.\\ \hline
+	$\overline{\tau_{i}}$ & $\overline{\tau_{i}}$ is the mean of the $\tau_{i_{j}}$, for $j\in\set{1,\ldots,k}$.\\ \hline
+	$L_{i}$ & $L_{i}$ is the local affine transformation for $\tau_{i}$.\\ \hline
+	$E_{i}$ & $E_{i}=\smallBMatrix{| & & |\\ \epsilon_{1}^{(i)} & \cdots & \epsilon_{k}^{(i)}\\ | & & |}$ is the matrix form of the local reconstruction error.\\ \hline
+	$e$ & $e=\smallBMatrix{1 & \cdots & 1}\tpose$ is a column vector of all ones of dimension $k$.\\ \hline
+	$T_{i}$ & $T_{i}=\smallBMatrix{| & & |\\ \tau_{i} & \cdots & \tau_{k}\\ | & & |}$ is the matrix form of the feature space coordinates. It satisfies $T_{i}=\frac{1}{k}T_{i}ee\tpose+L_{i}\Theta_{i}+E_{i}$, so $E_{i}=T_{i}(I_{k}-\frac{1}{k}ee\tpose)-L_{i}\Theta_{i}$.\\ \hline
+	$S_{i}$ & $S_{i}$ is the $0$-$1$ selection matrix such that $TS_{i}=T_{i}$.\\ \hline
+	$S$ & $S=\left[\begin{array}{c;{2pt/2pt}c;{2pt/2pt}c}S_{1} & \cdots & S_{N}\end{array}\right]$.\\ \hline
+	$W_{i}$ & $W_{i}=(I_{k}-\frac{1}{k}ee\tpose)(I-\Theta_{i}^{+}\Theta_{i})$.\\ \hline
+\end{tabularx}
+\begin{tabularx}{\linewidth}{|l|>{\raggedright\arraybackslash}X|} \hline
+	$W$ & $W=\operatorname{diag}(W_{1},\ldots,W_{N})=\left[\begin{array}{c;{2pt/2pt}c;{2pt/2pt}c;{2pt/2pt}c}W_{1} & 0 & \cdots & 0\\ \hdashline[2pt/2pt] 0 & W_{2} & \cdots & 0\\ \hdashline[2pt/2pt] \vdots & \vdots & \ddots & \vdots\\ \hdashline[2pt/2pt] 0 & 0 & \cdots & W_{N}\end{array}\right]$.\\ \hline
+	$T$ & We want to find $T$ to minimize the overall reconstruction error $\displaystyle\sum_{i}\norm{E_{i}}_{F}^{2}=\norm{TSW}_{F}^{2}$.\n
+	To determine $T$, we require $TT\tpose=I_{d}$.\\ \hline
+	$B$ & $B\equiv{}SWW\tpose{}S\tpose$ has eigenvector $e$ corresponding to eigenvalue $0$. Thus, optimal $T$ is given by the $d$ eigenvectors corresponding to the $2$nd to $d+1$st smallest eigenvalues.\\ \hline
+\end{tabularx}
+
+\end{document}

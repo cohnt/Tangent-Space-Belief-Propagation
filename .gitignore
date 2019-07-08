@@ -1,1 +1,19 @@
 *.pyc
+results/*
+results_triangle/*
+testing_history/*
+*.svg
+*.png
+*.gif
+
+# LaTeX
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.synctex.gz
+
+# IEEE Template for LaTeX
+*.bbl
+*.blg
+paper/*/*.out
