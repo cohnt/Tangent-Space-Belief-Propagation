@@ -14,16 +14,17 @@ from utils import write, flush
 
 global_t0 = time.time()
 
-dataset_seed = None
+dataset_name = "long_spiral_curve"
+dataset_seed = np.random.randint(0, 2**32)
+num_points = 1000    # Number of data points
+data_noise = 0.0025 # How much noise is added to the data
+source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
+target_dim = 1      # The number of dimensions the data is being reduced to
 
 num_iters = 10     # Number of iterations of the message passing algorithm to run
 neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
-num_points = 1000    # Number of data points
-data_noise = 0.0025 # How much noise is added to the data
 num_samples = 5   # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
-source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
-target_dim = 1      # The number of dimensions the data is being reduced to
 
 message_resample_cov = np.eye(target_dim) * 0.01 # TODO: Change
 pruning_angle_thresh = np.cos(30.0 * np.pi / 180.0)
@@ -32,6 +33,33 @@ output_dir = "results/"
 error_histogram_num_bins = num_points / 10
 
 write("\n")
+
+####################
+# Write Parameters #
+####################
+f = open(output_dir + "parameters.ini", "w")
+
+# Write as an INI file, so it can be directly entered into another program later.
+# [Section Name]
+# ; Comment
+# Key = Value
+
+f.write("[Dataset]\n")
+f.write("name=%s\n" % dataset_name)
+f.write("seed=%d\n" % dataset_seed)
+f.write("num_points=%d\n" % num_points)
+f.write("noise=%f\n" % data_noise)
+f.write("source_dim=%d\n" % source_dim)
+f.write("target_dim=%d\n" % target_dim)
+
+f.write("\n[Belief Propagation]\n")
+f.write("max_iters=%d\n" % num_iters)
+f.write("num_neighbors=%d\n" % neighbors_k)
+f.write("num_samples=%d\n" % num_samples)
+f.write("explore=%f\n" % explore_perc)
+f.write("prune_thresh=%f\n" % pruning_angle_thresh)
+
+f.close()
 
 ################
 # Load Dataset #
