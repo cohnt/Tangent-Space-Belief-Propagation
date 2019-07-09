@@ -59,3 +59,7 @@
 * https://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.tight_layout
 * https://stackoverflow.com/questions/4325733/save-a-subplot-in-matplotlib
 * https://matplotlib.org/api/_as_gen/matplotlib.pyplot.hist.html
+
+### Other
+
+* http://blog.davidecoppola.com/2015/02/how-to-create-git-submodule-from-repository-subdirectory/
