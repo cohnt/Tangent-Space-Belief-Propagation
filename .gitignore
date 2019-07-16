@@ -2,6 +2,7 @@
 results/*
 results_triangle/*
 results_local_smoothing/*
+results_mst/*
 testing_history/*
 *.svg
 *.png
