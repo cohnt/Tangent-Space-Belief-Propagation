@@ -20,9 +20,9 @@ source_dim = 2      # The dimensionality of the incoming dataset (see "Load Data
 target_dim = 1      # The number of dimensions the data is being reduced to
 
 neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
-r = 0.1
-T = 10
-gamma = 1.0
+r = 0.25
+T = 20
+edge_thresh = 0.25
 
 output_dir = "results_mst/"
 
@@ -50,6 +50,7 @@ f.write("\n[PMST]\n")
 f.write("num_neighbors=%d\n" % neighbors_k)
 f.write("r=%f\n" % r)
 f.write("T=%d\n" % T)
+f.write("thresh=%f\n" % edge_thresh)
 
 f.write("\n[Display]\n")
 f.write("; TODO\n")
@@ -168,3 +169,37 @@ for i in range(T):
 	ax.set_title("Perturbed Dataset %d" % i)
 	plt.savefig(output_dir + "perturbed_%d.svg" % i)
 	plt.close(fig)
+
+###################
+# MST on Each One #
+###################
+from scipy.sparse.csgraph import minimum_spanning_tree
+from scipy.spatial import distance_matrix
+from scipy.sparse import csr_matrix
+
+edge_count = np.zeros((num_points, num_points))
+
+for d_idx in range(T):
+	dist_mat = distance_matrix(dataset_list[d_idx], dataset_list[d_idx])
+	mst = minimum_spanning_tree(dist_mat).toarray()
+	is_edge = mst != 0
+	edge_count = edge_count + is_edge
+
+edge_weights = edge_count / T
+
+new_neighbor_graph = neighbor_graph.toarray()
+
+for i in range(num_points):
+	for j in range(num_points):
+		if edge_weights[i,j] < edge_thresh:
+			new_neighbor_graph[i,j] = 0
+
+#######################
+# Save Neighbor Graph #
+#######################
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+plot_neighbors_2d(points, color, csr_matrix(new_neighbor_graph), ax, point_size=2, line_width=0.25, edge_thickness=0.5, show_labels=False)
+ax.set_title("Improved Neighbors Graph")
+plt.savefig(output_dir + "better_neighbors.svg")
+plt.close(fig)
