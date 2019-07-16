@@ -2,7 +2,8 @@
 results/*
 results_triangle/*
 results_local_smoothing/*
-results_mst/*
+results_pmst/*
+results_dmst/*
 testing_history/*
 *.svg
 *.png
