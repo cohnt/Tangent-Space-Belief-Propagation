@@ -13,7 +13,7 @@ from tqdm import tqdm
 from utils import write, flush
 
 dataset_name = "o_curve"
-dataset_seed = np.random.randint(0, 2**32)
+dataset_seed = np.random.randint(2**32)
 num_points = 500    # Number of data points
 data_noise = 0.00025 # How much noise is added to the data
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
@@ -145,6 +145,8 @@ write("Number of edges: %d\n" % len(neighbor_pair_list))
 # Computing Local Smoothing #
 #############################
 
+smoothed = []
+
 for i in range(num_points):
 	print "i", i
 	nbd_idx = np.append(neighbor_dict[i], i)
@@ -173,3 +175,50 @@ for i in range(num_points):
 		if diff < eps:
 			print "Converged!\n"
 			break
+	smoothed.append(x_mean.copy())
+
+smoothed = np.asarray(smoothed)
+
+#######################
+# Save Smoothed Graph #
+#######################
+
+write("Saving smoothed dataset plot...")
+flush()
+t0 = time.time()
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(smoothed[:,0], smoothed[:,1], c=color, cmap=plt.cm.Spectral, s=2**2, zorder=2, linewidth=0.25)
+ax.set_title("Smoothed (epsilon=%f, gamma=%f)" % (eps, gamma))
+plt.savefig(output_dir + "smoothed.svg")
+plt.close(fig)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+###########################
+# Nearest-Neighbors Again #
+###########################
+
+write("Computing nearest neighbors again...")
+flush()
+t0 = time.time()
+neighbor_graph = kneighbors_graph(smoothed, neighbors_k, mode="distance", n_jobs=-1)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+# neighbor_graph is stored as a sparse matrix.
+# Note that neighbor_graph is not necessarily symmetric, such as the case where point x
+# is a nearest neighbor of point y, but point y is *not* a nearest neighbor of point x.
+# We fix this later on...
+
+write("Saving nearest neighbors plot...")
+flush()
+t0 = time.time()
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+plot_neighbors_2d(smoothed, color, neighbor_graph, ax, point_size=2, line_width=0.25, edge_thickness=0.5, show_labels=False)
+ax.set_title("Nearest Neighbors (k=%d)" % neighbors_k)
+plt.savefig(output_dir + "smoothed_neighbors.svg")
+plt.close(fig)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
