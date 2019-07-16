@@ -12,10 +12,10 @@ from joblib import Parallel, delayed
 from tqdm import tqdm
 from utils import write, flush
 
-dataset_name = "o_curve"
+dataset_name = "long_spiral_curve"
 dataset_seed = np.random.randint(2**32)
 num_points = 500    # Number of data points
-data_noise = 0.00025 # How much noise is added to the data
+data_noise = 0.001 # How much noise is added to the data
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1      # The number of dimensions the data is being reduced to
 
@@ -69,7 +69,7 @@ from datasets.dim_2.long_spiral_curve import make_long_spiral_curve
 write("Generating dataset...")
 flush()
 t0 = time.time()
-points, color, true_tangents, dataset_seed = make_o_curve(num_points, data_noise, rs_seed=dataset_seed)
+points, color, true_tangents, dataset_seed = make_long_spiral_curve(num_points, data_noise, rs_seed=dataset_seed)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
