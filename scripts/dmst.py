@@ -88,8 +88,10 @@ from scipy.spatial import distance_matrix
 dist_mat = distance_matrix(points, points)
 
 ########
-# DMSt #
+# DMST #
 ########
+from scipy.sparse import csr_matrix
+from visualization.plot_neighbors import plot_neighbors_2d
 
 # Uses the disjoint-set datatype
 # http://p-nand-q.com/python/data-types/general/disjoint-sets.html
@@ -143,15 +145,8 @@ for iter_t in range(t):
 	edge_iter_list.reverse()
 	for idx in edge_iter_list:
 		sorted_edge_list.pop(idx)
-
-#######################
-# Save Neighbor Graph #
-#######################
-from scipy.sparse import csr_matrix
-from visualization.plot_neighbors import plot_neighbors_2d
-
-fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-plot_neighbors_2d(points, color, csr_matrix(edge_array), ax, point_size=2, line_width=0.25, edge_thickness=0.5, show_labels=False)
-ax.set_title("Improved Neighbors Graph")
-plt.savefig(output_dir + "better_neighbors.svg")
-plt.close(fig)
+	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+	plot_neighbors_2d(points, color, csr_matrix(edge_array), ax, point_size=2, line_width=0.25, edge_thickness=0.5, show_labels=False)
+	ax.set_title("Improved Neighbors Graph at t=%d" % (iter_t + 1))
+	plt.savefig(output_dir + "better_neighbors_%d.svg" % (iter_t + 1))
+	plt.close(fig)
