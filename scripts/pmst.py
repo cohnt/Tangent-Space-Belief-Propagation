@@ -20,9 +20,9 @@ source_dim = 2      # The dimensionality of the incoming dataset (see "Load Data
 target_dim = 1      # The number of dimensions the data is being reduced to
 
 neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
-r = 0.25
+r = 0.5
 T = 20
-edge_thresh = 0.25
+edge_thresh = 0.1
 
 output_dir = "results_mst/"
 
