@@ -1,6 +1,7 @@
 *.pyc
 results/*
 results_triangle/*
+results_local_smoothing/*
 testing_history/*
 *.svg
 *.png
