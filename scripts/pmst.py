@@ -20,7 +20,7 @@ source_dim = 2      # The dimensionality of the incoming dataset (see "Load Data
 target_dim = 1      # The number of dimensions the data is being reduced to
 
 neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
-r = 1.0
+r = 0.1
 T = 10
 gamma = 1.0
 
