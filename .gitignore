@@ -4,6 +4,7 @@ results_triangle/*
 results_local_smoothing/*
 results_pmst/*
 results_dmst/*
+results_eiv/*
 testing_history/*
 *.svg
 *.png
