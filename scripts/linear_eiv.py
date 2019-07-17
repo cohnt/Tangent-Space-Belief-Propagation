@@ -172,6 +172,7 @@ for i in range(num_points):
 		# print "np.asmatrix(vh[:,j])", np.asmatrix(vh[:,j]).shape
 		E = E + (s[j] * np.asmatrix(u[:,j]).transpose() * np.asmatrix(vh[:,j]))
 	# print "E", E, E.shape
+	E = E + B
 
 	for j in range(len(nbd_idx)):
 		idx = nbd_idx[j]
