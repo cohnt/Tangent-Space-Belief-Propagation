@@ -220,3 +220,31 @@ ax.scatter(tildes[:,0], tildes[:,1], c=color, cmap=plt.cm.Spectral, s=2**2, zord
 ax.set_title("Smoothed")
 plt.savefig(output_dir + "smoothed.svg")
 plt.close(fig)
+
+############
+# NN Again #
+############
+
+write("Computing nearest neighbors...")
+flush()
+t0 = time.time()
+neighbor_graph = kneighbors_graph(tildes, neighbors_k, mode="distance", n_jobs=-1)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+# neighbor_graph is stored as a sparse matrix.
+# Note that neighbor_graph is not necessarily symmetric, such as the case where point x
+# is a nearest neighbor of point y, but point y is *not* a nearest neighbor of point x.
+# We fix this later on...
+
+write("Saving nearest neighbors plot...")
+flush()
+t0 = time.time()
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+plot_neighbors_2d(tildes, color, neighbor_graph, ax, point_size=2, line_width=0.25, edge_thickness=0.5, show_labels=False)
+ax.set_title("Nearest Neighbors (k=%d)" % neighbors_k)
+plt.savefig(output_dir + "smoothed_neighbors.svg")
+plt.close(fig)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
