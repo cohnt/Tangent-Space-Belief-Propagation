@@ -167,7 +167,7 @@ for i in range(num_points):
 
 	# Compute E
 	E = np.zeros(B.shape)
-	for j in range(min(k, len(s))):
+	for j in range(k-1):
 		# print "np.asmatrix(u[:,j]).transpose()", np.asmatrix(u[:,j]).transpose().shape
 		# print "np.asmatrix(vh[:,j])", np.asmatrix(vh[:,j]).shape
 		E = E + (s[j] * np.asmatrix(u[:,j]).transpose() * np.asmatrix(vh[:,j]))
