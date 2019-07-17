@@ -139,31 +139,39 @@ write("Number of edges: %d\n" % len(neighbor_pair_list))
 # EIV Model #
 #############
 
+reg_points = np.zeros((num_points, 30))
+reg_points[:,0:2] = points
+
 estimate_list = []
 for i in range(num_points):
 	estimate_list.append([])
 
 for i in range(num_points):
 	nbd_idx = np.append(neighbor_dict[i], i)
-	nbd = points[nbd_idx]
+	nbd = reg_points[nbd_idx]
 	D = len(nbd[0])
 	k = len(nbd)
 
 	# Construct the B matrix
 	B = np.zeros((D, k+1))
-	B[:,0] = points[i].T
+	B[:,0] = reg_points[i].T
 	B[:,1:] = nbd.T
 
 	# SVD
 	u, s, vh = np.linalg.svd(B, full_matrices=False)
-	print "u", u, u.shape
-	print "s", s, s.shape
-	print "vh", vh, vh.shape
+	# print "u", u, u.shape
+	# print "s", s, s.shape
+	# print "vh", vh, vh.shape
 
 	# Compute E
 	E = np.zeros(B.shape)
 	for j in range(min(k, len(s))):
-		E = E + (s[j] * u[:,j] * vh[:,j])
-	print "E", E, E.shape
+		# print "np.asmatrix(u[:,j]).transpose()", np.asmatrix(u[:,j]).transpose().shape
+		# print "np.asmatrix(vh[:,j])", np.asmatrix(vh[:,j]).shape
+		E = E + (s[j] * np.asmatrix(u[:,j]).transpose() * np.asmatrix(vh[:,j]))
+	# print "E", E, E.shape
 
-	break
+	for j in range(len(nbd_idx)):
+		idx = nbd_idx[j]
+		est = E[:,j]
+		estimate_list[idx].append(est)
