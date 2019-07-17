@@ -143,8 +143,10 @@ reg_points = np.zeros((num_points, 30))
 reg_points[:,0:2] = points
 
 estimate_list = []
+covariance_est_list = []
 for i in range(num_points):
 	estimate_list.append([])
+	covariance_est_list.append([])
 
 for i in range(num_points):
 	nbd_idx = np.append(neighbor_dict[i], i)
@@ -175,3 +177,6 @@ for i in range(num_points):
 		idx = nbd_idx[j]
 		est = E[:,j]
 		estimate_list[idx].append(est)
+
+		covariance_est = s[-1] / (30-k)
+		covariance_est_list.append(covariance_est)
