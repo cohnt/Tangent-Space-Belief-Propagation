@@ -179,4 +179,43 @@ for i in range(num_points):
 		estimate_list[idx].append(est)
 
 		covariance_est = s[-1] / (30-k)
-		covariance_est_list.append(covariance_est)
+		if covariance_est == 0:
+			covariance_est = 0.0000001
+		covariance_est_list[idx].append(covariance_est)
+
+##########
+# Fusion #
+##########
+
+tildes = []
+for i in range(num_points):
+	cov_sum = 0
+	for j in range(len(covariance_est_list[i])):
+		cov = covariance_est_list[i][j]
+		if cov > 0:
+			cov_sum = cov_sum + (1.0 / cov)
+
+	pt_weighted_sum = np.zeros(estimate_list[0][0].shape)
+	for j in range(len(estimate_list[i])):
+		pt = estimate_list[i][j]
+		cov = covariance_est_list[i][j]
+		if cov > 0:
+			pt_weighted_sum = pt_weighted_sum + ((1.0 / cov) * pt)
+
+	tilde_est = pt_weighted_sum
+	if cov_sum > 0:
+		tilde_est = (1.0 / cov_sum) * tilde_est
+
+	tildes.append(np.asarray(tilde_est).flatten()[0:2])
+
+tildes = np.asarray(tildes)
+
+###########
+# Display #
+###########
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(tildes[:,0], tildes[:,1], c=color, cmap=plt.cm.Spectral, s=2**2, zorder=2, linewidth=0.25)
+ax.set_title("Smoothed")
+plt.savefig(output_dir + "smoothed.svg")
+plt.close(fig)
