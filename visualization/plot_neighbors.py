@@ -37,6 +37,9 @@ def plot_neighbors_3d(points, color, neighbors_graph, ax, line_color="grey", poi
 	lines = Line3DCollection(coordinates.reshape((num_points*num_neighbors, 2, 3)), color=line_color, zorder=1, linewidths=edge_thickness)
 	ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=point_size**2, zorder=2, linewidth=line_width)
 	ax.add_collection(lines)
+	if show_labels:
+		for i in range(num_points):
+			ax.text(points[i][0], points[i][1], ("%d" % i))
 
 if __name__ == "__main__":
 	from sklearn.neighbors import kneighbors_graph
