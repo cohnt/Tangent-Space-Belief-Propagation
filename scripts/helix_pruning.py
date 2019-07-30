@@ -101,3 +101,48 @@ plt.close(fig)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
+
+#######################
+# k-Nearest-Neighbors #
+#######################
+from sklearn.neighbors import kneighbors_graph
+from visualization.plot_neighbors import plot_neighbors_3d
+from visualization.plot_pca import plot_pca_3d
+
+write("Computing nearest neighbors...")
+flush()
+t0 = time.time()
+neighbor_graph = kneighbors_graph(points, neighbors_k, mode="distance", n_jobs=-1)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+# neighbor_graph is stored as a sparse matrix.
+# Note that neighbor_graph is not necessarily symmetric, such as the case where point x
+# is a nearest neighbor of point y, but point y is *not* a nearest neighbor of point x.
+# We fix this later on...
+
+write("Saving nearest neighbors plot...")
+flush()
+t0 = time.time()
+fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
+ax = fig.add_subplot(111, projection='3d')
+plot_neighbors_3d(points, color, neighbor_graph, ax, point_size=2, line_width=0.25, edge_thickness=0.5, show_labels=False)
+ax.set_title("Nearest Neighbors (k=%d)" % neighbors_k)
+plt.savefig(output_dir + "nearest_neighbors.svg")
+plt.close(fig)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+write("Saving ground truth tangent plot...")
+flush()
+t0 = time.time()
+fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
+ax = fig.add_subplot(111, projection='3d')
+plot_pca_3d(points, color, true_tangents, ax, point_size=2, point_line_width=0.25, line_width=0.5, line_length=0.05)
+ax.set_title("Exact Tangents")
+plt.savefig(output_dir + "true_tangents.svg")
+plt.close(fig)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
