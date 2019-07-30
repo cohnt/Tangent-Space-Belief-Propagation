@@ -59,6 +59,7 @@
 * https://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.tight_layout
 * https://stackoverflow.com/questions/4325733/save-a-subplot-in-matplotlib
 * https://matplotlib.org/api/_as_gen/matplotlib.pyplot.hist.html
+* https://zulko.wordpress.com/2012/09/29/animate-your-3d-plots-with-pythons-matplotlib/
 
 ### Other
 
