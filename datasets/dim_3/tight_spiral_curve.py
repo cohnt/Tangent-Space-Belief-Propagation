@@ -18,9 +18,9 @@ def make_tight_spiral_curve(n_samples, noise_factor, rs_seed=None):
 	# x(t) = cos(t)
 	# y(t) = sin(t)
 	# z(t) = t/8pi
-	# for 0 <= t <= 8pi
+	# for 0 <= t <= 4pi
 	lowerBound = 0.0
-	upperBound = 8.0 * np.pi
+	upperBound = 4.0 * np.pi
 	
 	# For computing the Jacobian, we have
 	# dx/dt = -sin(t)
