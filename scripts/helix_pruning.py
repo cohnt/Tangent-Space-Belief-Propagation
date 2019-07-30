@@ -653,3 +653,114 @@ except KeyboardInterrupt:
 	write("\nTerminating early after %d iterations.\n" % (iter_num-1))
 	write("Iteration %d not completed.\n\n" % iter_num)
 	flush()
+
+write("Saving PCA error histogram...")
+flush()
+t0 = time.time()
+raw_max_error, raw_mean_error, raw_median_error, raw_error_data = evalError(true_tangents, observations)
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.hist(raw_error_data, np.arange(0, 1, 1.0/error_histogram_num_bins))
+ax.set_title("Histogram of PCA Error")
+ax.set_xlim(left=0, right=1)
+ax.set_ylim(top=num_points)
+plt.xlabel("PCA Error")
+plt.ylabel("Count")
+plt.savefig(output_dir + "pca_error_histogram.svg")
+plt.close(fig)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+write("Pruning edges...")
+flush()
+t0 = time.time()
+
+pruned_neighbors = scipy.sparse.lil_matrix(neighbor_graph)
+for i in range(0, num_points):
+	for j in range(0, num_points):
+		if i != j:
+			vec = points[j] - points[i]
+			proj_vec = projSubspace(mle_bases[i], vec)
+			dprod = np.abs(np.dot(vec, np.dot(proj_vec, mle_bases[i])) / (np.linalg.norm(vec) * np.linalg.norm(proj_vec)))
+			if dprod < pruning_angle_thresh:
+				pruned_neighbors[i,j] = 0
+				pruned_neighbors[j,i] = 0
+
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
+ax = fig.add_subplot(111, projection='3d')
+plot_neighbors_3d(points, color, pruned_neighbors, ax, point_size=2, line_width=0.25, edge_thickness=0.5, show_labels=False)
+ax.set_title("Pruned Nearest Neighbors (k=%d, thresh=%f)" % (neighbors_k, pruning_angle_thresh))
+plt.savefig(output_dir + "pruned_nearest_neighbors.svg")
+plt.close(fig)
+
+write("Connecting graph...\n")
+flush()
+t0 = time.time()
+
+# Uses the disjoint-set datatype
+# http://p-nand-q.com/python/data-types/general/disjoint-sets.html
+class DisjointSet():
+	def __init__(self, vals):
+		self.sets = set([self.makeSet(elt) for elt in vals])
+	def makeSet(self, elt):
+		return frozenset([elt])
+	def findSet(self, elt):
+		for subset in self.sets:
+			if elt in subset:
+				return subset
+	def union(self, set_a, set_b):
+		self.sets.add(frozenset.union(set_a, set_b))
+		self.sets.remove(set_a)
+		self.sets.remove(set_b)
+	def write(self):
+		for subset in self.sets:
+			print subset
+
+connected_components = DisjointSet(range(num_points))
+for i in range(num_points):
+	for j in range(num_points):
+		if pruned_neighbors[i,j] != 0:
+			set_i = connected_components.findSet(i)
+			if not j in set_i:
+				set_j = connected_components.findSet(j)
+				connected_components.union(set_i, set_j)
+
+if len(connected_components.sets) == 1:
+	write("Graph already connected!\n")
+	flush()
+else:
+	write("There are %d connected components.\n" % len(connected_components.sets))
+	while len(connected_components.sets) > 1:
+		min_edge_idx = (-1, -1)
+		min_edge_length = np.Inf
+		for set_a in connected_components.sets:
+			for set_b in connected_components.sets:
+				if set_a != set_b:
+					for i in set_a:
+						for j in set_b:
+							dist = np.linalg.norm(points[i] - points[j])
+							if dist < min_edge_length:
+								min_edge_length = dist
+								min_edge_idx = (i, j)
+		i = min_edge_idx[0]
+		j = min_edge_idx[1]
+		pruned_neighbors[i, j] = min_edge_length
+		pruned_neighbors[j, i] = min_edge_length
+		set_a = connected_components.findSet(i)
+		set_b = connected_components.findSet(j)
+		connected_components.union(set_a, set_b)
+
+fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
+ax = fig.add_subplot(111, projection='3d')
+plot_neighbors_3d(points, color, pruned_neighbors, ax, point_size=2, line_width=0.25, edge_thickness=0.5, show_labels=False)
+ax.set_title("Added Edges after Pruning")
+plt.savefig(output_dir + "added_edges.svg")
+plt.close(fig)
+
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
