@@ -549,7 +549,7 @@ try:
 
 		fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
 		ax = fig.add_subplot(111, projection='3d')
-		ax.scatter(points[:,0], points[:,1], c=color, cmap=plt.cm.Spectral, s=2**2, zorder=2, linewidth=0.25)
+		ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=2**2, zorder=2, linewidth=0.25)
 
 		coordinates = np.zeros((num_points*num_samples, 2, 3))
 		colors = np.zeros((num_points*num_samples, 4))
