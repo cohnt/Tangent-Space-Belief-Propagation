@@ -1,6 +1,7 @@
 *.pyc
 results/*
-results_3d/*
+results_helix/*
+results_sheet/*
 results_triangle/*
 results_local_smoothing/*
 results_pmst/*
