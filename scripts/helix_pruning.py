@@ -108,6 +108,7 @@ flush()
 from sklearn.neighbors import kneighbors_graph
 from visualization.plot_neighbors import plot_neighbors_3d
 from visualization.plot_pca import plot_pca_3d
+from visualization.animate import rotanimate
 
 write("Computing nearest neighbors...")
 flush()
@@ -655,8 +656,6 @@ except KeyboardInterrupt:
 	write("\nTerminating early after %d iterations.\n" % (iter_num-1))
 	write("Iteration %d not completed.\n\n" % iter_num)
 	flush()
-
-from visualization.animate import rotanimate
 
 write("Saving PCA error histogram...")
 flush()
