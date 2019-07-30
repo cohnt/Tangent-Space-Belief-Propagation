@@ -65,8 +65,8 @@ def projSubspace(orthonormal_basis, point):
 
 def randomSmallRotation(dimension, variance=None):
 	if variance is None:
-		variance = 0.05 * dimension
-	theta = np.random.normal(0, variance)
+		variance = 0.05 * dimension * 180.0 / np.pi
+	theta = np.random.normal(0, variance) * np.pi / 180.0
 	rotMat = np.eye(dimension)
 	rotMat[0,0] = np.cos(theta)
 	rotMat[0,1] = -np.sin(theta)

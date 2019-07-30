@@ -207,3 +207,53 @@ plt.close(fig)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
+
+#######################
+# Initialize Messages #
+#######################
+from scipy.stats import special_ortho_group
+from utils import randomSmallRotation
+
+class Message():
+	def __init__(self, num_samples, source_dim, target_dim):
+		# If num_samples=N and source_dim=n, and target_dim=m, then:
+		# self.ts is a list of ordered bases of m-dimensional (i.e. spanned by m
+		# unit vectors) subspaces in R^n, so it's of shape (N, m, n)
+		# self.weights is a list of weights, so it's of shape (N)
+		self.ts = np.zeros((num_samples, target_dim, source_dim))
+		self.weights = np.zeros(num_samples)
+
+def randomTangentSpaceList(num_samples, source_dim, target_dim):
+	# Return a random list of size target_dim orthonormal vectors in source_dim.
+	# This represents the basis of a random subspace of dimension target_dim in
+	# the higher dimensional space of dimension source_dim
+	ts = np.zeros((num_samples, target_dim, source_dim))
+	for i in range(num_samples):
+		ts[i][:] = special_ortho_group.rvs(dim=source_dim)[0:target_dim]
+	return ts
+
+def noisifyTS(ts, var):
+	rotMat = randomSmallRotation(3, variance=var)
+	# theta = np.random.normal(0, var) * np.pi / 180.0
+	# rotMat = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
+	return np.array([np.dot(rotMat, ts[0])])
+
+def noisifyTSList(ts_list, var=5):
+	for i in range(len(ts_list)):
+		ts_list[i] = noisifyTS(ts_list[i], var)
+	return ts_list
+
+# This initializes messages_prev and messages_next as num_points by num_points arrays of Nones.
+# Where appropriate, the Nones will be replaced by Message objects
+messages_prev = [[None for __ in range(num_points)] for _ in range(num_points)]
+messages_next = [[None for __ in range(num_points)] for _ in range(num_points)]
+for key, value in neighbor_pair_list:
+	# Note that key represents where the message is coming from and value represents where the message is going to
+	# In other words, messages[key][value] === m_key->value
+	messages_prev[key][value] = Message(num_samples, source_dim, target_dim)
+	# messages_prev[key][value].ts = randomTangentSpaceList(num_samples, source_dim, target_dim)
+	messages_prev[key][value].ts = noisifyTSList(np.repeat([observations[value]], num_samples, axis=0), var=30)
+	messages_prev[key][value].weights = np.zeros(num_samples) + (1.0 / num_samples) # Evenly weight each sample for now
+
+	# We don't initialize any values into messages_next
+	messages_next[key][value] = Message(num_samples, source_dim, target_dim)
