@@ -17,11 +17,11 @@ global_t0 = time.time()
 dataset_name = "helix_curve"
 dataset_seed = np.random.randint(0, 2**32)
 num_points = 250    # Number of data points
-data_noise = 0.0025      # How much noise is added to the data
+data_noise = 0.005      # How much noise is added to the data
 source_dim = 3      # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1      # The number of dimensions the data is being reduced to
 
-num_iters = 5      # Number of iterations of the message passing algorithm to run
+num_iters = 25      # Number of iterations of the message passing algorithm to run
 neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
 num_samples = 5     # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
@@ -94,7 +94,7 @@ flush()
 t0 = time.time()
 fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
 ax = fig.add_subplot(111, projection='3d')
-ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=2**2, zorder=2, linewidth=0.25)
+ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=3**2, zorder=2, linewidth=0.5)
 ax.set_title("Dataset (num=%d, variance=%f, seed=%d)" % (num_points, data_noise, dataset_seed))
 plt.savefig(output_dir + "dataset.svg")
 plt.close(fig)
@@ -127,7 +127,7 @@ flush()
 t0 = time.time()
 fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
 ax = fig.add_subplot(111, projection='3d')
-plot_neighbors_3d(points, color, neighbor_graph, ax, point_size=2, line_width=0.25, edge_thickness=0.5, show_labels=False)
+plot_neighbors_3d(points, color, neighbor_graph, ax, point_size=3, line_width=0.5, edge_thickness=0.5, show_labels=False)
 ax.set_title("Nearest Neighbors (k=%d)" % neighbors_k)
 plt.savefig(output_dir + "nearest_neighbors.svg")
 angles = np.linspace(0, 360, 40+1)[:-1]
@@ -142,7 +142,7 @@ flush()
 t0 = time.time()
 fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
 ax = fig.add_subplot(111, projection='3d')
-plot_pca_3d(points, color, true_tangents, ax, point_size=2, point_line_width=0.25, line_width=0.5, line_length=0.05)
+plot_pca_3d(points, color, true_tangents, ax, point_size=3, point_line_width=0.5, line_width=0.5, line_length=0.05)
 ax.set_title("Exact Tangents")
 plt.savefig(output_dir + "true_tangents.svg")
 plt.close(fig)
@@ -203,7 +203,7 @@ flush()
 t0 = time.time()
 fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
 ax = fig.add_subplot(111, projection='3d')
-plot_pca_3d(points, color, observations, ax, point_size=2, point_line_width=0.25, line_width=0.5, line_length=0.05)
+plot_pca_3d(points, color, observations, ax, point_size=3, point_line_width=0.5, line_width=0.5, line_length=0.05)
 ax.set_title("Measured Tangent Spaces (PCA)")
 plt.savefig(output_dir + "pca_observations.svg")
 plt.close(fig)
@@ -545,14 +545,14 @@ try:
 
 		fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
 		ax = fig.add_subplot(111, projection='3d')
-		plot_pca_3d(points, color, mle_bases, ax, point_size=2, point_line_width=0.25, line_width=0.5, line_length=0.05)
+		plot_pca_3d(points, color, mle_bases, ax, point_size=3, point_line_width=0.5, line_width=0.5, line_length=0.05)
 		ax.set_title("Tangent Space MLE (iter %d)" % iter_num)
 		plt.savefig(output_dir + ("ts_mle_iter%s.svg" % str(iter_num).zfill(4)))
 		plt.close(fig)
 
 		fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
 		ax = fig.add_subplot(111, projection='3d')
-		ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=2**2, zorder=2, linewidth=0.25)
+		ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=3**2, zorder=2, linewidth=0.5)
 
 		coordinates = np.zeros((num_points*num_samples, 2, source_dim))
 		colors = np.zeros((num_points*num_samples, 4))
@@ -695,7 +695,7 @@ flush()
 
 fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
 ax = fig.add_subplot(111, projection='3d')
-plot_neighbors_3d(points, color, pruned_neighbors, ax, point_size=2, line_width=0.25, edge_thickness=0.5, show_labels=False)
+plot_neighbors_3d(points, color, pruned_neighbors, ax, point_size=3, line_width=0.5, edge_thickness=0.5, show_labels=False)
 ax.set_title("Pruned Nearest Neighbors (k=%d, thresh=%f)" % (neighbors_k, pruning_angle_thresh))
 plt.savefig(output_dir + "pruned_nearest_neighbors.svg")
 angles = np.linspace(0, 360, 40+1)[:-1]
@@ -761,7 +761,7 @@ else:
 
 fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
 ax = fig.add_subplot(111, projection='3d')
-plot_neighbors_3d(points, color, pruned_neighbors, ax, point_size=2, line_width=0.25, edge_thickness=0.5, show_labels=False)
+plot_neighbors_3d(points, color, pruned_neighbors, ax, point_size=3, line_width=0.5, edge_thickness=0.5, show_labels=False)
 ax.set_title("Added Edges after Pruning")
 plt.savefig(output_dir + "added_edges.svg")
 plt.close(fig)
