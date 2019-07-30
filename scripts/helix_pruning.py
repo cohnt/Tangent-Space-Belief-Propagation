@@ -16,8 +16,8 @@ global_t0 = time.time()
 
 dataset_name = "helix_curve"
 dataset_seed = np.random.randint(0, 2**32)
-num_points = 500    # Number of data points
-data_noise = 0      # How much noise is added to the data
+num_points = 250    # Number of data points
+data_noise = 0.0025      # How much noise is added to the data
 source_dim = 3      # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1      # The number of dimensions the data is being reduced to
 
@@ -763,4 +763,176 @@ plt.close(fig)
 
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+from sklearn.utils.graph_shortest_path import graph_shortest_path
+write("Finding shortest paths...")
+flush()
+t0 = time.time()
+shortest_distances = graph_shortest_path(pruned_neighbors, directed=False)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+write("Fitting KernelPCA...")
+flush()
+t0 = time.time()
+
+# from sklearn.manifold import MDS
+# mds = MDS(n_components=target_dim, max_iter=3000, eps=1e-9, n_init=25, dissimilarity="precomputed", n_jobs=-1, metric=True)
+# feature_coords = mds.fit_transform(shortest_distances)
+
+from sklearn.decomposition import KernelPCA
+kpca = KernelPCA(n_components=target_dim, kernel="precomputed", eigen_solver=kpca_eigen_solver, tol=kpca_tol, max_iter=kpca_max_iter, n_jobs=-1)
+feature_coords = kpca.fit_transform((shortest_distances**2) * -0.5)
+
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral)
+ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from BP Tangent Correction for Edge Pruning", 60)))
+plt.xlabel("Actual Parameter Value")
+plt.ylabel("Embedded Coordinate")
+plt.savefig(output_dir + "coord_bp.svg")
+plt.close(fig)
+
+############################
+# Compare to Other Methods #
+############################
+
+write("\nComparing to other methods...\n")
+flush()
+
+from sklearn.manifold import LocallyLinearEmbedding, MDS, Isomap, SpectralEmbedding
+from ltsa import compute_ltsa
+
+methods = []
+methods.append(LocallyLinearEmbedding(n_neighbors=neighbors_k, n_components=target_dim, n_jobs=-1))
+methods.append(MDS(n_components=target_dim, n_jobs=-1))
+methods.append(Isomap(n_neighbors=neighbors_k, n_components=target_dim, n_jobs=-1))
+methods.append(SpectralEmbedding(n_components=target_dim, n_neighbors=neighbors_k, n_jobs=-1))
+num_methods = len(methods)
+
+method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding"]
+
+for i in range(num_methods):
+	solver = methods[i]
+	name = method_names[i]
+	write("Computing %s..." % name)
+	flush()
+	t0 = time.time()
+	feature_coords = solver.fit_transform(points)
+	t1 = time.time()
+	write("Done! dt=%f\n" % (t1-t0))
+	flush()
+	
+	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+	ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral)
+	ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from %s" % name, 60)))
+	plt.xlabel("Actual Parameter Value")
+	plt.ylabel("Embedded Coordinate")
+	plt.savefig(output_dir + ("comparison_%s.svg" % name))
+	plt.close(fig)
+
+write("Computing Classical LTSA...")
+flush()
+t0 = time.time()
+feature_coords = compute_ltsa(points, neighbor_dict, observations, source_dim, target_dim)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral)
+ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Classical LTSA", 60)))
+plt.xlabel("Actual Parameter Value")
+plt.ylabel("Embedded Coordinate")
+plt.savefig(output_dir + "comparison_orig_LTSA.svg")
+plt.close(fig)
+
+write("Computing LTSA with Tangent Space Correction...")
+flush()
+t0 = time.time()
+feature_coords = compute_ltsa(points, neighbor_dict, mle_bases, source_dim, target_dim)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral)
+ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction", 60)))
+plt.xlabel("Actual Parameter Value")
+plt.ylabel("Embedded Coordinate")
+plt.savefig(output_dir + "comparison_corrected_LTSA.svg")
+plt.close(fig)
+
+write("Computing LTSA with Tangent Space Correction and Edge Pruning...")
+flush()
+t0 = time.time()
+pruned_neighbor_dict = sparseMatrixToDict(pruned_neighbors)
+feature_coords = compute_ltsa(points, pruned_neighbor_dict, mle_bases, source_dim, target_dim)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral)
+ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction and Edge Pruning", 60)))
+plt.xlabel("Actual Parameter Value")
+plt.ylabel("Embedded Coordinate")
+plt.savefig(output_dir + "comparison_pruned_LTSA.svg")
+plt.close(fig)
+
+write("Creating combined image...")
+flush()
+t0 = time.time()
+
+matplotlib.rcParams.update({'font.size': 6})
+
+fig, axes = plt.subplots(nrows=2, ncols=4, figsize=(19.2, 10.8), dpi=100)
+plt.tight_layout(pad=5, h_pad=10, w_pad=5)
+axes_list = np.concatenate(axes)
+
+for i in range(num_methods):
+	solver = methods[i]
+	name = method_names[i]
+	feature_coords = solver.fit_transform(points)
+
+	axes_list[i].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=2, linewidths=0.25)
+	axes_list[i].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from %s" % name, 25)))
+
+feature_coords = compute_ltsa(points, neighbor_dict, observations, source_dim, target_dim)
+axes_list[4].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=2, linewidths=0.25)
+axes_list[4].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Classical LTSA", 25)))
+
+feature_coords = compute_ltsa(points, neighbor_dict, mle_bases, source_dim, target_dim)
+axes_list[5].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=2, linewidths=0.25)
+axes_list[5].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction", 25)))
+
+feature_coords = compute_ltsa(points, pruned_neighbor_dict, mle_bases, source_dim, target_dim)
+axes_list[6].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=2, linewidths=0.25)
+axes_list[6].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction and Edge Pruning", 25)))
+
+# mds = MDS(n_components=target_dim, max_iter=3000, eps=1e-9, n_init=25, dissimilarity="precomputed", n_jobs=-1)
+# feature_coords = mds.fit_transform(shortest_distances)
+kpca = KernelPCA(n_components=target_dim, kernel="precomputed", eigen_solver=kpca_eigen_solver, tol=kpca_tol, max_iter=kpca_max_iter, n_jobs=-1)
+feature_coords = kpca.fit_transform((shortest_distances**2) * -0.5)
+axes_list[7].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=2, linewidths=0.25)
+axes_list[7].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from BP Tangent Correction for Edge Pruning", 25)))
+
+for i in range(8):
+	axes_list[i].set_xlabel("Actual Parameter Value")
+	axes_list[i].set_ylabel("Embedded Coordinate")
+
+plt.savefig(output_dir + "comparison_all.svg")
+plt.close(fig)
+
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+global_t1 = time.time()
+write("\nTotal program runtime: %d seconds.\n\n" % (global_t1-global_t0))
 flush()
