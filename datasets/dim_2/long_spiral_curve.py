@@ -44,6 +44,6 @@ def make_long_spiral_curve(n_samples, noise_factor, b_val=0.05, rs_seed=None):
 
 if __name__ == "__main__":
 	import matplotlib.pyplot as plt
-	data, color, ts = make_long_spiral_curve(500, 0.001, b_val=0.05)
+	data, color, ts, seed = make_long_spiral_curve(500, 0.001, b_val=0.05)
 	plt.scatter(data[:,0], data[:,1], c=color, cmap=plt.cm.Spectral)
 	plt.show()

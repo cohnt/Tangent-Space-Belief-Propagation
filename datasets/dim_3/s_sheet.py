@@ -60,7 +60,7 @@ def make_s_sheet(n_samples, noise_factor, rs_seed=None):
 if __name__ == "__main__":
 	from mpl_toolkits.mplot3d import Axes3D
 	import matplotlib.pyplot as plt
-	data, color, ts = make_s_sheet(500, 0.001)
+	data, color, ts, seed = make_s_sheet(500, 0.001)
 	fig = plt.figure()
 	ax = fig.add_subplot(111, projection='3d')
 	ax.scatter(data[:,0], data[:,1], data[:,2], c=color, cmap=plt.cm.Spectral)

@@ -44,6 +44,6 @@ def make_eight_curve(n_samples, noise_factor, rs_seed=None):
 
 if __name__ == "__main__":
 	import matplotlib.pyplot as plt
-	data, color, ts = make_eight_curve(500, 0.001)
+	data, color, ts, seed = make_eight_curve(500, 0.001)
 	plt.scatter(data[:,0], data[:,1], c=color, cmap=plt.cm.Spectral)
 	plt.show()
