@@ -21,7 +21,7 @@ data_noise = 0.005      # How much noise is added to the data
 source_dim = 3      # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1      # The number of dimensions the data is being reduced to
 
-num_iters = 25      # Number of iterations of the message passing algorithm to run
+num_iters = 10      # Number of iterations of the message passing algorithm to run
 neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
 num_samples = 5     # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
@@ -130,6 +130,7 @@ ax = fig.add_subplot(111, projection='3d')
 plot_neighbors_3d(points, color, neighbor_graph, ax, point_size=3, line_width=0.5, edge_thickness=0.5, show_labels=False)
 ax.set_title("Nearest Neighbors (k=%d)" % neighbors_k)
 plt.savefig(output_dir + "nearest_neighbors.svg")
+ax.axis("off")
 angles = np.linspace(0, 360, 40+1)[:-1]
 rotanimate(ax, angles, output_dir + "nearest_neighbors.gif", delay=30, width=14.4, height=10.8)
 plt.close(fig)
@@ -698,6 +699,7 @@ ax = fig.add_subplot(111, projection='3d')
 plot_neighbors_3d(points, color, pruned_neighbors, ax, point_size=3, line_width=0.5, edge_thickness=0.5, show_labels=False)
 ax.set_title("Pruned Nearest Neighbors (k=%d, thresh=%f)" % (neighbors_k, pruning_angle_thresh))
 plt.savefig(output_dir + "pruned_nearest_neighbors.svg")
+ax.axis("off")
 angles = np.linspace(0, 360, 40+1)[:-1]
 rotanimate(ax, angles, output_dir + "pruned_nearest_neighbors.gif", delay=30, width=14.4, height=10.8)
 plt.close(fig)
