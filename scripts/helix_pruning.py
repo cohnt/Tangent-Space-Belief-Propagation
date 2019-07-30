@@ -146,3 +146,64 @@ plt.close(fig)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
+
+####################
+# Initialize Graph #
+####################
+from utils import sparseMatrixToDict, sparseMaximum
+
+write("Initializing graph data structures...")
+flush()
+t0 = time.time()
+# Make the matrix symmetric by taking max(G, G^T)
+neighbor_graph = sparseMaximum(neighbor_graph, neighbor_graph.T)
+# This dictionary will have the structure point_idx: [list, of, neighbor_idx]
+neighbor_dict = sparseMatrixToDict(neighbor_graph)
+# This extracts all pairs of neighbors from the dictionary and stores them as a list of tuples.
+# neighbor_pair_list represents the identification of the messages, i.e., "message 0" is
+# so defined by being at index 0 of neighbor_pair_list.
+neighbor_pair_list = [(key, value) for key, arr in neighbor_dict.items() for value in arr]
+num_messages = len(neighbor_pair_list)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+write("Number of points: %d\n" % num_points)
+write("Number of edges: %d\n" % len(neighbor_pair_list))
+
+###############
+# Measure PCA #
+###############
+from sklearn.decomposition import PCA
+
+# n_components is the number of principal components pca will compute
+pca = PCA(n_components=target_dim)
+observations = [None for i in range(num_points)]
+
+write("Computing PCA observations...")
+flush()
+t0 = time.time()
+for i in range(num_points):
+	og_point = points[i]
+	row = neighbor_graph.toarray()[i]
+	neighbors = np.nonzero(row)[0]
+	neighborhood = points[neighbors]
+	pca.fit(neighborhood)
+	# vec1 = pca.components_[0]
+	observations[i] = pca.components_[0:target_dim]
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+write("Saving PCA observations plot...")
+flush()
+t0 = time.time()
+fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
+ax = fig.add_subplot(111, projection='3d')
+plot_pca_3d(points, color, observations, ax, point_size=2, point_line_width=0.25, line_width=0.5, line_length=0.05)
+ax.set_title("Measured Tangent Spaces (PCA)")
+plt.savefig(output_dir + "pca_observations.svg")
+plt.close(fig)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
