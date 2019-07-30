@@ -22,7 +22,7 @@ def plot_neighbors_2d(points, color, neighbors_graph, ax, line_color="grey", poi
 		for i in range(num_points):
 			ax.text(points[i][0], points[i][1], ("%d" % i))
 
-def plot_neighbors_3d(points, color, neighbors_graph, ax, line_color="grey", point_size=5, line_width=1, edge_thickness=1):
+def plot_neighbors_3d(points, color, neighbors_graph, ax, line_color="grey", point_size=5, line_width=1, edge_thickness=1, show_labels=False):
 	num_points = len(points)
 	num_neighbors = np.count_nonzero(neighbors_graph[0].todense())
 	coordinates = np.zeros((num_points, num_neighbors, 2, 3))
