@@ -654,6 +654,8 @@ except KeyboardInterrupt:
 	write("Iteration %d not completed.\n\n" % iter_num)
 	flush()
 
+from visualization.animate import rotanimate
+
 write("Saving PCA error histogram...")
 flush()
 t0 = time.time()
@@ -694,6 +696,8 @@ fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
 ax = fig.add_subplot(111, projection='3d')
 plot_neighbors_3d(points, color, pruned_neighbors, ax, point_size=2, line_width=0.25, edge_thickness=0.5, show_labels=False)
 ax.set_title("Pruned Nearest Neighbors (k=%d, thresh=%f)" % (neighbors_k, pruning_angle_thresh))
+angles = np.linspace(0, 360, 21)[:-1]
+rotanimate(ax, angles, output_dir + "pruned_nearest_neighbors.gif", delay=100)
 plt.savefig(output_dir + "pruned_nearest_neighbors.svg")
 plt.close(fig)
 
