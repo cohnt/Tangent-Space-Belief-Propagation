@@ -233,7 +233,7 @@ def randomTangentSpaceList(num_samples, source_dim, target_dim):
 	return ts
 
 def noisifyTS(ts, var):
-	rotMat = randomSmallRotation(3, variance=var)
+	rotMat = randomSmallRotation(source_dim, variance=var)
 	# theta = np.random.normal(0, var) * np.pi / 180.0
 	# rotMat = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
 	return np.array([np.dot(rotMat, ts[0])])
@@ -551,7 +551,7 @@ try:
 		ax = fig.add_subplot(111, projection='3d')
 		ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=2**2, zorder=2, linewidth=0.25)
 
-		coordinates = np.zeros((num_points*num_samples, 2, 3))
+		coordinates = np.zeros((num_points*num_samples, 2, source_dim))
 		colors = np.zeros((num_points*num_samples, 4))
 		for i in range(num_points):
 			max_weight = np.max(belief[i].weights)
