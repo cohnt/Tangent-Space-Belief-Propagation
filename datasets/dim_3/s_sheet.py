@@ -16,8 +16,8 @@ def make_s_sheet(n_samples, noise_factor, rs_seed=None):
 
 	# The s curve is parameterized by 
 	# x(s,t) = 0.5 + sin(t)cos(t)
-	# y(s,t) = 0.5 + 0.5cos(t)
-	# z(s,t) = s
+	# y(s,t) = s
+	# z(s,t) = 0.5 + 0.5cos(t)
 	# for 0 <= s <= 1 and (3/4)pi <= t <= (9/4)pi
 	sLowerBound = 0.0
 	sUpperBound = 1.0
@@ -26,18 +26,18 @@ def make_s_sheet(n_samples, noise_factor, rs_seed=None):
 
 	# For computing the Jacobian, we have
 	# dx/dt = cos(t)cos(t) - sin(t)sin(t)
-	# dy/dt = -0.5sin(t)
-	# dz/dt = 0
+	# dy/dt = 0
+	# dz/dt = -0.5sin(t)
 	# 
 	# dx/ds = 0
-	# dy/ds = 0
-	# dz/ds = 1
+	# dy/ds = 1
+	# dz/ds = 0
 
 	s = rs.uniform(sLowerBound, sUpperBound, n_samples)
 	t = rs.uniform(tLowerBound, tUpperBound, n_samples)
-	data = np.array([0.5 + np.multiply(np.sin(t), np.cos(t)), 0.5 + (0.5 * np.cos(t)), s]).transpose()
+	data = np.array([0.5 + np.multiply(np.sin(t), np.cos(t)), s, 0.5 + (0.5 * np.cos(t))]).transpose()
 	# data.shape will be (n_samples, 3), so we can interpret it as a list of n_samples 3D points
-	ts = np.array([[(np.cos(t) ** 2) - (np.sin(t) ** 2), -0.5 * np.sin(t), np.full(t.shape, 0)], [np.full(t.shape, 0), np.full(t.shape, 0), np.full(t.shape, 1)]])
+	ts = np.array([[(np.cos(t) ** 2) - (np.sin(t) ** 2), np.full(t.shape, 0), -0.5 * np.sin(t)], [np.full(t.shape, 0), np.full(t.shape, 1), np.full(t.shape, 0)]])
 	# ts is currently of shape (2, 3, n_samples)
 	ts = ts.transpose()
 	# ts is currently of shape (n_samples, 3, 2)
