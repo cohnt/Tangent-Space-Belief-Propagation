@@ -42,7 +42,11 @@ write("\n")
 def make3DFigure():
 	f = plt.figure(figsize=(14.4, 10.8), dpi=100)
 	a = f.add_subplot(111, projection='3d')
-	a.view_init(elev=10.0, azim=-90.0)
+	if dataset_name == "swiss_roll":
+		a.set_ylim(bottom=-1.0, top=1.0)
+		a.view_init(elev=20.0, azim=-90.0)
+	else:
+		a.view_init(elev=10.0, azim=-90.0)
 	return f, a
 
 ####################
@@ -136,7 +140,7 @@ plot_neighbors_3d(points, color, neighbor_graph, ax, point_size=3, line_width=0.
 ax.set_title("Nearest Neighbors (k=%d)" % neighbors_k)
 plt.savefig(output_dir + "nearest_neighbors.svg")
 angles = np.linspace(0, 360, 40+1)[:-1]
-rotanimate(ax, angles, output_dir + "nearest_neighbors.gif", delay=30, width=14.4, height=10.8)
+# rotanimate(ax, angles, output_dir + "nearest_neighbors.gif", delay=30, width=14.4, height=10.8)
 plt.close(fig)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
@@ -546,15 +550,13 @@ try:
 			max_ind = np.argmax(belief[i].weights)
 			mle_bases[i] = belief[i].ts[max_ind]
 
-		fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
-		ax = fig.add_subplot(111, projection='3d')
+		fig, ax = make3DFigure()
 		plot_pca_3d(points, color, mle_bases, ax, point_size=3, point_line_width=0.5, line_width=0.5, line_length=0.05)
 		ax.set_title("Tangent Space MLE (iter %d)" % iter_num)
 		plt.savefig(output_dir + ("ts_mle_iter%s.svg" % str(iter_num).zfill(4)))
 		plt.close(fig)
 
-		fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
-		ax = fig.add_subplot(111, projection='3d')
+		fig, ax = make3DFigure()
 		ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=3**2, zorder=2, linewidth=0.5)
 
 		num_comps = len(belief[0].ts[0])
