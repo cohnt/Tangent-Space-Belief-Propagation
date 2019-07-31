@@ -14,7 +14,7 @@ from utils import write, flush
 
 global_t0 = time.time()
 
-dataset_name = "helix_curve"
+dataset_name = "tight_spiral_curve"
 dataset_seed = np.random.randint(0, 2**32)
 num_points = 500    # Number of data points
 data_noise = 0.001      # How much noise is added to the data
