@@ -14,7 +14,7 @@ from utils import write, flush
 
 global_t0 = time.time()
 
-dataset_name = "s_sheet"
+dataset_name = "swiss_roll"
 dataset_seed = np.random.randint(0, 2**32)
 num_points = 500    # Number of data points
 data_noise = 0.0     # How much noise is added to the data
@@ -85,12 +85,13 @@ f.close()
 # Load Dataset #
 ################
 from datasets.dim_3.s_sheet import make_s_sheet
+from datasets.dim_3.swiss_roll import make_swiss_roll_sheet
 from mpl_toolkits.mplot3d import Axes3D
 
 write("Generating dataset...")
 flush()
 t0 = time.time()
-points, color, true_tangents, dataset_seed = make_s_sheet(num_points, data_noise, rs_seed=dataset_seed)
+points, color, true_tangents, dataset_seed = make_swiss_roll_sheet(num_points, data_noise, rs_seed=dataset_seed)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()

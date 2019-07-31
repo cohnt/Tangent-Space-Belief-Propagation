@@ -18,11 +18,11 @@ def make_swiss_roll_sheet(n_samples, noise_factor, b_val=0.05, rs_seed=None):
 	# x(s,t) = btcos(t)
 	# y(s,t) = s
 	# z(s,t) = btsin(t)
-	# for 0 <= s <= 0.25 and 2pi <= t <= 8pi
+	# for 0 <= s <= 0.25 and 2pi <= t <= 6pi
 	sLowerBound = 0.0
 	sUpperBound = 0.25
 	tLowerBound = 2.0 * np.pi
-	tUpperBound = 8.0 * np.pi
+	tUpperBound = 6.0 * np.pi
 
 	# For computing the Jacobian, we have
 	# dx/dt = bcos(t) - btsin(t)
