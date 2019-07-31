@@ -136,7 +136,7 @@ plot_neighbors_3d(points, color, neighbor_graph, ax, point_size=3, line_width=0.
 ax.set_title("Nearest Neighbors (k=%d)" % neighbors_k)
 plt.savefig(output_dir + "nearest_neighbors.svg")
 angles = np.linspace(0, 360, 40+1)[:-1]
-# rotanimate(ax, angles, output_dir + "nearest_neighbors.gif", delay=30, width=14.4, height=10.8)
+rotanimate(ax, angles, output_dir + "nearest_neighbors.gif", delay=30, width=14.4, height=10.8)
 plt.close(fig)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
