@@ -101,3 +101,75 @@ plt.close(fig)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
+
+#######################
+# k-Nearest-Neighbors #
+#######################
+from sklearn.neighbors import kneighbors_graph
+from visualization.plot_neighbors import plot_neighbors_3d
+from visualization.plot_pca import plot_pca_3d
+from visualization.animate import rotanimate
+
+write("Computing nearest neighbors...")
+flush()
+t0 = time.time()
+neighbor_graph = kneighbors_graph(points, neighbors_k, mode="distance", n_jobs=-1)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+# neighbor_graph is stored as a sparse matrix.
+# Note that neighbor_graph is not necessarily symmetric, such as the case where point x
+# is a nearest neighbor of point y, but point y is *not* a nearest neighbor of point x.
+# We fix this later on...
+
+write("Saving nearest neighbors plot...")
+flush()
+t0 = time.time()
+fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
+ax = fig.add_subplot(111, projection='3d')
+plot_neighbors_3d(points, color, neighbor_graph, ax, point_size=3, line_width=0.5, edge_thickness=0.5, show_labels=False)
+ax.set_title("Nearest Neighbors (k=%d)" % neighbors_k)
+plt.savefig(output_dir + "nearest_neighbors.svg")
+angles = np.linspace(0, 360, 40+1)[:-1]
+rotanimate(ax, angles, output_dir + "nearest_neighbors.gif", delay=30, width=14.4, height=10.8)
+plt.close(fig)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+write("Saving ground truth tangent plot...")
+flush()
+t0 = time.time()
+fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
+ax = fig.add_subplot(111, projection='3d')
+plot_pca_3d(points, color, true_tangents, ax, point_size=3, point_line_width=0.5, line_width=0.5, line_length=0.05)
+ax.set_title("Exact Tangents")
+plt.savefig(output_dir + "true_tangents.svg")
+plt.close(fig)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+####################
+# Initialize Graph #
+####################
+from utils import sparseMatrixToDict, sparseMaximum
+
+write("Initializing graph data structures...")
+flush()
+t0 = time.time()
+# Make the matrix symmetric by taking max(G, G^T)
+neighbor_graph = sparseMaximum(neighbor_graph, neighbor_graph.T)
+# This dictionary will have the structure point_idx: [list, of, neighbor_idx]
+neighbor_dict = sparseMatrixToDict(neighbor_graph)
+# This extracts all pairs of neighbors from the dictionary and stores them as a list of tuples.
+# neighbor_pair_list represents the identification of the messages, i.e., "message 0" is
+# so defined by being at index 0 of neighbor_pair_list.
+neighbor_pair_list = [(key, value) for key, arr in neighbor_dict.items() for value in arr]
+num_messages = len(neighbor_pair_list)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+write("Number of points: %d\n" % num_points)
+write("Number of edges: %d\n" % len(neighbor_pair_list))
