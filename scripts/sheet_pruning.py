@@ -556,19 +556,21 @@ try:
 		ax = fig.add_subplot(111, projection='3d')
 		ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=3**2, zorder=2, linewidth=0.5)
 
-		coordinates = np.zeros((num_points*num_samples, 2, source_dim))
-		colors = np.zeros((num_points*num_samples, 4))
+		num_comps = len(belief[0].ts[0])
+		coordinates = np.zeros((num_points*num_samples*num_comps, 2, source_dim))
+		colors = np.zeros((num_points*num_samples*num_comps, 4))
 		for i in range(num_points):
 			max_weight = np.max(belief[i].weights)
 			for j in range(num_samples):
-				c_idx = i*num_samples + j
-				coordinates[c_idx][0][0] = points[i][0]
-				coordinates[c_idx][0][1] = points[i][1]
-				coordinates[c_idx][0][2] = points[i][2]
-				coordinates[c_idx][1][0] = points[i][0] + (0.05 * belief[i].ts[j][0][0])
-				coordinates[c_idx][1][1] = points[i][1] + (0.05 * belief[i].ts[j][0][1])
-				coordinates[c_idx][1][2] = points[i][2] + (0.05 * belief[i].ts[j][0][2])
-				colors[c_idx][:] = coolwarm(belief[i].weights[j] * (1.0 / max_weight))
+				for k in range(num_comps):
+					c_idx = i*num_samples*num_comps + j*num_comps + k
+					coordinates[c_idx][0][0] = points[i][0]
+					coordinates[c_idx][0][1] = points[i][1]
+					coordinates[c_idx][0][2] = points[i][2]
+					coordinates[c_idx][1][0] = points[i][0] + (0.05 * belief[i].ts[j][k][0])
+					coordinates[c_idx][1][1] = points[i][1] + (0.05 * belief[i].ts[j][k][1])
+					coordinates[c_idx][1][2] = points[i][2] + (0.05 * belief[i].ts[j][k][2])
+					colors[c_idx][:] = coolwarm(belief[i].weights[j] * (1.0 / max_weight))
 		lines = Line3DCollection(coordinates, color=colors, linewidths=0.5)
 		ax.add_collection(lines)
 		ax.set_title("Tangent Space Belief (iter %d)" % iter_num)
