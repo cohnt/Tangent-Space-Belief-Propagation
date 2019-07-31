@@ -39,6 +39,12 @@ kpca_max_iter = 3000
 
 write("\n")
 
+def make3DFigure():
+	f = plt.figure(figsize=(14.4, 10.8), dpi=100)
+	a = f.add_subplot(111, projection='3d')
+	a.view_init(elev=10.0, azim=-90.0)
+	return f, a
+
 ####################
 # Write Parameters #
 ####################
@@ -92,8 +98,7 @@ flush()
 write("Saving dataset plot...")
 flush()
 t0 = time.time()
-fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
-ax = fig.add_subplot(111, projection='3d')
+fig, ax = make3DFigure()
 ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=3**2, zorder=2, linewidth=0.5)
 ax.set_title("Dataset (num=%d, variance=%f, seed=%d)" % (num_points, data_noise, dataset_seed))
 plt.savefig(output_dir + "dataset.svg")
@@ -125,13 +130,12 @@ flush()
 write("Saving nearest neighbors plot...")
 flush()
 t0 = time.time()
-fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
-ax = fig.add_subplot(111, projection='3d')
+fig, ax = make3DFigure()
 plot_neighbors_3d(points, color, neighbor_graph, ax, point_size=3, line_width=0.5, edge_thickness=0.5, show_labels=False)
 ax.set_title("Nearest Neighbors (k=%d)" % neighbors_k)
 plt.savefig(output_dir + "nearest_neighbors.svg")
 angles = np.linspace(0, 360, 40+1)[:-1]
-rotanimate(ax, angles, output_dir + "nearest_neighbors.gif", delay=30, width=14.4, height=10.8)
+# rotanimate(ax, angles, output_dir + "nearest_neighbors.gif", delay=30, width=14.4, height=10.8)
 plt.close(fig)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
@@ -140,8 +144,7 @@ flush()
 write("Saving ground truth tangent plot...")
 flush()
 t0 = time.time()
-fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
-ax = fig.add_subplot(111, projection='3d')
+fig, ax = make3DFigure()
 plot_pca_3d(points, color, true_tangents, ax, point_size=3, point_line_width=0.5, line_width=0.5, line_length=0.05)
 ax.set_title("Exact Tangents")
 plt.savefig(output_dir + "true_tangents.svg")
@@ -173,3 +176,39 @@ flush()
 
 write("Number of points: %d\n" % num_points)
 write("Number of edges: %d\n" % len(neighbor_pair_list))
+
+###############
+# Measure PCA #
+###############
+from sklearn.decomposition import PCA
+
+# n_components is the number of principal components pca will compute
+pca = PCA(n_components=target_dim)
+observations = [None for i in range(num_points)]
+
+write("Computing PCA observations...")
+flush()
+t0 = time.time()
+for i in range(num_points):
+	og_point = points[i]
+	row = neighbor_graph.toarray()[i]
+	neighbors = np.nonzero(row)[0]
+	neighborhood = points[neighbors]
+	pca.fit(neighborhood)
+	# vec1 = pca.components_[0]
+	observations[i] = pca.components_[0:target_dim]
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+write("Saving PCA observations plot...")
+flush()
+t0 = time.time()
+fig, ax = make3DFigure()
+plot_pca_3d(points, color, observations, ax, point_size=3, point_line_width=0.5, line_width=0.5, line_length=0.05)
+ax.set_title("Measured Tangent Spaces (PCA)")
+plt.savefig(output_dir + "pca_observations.svg")
+plt.close(fig)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
