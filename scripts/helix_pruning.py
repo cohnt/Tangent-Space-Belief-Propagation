@@ -17,12 +17,12 @@ global_t0 = time.time()
 dataset_name = "tight_spiral_curve"
 dataset_seed = np.random.randint(0, 2**32)
 num_points = 500    # Number of data points
-data_noise = 0.0      # How much noise is added to the data
+data_noise = 0.001      # How much noise is added to the data
 source_dim = 3      # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1      # The number of dimensions the data is being reduced to
 
 num_iters = 10      # Number of iterations of the message passing algorithm to run
-neighbors_k = 8    # The value of 'k' used for k-nearest-neighbors
+neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
 num_samples = 5     # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
 
@@ -84,6 +84,10 @@ f.write("embedding_tol=%s\n" % str(kpca_tol))
 f.write("embedding_max_iter=%d\n" % kpca_max_iter)
 
 f.write("\n[Display]\n")
+f.write("\ndata_sp_rad=%s\n" % str(data_sp_rad))
+f.write("\ndata_sp_lw=%s\n" % str(data_sp_lw))
+f.write("\nnn_lw=%s\n" % str(nn_lw))
+f.write("\npca_ll=%s\n" % str(pca_ll))
 f.write("\nembedding_sp_rad=%s\n" % str(embedding_sp_rad))
 f.write("\nembedding_sp_lw=%s\n" % str(embedding_sp_lw))
 f.write("\ncombined_sp_rad=%s\n" % str(combined_sp_rad))
