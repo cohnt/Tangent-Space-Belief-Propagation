@@ -38,7 +38,7 @@ kpca_eigen_solver = "auto"
 kpca_tol = 1e-9
 kpca_max_iter = 3000
 
-data_sp_rad = 3.0
+data_sp_rad = 4.0
 data_sp_lw = 0.5
 nn_lw = 0.5
 pca_ll = 0.05
@@ -111,7 +111,7 @@ flush()
 t0 = time.time()
 fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
 ax = fig.add_subplot(111, projection='3d')
-ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=data_sp_rad**2, zorder=2, linewidth=data_sp_lw)
+ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=data_sp_rad**2, linewidth=data_sp_lw)
 ax.set_title("Dataset (num=%d, variance=%f, seed=%d)" % (num_points, data_noise, dataset_seed))
 plt.savefig(output_dir + "dataset.svg")
 plt.close(fig)
@@ -573,7 +573,7 @@ try:
 
 		fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
 		ax = fig.add_subplot(111, projection='3d')
-		ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=data_sp_rad**2, zorder=2, linewidth=data_sp_lw)
+		ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=data_sp_rad**2, linewidth=data_sp_lw)
 
 		coordinates = np.zeros((num_points*num_samples, 2, source_dim))
 		colors = np.zeros((num_points*num_samples, 4))
