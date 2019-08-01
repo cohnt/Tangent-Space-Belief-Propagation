@@ -17,7 +17,7 @@ global_t0 = time.time()
 dataset_name = "swiss_roll"
 dataset_seed = np.random.randint(0, 2**32)
 num_points = 1000    # Number of data points
-data_noise = 0     # How much noise is added to the data
+data_noise = 0.0001     # How much noise is added to the data
 source_dim = 3      # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 2      # The number of dimensions the data is being reduced to
 
@@ -28,7 +28,7 @@ explore_perc = 0.1  # Fraction of uniform samples to keep exploring
 
 message_resample_cov = np.eye(target_dim) * 0.01 # TODO: Change
 pruning_angle_thresh = np.cos(30.0 * np.pi / 180.0)
-ts_noise_variance = 10 # Degrees
+ts_noise_variance = 30 # Degrees
 
 output_dir = "results_sheet/"
 error_histogram_num_bins = num_points / 10
