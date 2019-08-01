@@ -38,13 +38,24 @@ kpca_eigen_solver = "auto"
 kpca_tol = 1e-9
 kpca_max_iter = 3000
 
+data_sp_rad = 5.0
+data_sp_lw = 1.0
+nn_lw = 0.5
+pca_ll = 0.1
+
+embedding_sp_rad = 7.0
+embedding_sp_lw = 1.0
+
+combined_sp_rad = 4.0
+combined_sp_lw = 0.5
+
 write("\n")
 
 def make3DFigure():
 	f = plt.figure(figsize=(14.4, 10.8), dpi=100)
 	a = f.add_subplot(111, projection='3d')
 	if dataset_name == "swiss_roll":
-		a.set_ylim(bottom=-1.0, top=1.0)
+		a.set_ylim(bottom=0.0, top=1.0)
 		a.view_init(elev=20.0, azim=-75.0)
 	else:
 		a.view_init(elev=10.0, azim=-90.0)
@@ -83,7 +94,14 @@ f.write("embedding_tol=%s\n" % str(kpca_tol))
 f.write("embedding_max_iter=%d\n" % kpca_max_iter)
 
 f.write("\n[Display]\n")
-f.write("; TODO\n")
+f.write("\ndata_sp_rad=%s\n" % str(data_sp_rad))
+f.write("\ndata_sp_lw=%s\n" % str(data_sp_lw))
+f.write("\nnn_lw=%s\n" % str(nn_lw))
+f.write("\npca_ll=%s\n" % str(pca_ll))
+f.write("\nembedding_sp_rad=%s\n" % str(embedding_sp_rad))
+f.write("\nembedding_sp_lw=%s\n" % str(embedding_sp_lw))
+f.write("\ncombined_sp_rad=%s\n" % str(combined_sp_rad))
+f.write("\ncombined_sp_lw=%s\n" % str(combined_sp_lw))
 
 f.close()
 
@@ -106,7 +124,7 @@ write("Saving dataset plot...")
 flush()
 t0 = time.time()
 fig, ax = make3DFigure()
-ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=3**2, zorder=2, linewidth=0.5)
+ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=data_sp_rad**2, linewidth=data_sp_lw)
 ax.set_title("Dataset (num=%d, variance=%f, seed=%d)" % (num_points, data_noise, dataset_seed))
 plt.savefig(output_dir + "dataset.svg")
 plt.close(fig)
@@ -138,7 +156,8 @@ write("Saving nearest neighbors plot...")
 flush()
 t0 = time.time()
 fig, ax = make3DFigure()
-plot_neighbors_3d(points, color, neighbor_graph, ax, point_size=3, line_width=0.5, edge_thickness=0.5, show_labels=False)
+# Not squared because it's squared inside plot_neighbors_3d
+plot_neighbors_3d(points, color, neighbor_graph, ax, point_size=data_sp_rad, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False)
 ax.set_title("Nearest Neighbors (k=%d)" % neighbors_k)
 plt.savefig(output_dir + "nearest_neighbors.svg")
 angles = np.linspace(0, 360, 40+1)[:-1]
@@ -152,7 +171,8 @@ write("Saving ground truth tangent plot...")
 flush()
 t0 = time.time()
 fig, ax = make3DFigure()
-plot_pca_3d(points, color, true_tangents, ax, point_size=3, point_line_width=0.5, line_width=0.5, line_length=0.05)
+# Not squared because it's squared inside plot_neighbors_3d
+plot_pca_3d(points, color, true_tangents, ax, point_size=data_sp_rad, point_line_width=data_sp_lw, line_width=nn_lw, line_length=pca_ll)
 ax.set_title("Exact Tangents")
 plt.savefig(output_dir + "true_tangents.svg")
 plt.close(fig)
@@ -212,7 +232,8 @@ write("Saving PCA observations plot...")
 flush()
 t0 = time.time()
 fig, ax = make3DFigure()
-plot_pca_3d(points, color, observations, ax, point_size=3, point_line_width=0.5, line_width=0.5, line_length=0.05)
+# Not squared because it's squared inside plot_neighbors_3d
+plot_pca_3d(points, color, observations, ax, point_size=data_sp_rad, point_line_width=data_sp_lw, line_width=nn_lw, line_length=pca_ll)
 ax.set_title("Measured Tangent Spaces (PCA)")
 plt.savefig(output_dir + "pca_observations.svg")
 plt.close(fig)
@@ -553,13 +574,14 @@ try:
 			mle_bases[i] = belief[i].ts[max_ind]
 
 		fig, ax = make3DFigure()
-		plot_pca_3d(points, color, mle_bases, ax, point_size=3, point_line_width=0.5, line_width=0.5, line_length=0.05)
+		# Not squared because it's squared inside plot_neighbors_3d
+		plot_pca_3d(points, color, mle_bases, ax, point_size=data_sp_rad, point_line_width=data_sp_lw, line_width=nn_lw, line_length=pca_ll)
 		ax.set_title("Tangent Space MLE (iter %d)" % iter_num)
 		plt.savefig(output_dir + ("ts_mle_iter%s.svg" % str(iter_num).zfill(4)))
 		plt.close(fig)
 
 		fig, ax = make3DFigure()
-		ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=3**2, zorder=2, linewidth=0.5)
+		ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=data_sp_rad**2, linewidth=data_sp_lw)
 
 		num_comps = len(belief[0].ts[0])
 		coordinates = np.zeros((num_points*num_samples*num_comps, 2, source_dim))
@@ -572,11 +594,11 @@ try:
 					coordinates[c_idx][0][0] = points[i][0]
 					coordinates[c_idx][0][1] = points[i][1]
 					coordinates[c_idx][0][2] = points[i][2]
-					coordinates[c_idx][1][0] = points[i][0] + (0.05 * belief[i].ts[j][k][0])
-					coordinates[c_idx][1][1] = points[i][1] + (0.05 * belief[i].ts[j][k][1])
-					coordinates[c_idx][1][2] = points[i][2] + (0.05 * belief[i].ts[j][k][2])
+					coordinates[c_idx][1][0] = points[i][0] + (pca_ll * belief[i].ts[j][k][0])
+					coordinates[c_idx][1][1] = points[i][1] + (pca_ll * belief[i].ts[j][k][1])
+					coordinates[c_idx][1][2] = points[i][2] + (pca_ll * belief[i].ts[j][k][2])
 					colors[c_idx][:] = coolwarm(belief[i].weights[j] * (1.0 / max_weight))
-		lines = Line3DCollection(coordinates, color=colors, linewidths=0.5)
+		lines = Line3DCollection(coordinates, color=colors, linewidths=nn_lw)
 		ax.add_collection(lines)
 		ax.set_title("Tangent Space Belief (iter %d)" % iter_num)
 		plt.savefig(output_dir + ("ts_bel_iter%s.svg" % str(iter_num).zfill(4)))
@@ -705,7 +727,8 @@ write("Done! dt=%f\n" % (t1-t0))
 flush()
 
 fig, ax = make3DFigure()
-plot_neighbors_3d(points, color, pruned_neighbors, ax, point_size=3, line_width=0.5, edge_thickness=0.5, show_labels=False)
+# Not squared because it's squared inside plot_neighbors_3d
+plot_neighbors_3d(points, color, pruned_neighbors, ax, point_size=data_sp_rad, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False)
 ax.set_title("Pruned Nearest Neighbors (k=%d, thresh=%f)" % (neighbors_k, pruning_angle_thresh))
 plt.savefig(output_dir + "pruned_nearest_neighbors.svg")
 angles = np.linspace(0, 360, 40+1)[:-1]
@@ -770,7 +793,8 @@ else:
 		connected_components.union(set_a, set_b)
 
 fig, ax = make3DFigure()
-plot_neighbors_3d(points, color, pruned_neighbors, ax, point_size=3, line_width=0.5, edge_thickness=0.5, show_labels=False)
+# Not squared because it's squared inside plot_neighbors_3d
+plot_neighbors_3d(points, color, pruned_neighbors, ax, point_size=data_sp_rad, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False)
 ax.set_title("Added Edges after Pruning")
 plt.savefig(output_dir + "added_edges.svg")
 plt.close(fig)
@@ -805,7 +829,7 @@ write("Done! dt=%f\n" % (t1-t0))
 flush()
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral)
+ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 ax.set_title("2D Embedding from BP Tangent Correction")
 plt.savefig(output_dir + "coord_bp.svg")
 plt.close(fig)
@@ -841,7 +865,7 @@ for i in range(num_methods):
 	flush()
 	
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-	ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral)
+	ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 	ax.set_title("\n".join(wrap("2D Embedding from %s" % name, 60)))
 	plt.savefig(output_dir + ("comparison_%s.svg" % name))
 	plt.close(fig)
@@ -855,7 +879,7 @@ write("Done! dt=%f\n" % (t1-t0))
 flush()
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral)
+ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 ax.set_title("\n".join(wrap("2D Embedding from Classical LTSA", 60)))
 plt.savefig(output_dir + "comparison_orig_LTSA.svg")
 plt.close(fig)
@@ -869,7 +893,7 @@ write("Done! dt=%f\n" % (t1-t0))
 flush()
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral)
+ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 ax.set_title("\n".join(wrap("2D Embedding from LTSA with Tangent Space Correction", 60)))
 plt.savefig(output_dir + "comparison_corrected_LTSA.svg")
 plt.close(fig)
@@ -884,7 +908,7 @@ write("Done! dt=%f\n" % (t1-t0))
 flush()
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral)
+ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 ax.set_title("\n".join(wrap("2D Embedding from LTSA with Tangent Space Correction and Edge Pruning", 60)))
 plt.savefig(output_dir + "comparison_pruned_LTSA.svg")
 plt.close(fig)
@@ -904,26 +928,26 @@ for i in range(num_methods):
 	name = method_names[i]
 	feature_coords = solver.fit_transform(points)
 
-	axes_list[i].scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=2, linewidths=0.25)
+	axes_list[i].scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
 	axes_list[i].set_title("\n".join(wrap("2D Embedding from %s" % name, 25)))
 
 feature_coords = compute_ltsa(points, neighbor_dict, observations, source_dim, target_dim)
-axes_list[4].scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=2, linewidths=0.25)
+axes_list[4].scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
 axes_list[4].set_title("\n".join(wrap("2D Embedding from Classical LTSA", 25)))
 
 feature_coords = compute_ltsa(points, neighbor_dict, mle_bases, source_dim, target_dim)
-axes_list[5].scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=2, linewidths=0.25)
+axes_list[5].scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
 axes_list[5].set_title("\n".join(wrap("2D Embedding from LTSA with Tangent Space Correction", 25)))
 
 feature_coords = compute_ltsa(points, pruned_neighbor_dict, mle_bases, source_dim, target_dim)
-axes_list[6].scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=2, linewidths=0.25)
+axes_list[6].scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
 axes_list[6].set_title("\n".join(wrap("2D Embedding from LTSA with Tangent Space Correction and Edge Pruning", 25)))
 
 # mds = MDS(n_components=target_dim, max_iter=3000, eps=1e-9, n_init=25, dissimilarity="precomputed", n_jobs=-1)
 # feature_coords = mds.fit_transform(shortest_distances)
 kpca = KernelPCA(n_components=target_dim, kernel="precomputed", eigen_solver=kpca_eigen_solver, tol=kpca_tol, max_iter=kpca_max_iter, n_jobs=-1)
 feature_coords = kpca.fit_transform((shortest_distances**2) * -0.5)
-axes_list[7].scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=2, linewidths=0.25)
+axes_list[7].scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
 axes_list[7].set_title("\n".join(wrap("2D Embedding from BP Tangent Correction for Edge Pruning", 25)))
 
 plt.savefig(output_dir + "comparison_all.svg")
