@@ -79,7 +79,10 @@ f.write("embedding_tol=%s\n" % str(kpca_tol))
 f.write("embedding_max_iter=%d\n" % kpca_max_iter)
 
 f.write("\n[Display]\n")
-f.write("; TODO\n")
+f.write("\nembedding_sp_rad=%s\n" % str(embedding_sp_rad))
+f.write("\nembedding_sp_lw=%s\n" % str(embedding_sp_lw))
+f.write("\ncombined_sp_rad=%s\n" % str(combined_sp_rad))
+f.write("\ncombined_sp_lw=%s\n" % str(combined_sp_lw))
 
 f.close()
 
