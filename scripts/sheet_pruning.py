@@ -22,7 +22,7 @@ source_dim = 3      # The dimensionality of the incoming dataset (see "Load Data
 target_dim = 2      # The number of dimensions the data is being reduced to
 
 num_iters = 10      # Number of iterations of the message passing algorithm to run
-neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
+neighbors_k = 15    # The value of 'k' used for k-nearest-neighbors
 num_samples = 5     # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
 
@@ -44,7 +44,7 @@ def make3DFigure():
 	a = f.add_subplot(111, projection='3d')
 	if dataset_name == "swiss_roll":
 		a.set_ylim(bottom=-1.0, top=1.0)
-		a.view_init(elev=20.0, azim=-90.0)
+		a.view_init(elev=20.0, azim=-75.0)
 	else:
 		a.view_init(elev=10.0, azim=-90.0)
 	return f, a
@@ -140,7 +140,7 @@ plot_neighbors_3d(points, color, neighbor_graph, ax, point_size=3, line_width=0.
 ax.set_title("Nearest Neighbors (k=%d)" % neighbors_k)
 plt.savefig(output_dir + "nearest_neighbors.svg")
 angles = np.linspace(0, 360, 40+1)[:-1]
-# rotanimate(ax, angles, output_dir + "nearest_neighbors.gif", delay=30, width=14.4, height=10.8)
+rotanimate(ax, angles, output_dir + "nearest_neighbors.gif", delay=30, width=14.4, height=10.8)
 plt.close(fig)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
@@ -804,6 +804,133 @@ flush()
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral)
-ax.set_title("2D Embedding")
+ax.set_title("2D Embedding from BP Tangent Correction")
 plt.savefig(output_dir + "coord_bp.svg")
 plt.close(fig)
+
+############################
+# Compare to Other Methods #
+############################
+
+write("\nComparing to other methods...\n")
+flush()
+
+from sklearn.manifold import LocallyLinearEmbedding, MDS, Isomap, SpectralEmbedding
+from ltsa import compute_ltsa
+
+methods = []
+methods.append(LocallyLinearEmbedding(n_neighbors=neighbors_k, n_components=target_dim, n_jobs=-1))
+methods.append(MDS(n_components=target_dim, n_jobs=-1))
+methods.append(Isomap(n_neighbors=neighbors_k, n_components=target_dim, n_jobs=-1))
+methods.append(SpectralEmbedding(n_components=target_dim, n_neighbors=neighbors_k, n_jobs=-1))
+num_methods = len(methods)
+
+method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding"]
+
+for i in range(num_methods):
+	solver = methods[i]
+	name = method_names[i]
+	write("Computing %s..." % name)
+	flush()
+	t0 = time.time()
+	feature_coords = solver.fit_transform(points)
+	t1 = time.time()
+	write("Done! dt=%f\n" % (t1-t0))
+	flush()
+	
+	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+	ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral)
+	ax.set_title("\n".join(wrap("2D Embedding from %s" % name, 60)))
+	plt.savefig(output_dir + ("comparison_%s.svg" % name))
+	plt.close(fig)
+
+write("Computing Classical LTSA...")
+flush()
+t0 = time.time()
+feature_coords = compute_ltsa(points, neighbor_dict, observations, source_dim, target_dim)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral)
+ax.set_title("\n".join(wrap("2D Embedding from Classical LTSA", 60)))
+plt.savefig(output_dir + "comparison_orig_LTSA.svg")
+plt.close(fig)
+
+write("Computing LTSA with Tangent Space Correction...")
+flush()
+t0 = time.time()
+feature_coords = compute_ltsa(points, neighbor_dict, mle_bases, source_dim, target_dim)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral)
+ax.set_title("\n".join(wrap("2D Embedding from LTSA with Tangent Space Correction", 60)))
+plt.savefig(output_dir + "comparison_corrected_LTSA.svg")
+plt.close(fig)
+
+write("Computing LTSA with Tangent Space Correction and Edge Pruning...")
+flush()
+t0 = time.time()
+pruned_neighbor_dict = sparseMatrixToDict(pruned_neighbors)
+feature_coords = compute_ltsa(points, pruned_neighbor_dict, mle_bases, source_dim, target_dim)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral)
+ax.set_title("\n".join(wrap("2D Embedding from LTSA with Tangent Space Correction and Edge Pruning", 60)))
+plt.savefig(output_dir + "comparison_pruned_LTSA.svg")
+plt.close(fig)
+
+write("Creating combined image...")
+flush()
+t0 = time.time()
+
+matplotlib.rcParams.update({'font.size': 6})
+
+fig, axes = plt.subplots(nrows=2, ncols=4, figsize=(19.2, 10.8), dpi=100)
+plt.tight_layout(pad=5, h_pad=10, w_pad=5)
+axes_list = np.concatenate(axes)
+
+for i in range(num_methods):
+	solver = methods[i]
+	name = method_names[i]
+	feature_coords = solver.fit_transform(points)
+
+	axes_list[i].scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=2, linewidths=0.25)
+	axes_list[i].set_title("\n".join(wrap("2D Embedding from %s" % name, 25)))
+
+feature_coords = compute_ltsa(points, neighbor_dict, observations, source_dim, target_dim)
+axes_list[4].scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=2, linewidths=0.25)
+axes_list[4].set_title("\n".join(wrap("2D Embedding from Classical LTSA", 25)))
+
+feature_coords = compute_ltsa(points, neighbor_dict, mle_bases, source_dim, target_dim)
+axes_list[5].scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=2, linewidths=0.25)
+axes_list[5].set_title("\n".join(wrap("2D Embedding from LTSA with Tangent Space Correction", 25)))
+
+feature_coords = compute_ltsa(points, pruned_neighbor_dict, mle_bases, source_dim, target_dim)
+axes_list[6].scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=2, linewidths=0.25)
+axes_list[6].set_title("\n".join(wrap("2D Embedding from LTSA with Tangent Space Correction and Edge Pruning", 25)))
+
+# mds = MDS(n_components=target_dim, max_iter=3000, eps=1e-9, n_init=25, dissimilarity="precomputed", n_jobs=-1)
+# feature_coords = mds.fit_transform(shortest_distances)
+kpca = KernelPCA(n_components=target_dim, kernel="precomputed", eigen_solver=kpca_eigen_solver, tol=kpca_tol, max_iter=kpca_max_iter, n_jobs=-1)
+feature_coords = kpca.fit_transform((shortest_distances**2) * -0.5)
+axes_list[7].scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=2, linewidths=0.25)
+axes_list[7].set_title("\n".join(wrap("2D Embedding from BP Tangent Correction for Edge Pruning", 25)))
+
+plt.savefig(output_dir + "comparison_all.svg")
+plt.close(fig)
+
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+global_t1 = time.time()
+write("\nTotal program runtime: %d seconds.\n\n" % (global_t1-global_t0))
+flush()
