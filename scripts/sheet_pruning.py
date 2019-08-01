@@ -46,8 +46,8 @@ embedding_sp_rad = 7.0
 embedding_sp_lw = 1.0
 combined_sp_rad = 4.0
 combined_sp_lw = 0.5
-disp_elev = 10.0
-disp_azim = -75.0
+disp_elev = 5.0
+disp_azim = -85.0
 
 write("\n")
 
