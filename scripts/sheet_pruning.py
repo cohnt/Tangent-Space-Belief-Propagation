@@ -42,12 +42,12 @@ data_sp_rad = 5.0
 data_sp_lw = 1.0
 nn_lw = 0.5
 pca_ll = 0.1
-
 embedding_sp_rad = 7.0
 embedding_sp_lw = 1.0
-
 combined_sp_rad = 4.0
 combined_sp_lw = 0.5
+disp_elev = 10.0
+disp_azim = -75.0
 
 write("\n")
 
@@ -56,9 +56,7 @@ def make3DFigure():
 	a = f.add_subplot(111, projection='3d')
 	if dataset_name == "swiss_roll":
 		a.set_ylim(bottom=-0.5, top=1.5)
-		a.view_init(elev=20.0, azim=-75.0)
-	else:
-		a.view_init(elev=10.0, azim=-90.0)
+	a.view_init(elev=disp_elev, azim=disp_azim)
 	return f, a
 
 ####################
@@ -102,6 +100,9 @@ f.write("embedding_sp_rad=%s\n" % str(embedding_sp_rad))
 f.write("embedding_sp_lw=%s\n" % str(embedding_sp_lw))
 f.write("combined_sp_rad=%s\n" % str(combined_sp_rad))
 f.write("combined_sp_lw=%s\n" % str(combined_sp_lw))
+f.write("disp_elev=%s\n" % str(disp_elev))
+f.write("disp_azim=%s\n" % str(disp_azim))
+
 
 f.close()
 
