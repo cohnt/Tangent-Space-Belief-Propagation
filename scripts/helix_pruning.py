@@ -28,7 +28,7 @@ explore_perc = 0.1  # Fraction of uniform samples to keep exploring
 
 message_resample_cov = np.eye(target_dim) * 0.01 # TODO: Change
 pruning_angle_thresh = np.cos(30.0 * np.pi / 180.0)
-ts_noise_variance = 10 # In degrees
+ts_noise_variance = 30 # In degrees
 
 output_dir = "results_helix/"
 error_histogram_num_bins = num_points / 10
