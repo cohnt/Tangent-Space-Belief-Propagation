@@ -39,7 +39,7 @@ kpca_tol = 1e-9
 kpca_max_iter = 3000
 
 data_sp_rad = 5.0
-data_sp_lw = 0.75
+data_sp_lw = 1.0
 nn_lw = 0.5
 pca_ll = 0.1
 
