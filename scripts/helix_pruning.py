@@ -144,7 +144,8 @@ flush()
 t0 = time.time()
 fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
 ax = fig.add_subplot(111, projection='3d')
-plot_neighbors_3d(points, color, neighbor_graph, ax, point_size=data_sp_rad**2, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False)
+# Not squared because it's squared inside plot_neighbors_3d
+plot_neighbors_3d(points, color, neighbor_graph, ax, point_size=data_sp_rad, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False)
 ax.set_title("Nearest Neighbors (k=%d)" % neighbors_k)
 plt.savefig(output_dir + "nearest_neighbors.svg")
 angles = np.linspace(0, 360, 40+1)[:-1]
@@ -159,7 +160,8 @@ flush()
 t0 = time.time()
 fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
 ax = fig.add_subplot(111, projection='3d')
-plot_pca_3d(points, color, true_tangents, ax, point_size=data_sp_rad**2, point_line_width=data_sp_lw, line_width=nn_lw, line_length=pca_ll)
+# Not squared because it's squared inside plot_neighbors_3d
+plot_pca_3d(points, color, true_tangents, ax, point_size=data_sp_rad, point_line_width=data_sp_lw, line_width=nn_lw, line_length=pca_ll)
 ax.set_title("Exact Tangents")
 plt.savefig(output_dir + "true_tangents.svg")
 plt.close(fig)
@@ -220,7 +222,8 @@ flush()
 t0 = time.time()
 fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
 ax = fig.add_subplot(111, projection='3d')
-plot_pca_3d(points, color, observations, ax, point_size=data_sp_rad**2, point_line_width=data_sp_lw, line_width=nn_lw, line_length=pca_ll)
+# Not squared because it's squared inside plot_neighbors_3d
+plot_pca_3d(points, color, observations, ax, point_size=data_sp_rad, point_line_width=data_sp_lw, line_width=nn_lw, line_length=pca_ll)
 ax.set_title("Measured Tangent Spaces (PCA)")
 plt.savefig(output_dir + "pca_observations.svg")
 plt.close(fig)
@@ -562,7 +565,8 @@ try:
 
 		fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
 		ax = fig.add_subplot(111, projection='3d')
-		plot_pca_3d(points, color, mle_bases, ax, point_size=data_sp_rad**2, point_line_width=data_sp_lw, line_width=nn_lw, line_length=pca_ll)
+		# Not squared because it's squared inside plot_neighbors_3d
+		plot_pca_3d(points, color, mle_bases, ax, point_size=data_sp_rad, point_line_width=data_sp_lw, line_width=nn_lw, line_length=pca_ll)
 		ax.set_title("Tangent Space MLE (iter %d)" % iter_num)
 		plt.savefig(output_dir + ("ts_mle_iter%s.svg" % str(iter_num).zfill(4)))
 		plt.close(fig)
@@ -712,7 +716,8 @@ flush()
 
 fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
 ax = fig.add_subplot(111, projection='3d')
-plot_neighbors_3d(points, color, pruned_neighbors, ax, point_size=data_sp_rad**2, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False)
+# Not squared because it's squared inside plot_neighbors_3d
+plot_neighbors_3d(points, color, pruned_neighbors, ax, point_size=data_sp_rad, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False)
 ax.set_title("Pruned Nearest Neighbors (k=%d, thresh=%f)" % (neighbors_k, pruning_angle_thresh))
 plt.savefig(output_dir + "pruned_nearest_neighbors.svg")
 angles = np.linspace(0, 360, 40+1)[:-1]
@@ -778,7 +783,8 @@ else:
 
 fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
 ax = fig.add_subplot(111, projection='3d')
-plot_neighbors_3d(points, color, pruned_neighbors, ax, point_size=data_sp_rad**2, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False)
+# Not squared because it's squared inside plot_neighbors_3d
+plot_neighbors_3d(points, color, pruned_neighbors, ax, point_size=data_sp_rad, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False)
 ax.set_title("Added Edges after Pruning")
 plt.savefig(output_dir + "added_edges.svg")
 plt.close(fig)
