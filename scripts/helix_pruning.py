@@ -38,11 +38,11 @@ kpca_eigen_solver = "auto"
 kpca_tol = 1e-9
 kpca_max_iter = 3000
 
-embedding_sp_rad = 5
-embedding_sp_lw = 0.25
+embedding_sp_rad = 7.0
+embedding_sp_lw = 1.0
 
-combined_sp_rad = 4
-combined_sp_lw = 0.25
+combined_sp_rad = 4.0
+combined_sp_lw = 0.5
 
 write("\n")
 
