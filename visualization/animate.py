@@ -13,7 +13,7 @@ import numpy as np
 ##### TO CREATE A SERIES OF PICTURES
  
 def make_views(ax,angles,elevation=None, width=4, height = 3,
-                prefix='tmprot_',**kwargs):
+                prefix='tmprot_', folder="",**kwargs):
     """
     Makes jpeg pictures of the given 3d ax, with different angles.
     Args:
@@ -32,7 +32,7 @@ def make_views(ax,angles,elevation=None, width=4, height = 3,
     for i,angle in enumerate(angles):
      
         ax.view_init(elev = elevation, azim=angle)
-        fname = '%s%03d.jpeg'%(prefix,i)
+        fname = '%s%s%03d.jpeg'%(folder,prefix,i)
         ax.figure.savefig(fname)
         files.append(fname)
      
