@@ -55,7 +55,7 @@ def make3DFigure():
 	f = plt.figure(figsize=(14.4, 10.8), dpi=100)
 	a = f.add_subplot(111, projection='3d')
 	if dataset_name == "swiss_roll":
-		a.set_ylim(bottom=0.0, top=1.0)
+		a.set_ylim(bottom=-0.5, top=1.5)
 		a.view_init(elev=20.0, azim=-75.0)
 	else:
 		a.view_init(elev=10.0, azim=-90.0)
@@ -94,14 +94,14 @@ f.write("embedding_tol=%s\n" % str(kpca_tol))
 f.write("embedding_max_iter=%d\n" % kpca_max_iter)
 
 f.write("\n[Display]\n")
-f.write("\ndata_sp_rad=%s\n" % str(data_sp_rad))
-f.write("\ndata_sp_lw=%s\n" % str(data_sp_lw))
-f.write("\nnn_lw=%s\n" % str(nn_lw))
-f.write("\npca_ll=%s\n" % str(pca_ll))
-f.write("\nembedding_sp_rad=%s\n" % str(embedding_sp_rad))
-f.write("\nembedding_sp_lw=%s\n" % str(embedding_sp_lw))
-f.write("\ncombined_sp_rad=%s\n" % str(combined_sp_rad))
-f.write("\ncombined_sp_lw=%s\n" % str(combined_sp_lw))
+f.write("data_sp_rad=%s\n" % str(data_sp_rad))
+f.write("data_sp_lw=%s\n" % str(data_sp_lw))
+f.write("nn_lw=%s\n" % str(nn_lw))
+f.write("pca_ll=%s\n" % str(pca_ll))
+f.write("embedding_sp_rad=%s\n" % str(embedding_sp_rad))
+f.write("embedding_sp_lw=%s\n" % str(embedding_sp_lw))
+f.write("combined_sp_rad=%s\n" % str(combined_sp_rad))
+f.write("combined_sp_lw=%s\n" % str(combined_sp_lw))
 
 f.close()
 
