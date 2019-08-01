@@ -38,6 +38,11 @@ kpca_eigen_solver = "auto"
 kpca_tol = 1e-9
 kpca_max_iter = 3000
 
+data_sp_rad = 3.0
+data_sp_lw = 0.5
+nn_lw = 0.5
+pca_ll = 0.05
+
 embedding_sp_rad = 7.0
 embedding_sp_lw = 1.0
 
@@ -106,7 +111,7 @@ flush()
 t0 = time.time()
 fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
 ax = fig.add_subplot(111, projection='3d')
-ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=3**2, zorder=2, linewidth=0.5)
+ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=data_sp_rad**2, zorder=2, linewidth=data_sp_lw)
 ax.set_title("Dataset (num=%d, variance=%f, seed=%d)" % (num_points, data_noise, dataset_seed))
 plt.savefig(output_dir + "dataset.svg")
 plt.close(fig)
@@ -139,7 +144,7 @@ flush()
 t0 = time.time()
 fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
 ax = fig.add_subplot(111, projection='3d')
-plot_neighbors_3d(points, color, neighbor_graph, ax, point_size=3, line_width=0.5, edge_thickness=0.5, show_labels=False)
+plot_neighbors_3d(points, color, neighbor_graph, ax, point_size=data_sp_rad**2, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False)
 ax.set_title("Nearest Neighbors (k=%d)" % neighbors_k)
 plt.savefig(output_dir + "nearest_neighbors.svg")
 angles = np.linspace(0, 360, 40+1)[:-1]
@@ -154,7 +159,7 @@ flush()
 t0 = time.time()
 fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
 ax = fig.add_subplot(111, projection='3d')
-plot_pca_3d(points, color, true_tangents, ax, point_size=3, point_line_width=0.5, line_width=0.5, line_length=0.05)
+plot_pca_3d(points, color, true_tangents, ax, point_size=data_sp_rad**2, point_line_width=data_sp_lw, line_width=nn_lw, line_length=pca_ll)
 ax.set_title("Exact Tangents")
 plt.savefig(output_dir + "true_tangents.svg")
 plt.close(fig)
@@ -215,7 +220,7 @@ flush()
 t0 = time.time()
 fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
 ax = fig.add_subplot(111, projection='3d')
-plot_pca_3d(points, color, observations, ax, point_size=3, point_line_width=0.5, line_width=0.5, line_length=0.05)
+plot_pca_3d(points, color, observations, ax, point_size=data_sp_rad**2, point_line_width=data_sp_lw, line_width=nn_lw, line_length=pca_ll)
 ax.set_title("Measured Tangent Spaces (PCA)")
 plt.savefig(output_dir + "pca_observations.svg")
 plt.close(fig)
@@ -557,14 +562,14 @@ try:
 
 		fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
 		ax = fig.add_subplot(111, projection='3d')
-		plot_pca_3d(points, color, mle_bases, ax, point_size=3, point_line_width=0.5, line_width=0.5, line_length=0.05)
+		plot_pca_3d(points, color, mle_bases, ax, point_size=data_sp_rad**2, point_line_width=data_sp_lw, line_width=nn_lw, line_length=pca_ll)
 		ax.set_title("Tangent Space MLE (iter %d)" % iter_num)
 		plt.savefig(output_dir + ("ts_mle_iter%s.svg" % str(iter_num).zfill(4)))
 		plt.close(fig)
 
 		fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
 		ax = fig.add_subplot(111, projection='3d')
-		ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=3**2, zorder=2, linewidth=0.5)
+		ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=data_sp_rad**2, zorder=2, linewidth=data_sp_lw)
 
 		coordinates = np.zeros((num_points*num_samples, 2, source_dim))
 		colors = np.zeros((num_points*num_samples, 4))
@@ -575,11 +580,11 @@ try:
 				coordinates[c_idx][0][0] = points[i][0]
 				coordinates[c_idx][0][1] = points[i][1]
 				coordinates[c_idx][0][2] = points[i][2]
-				coordinates[c_idx][1][0] = points[i][0] + (0.05 * belief[i].ts[j][0][0])
-				coordinates[c_idx][1][1] = points[i][1] + (0.05 * belief[i].ts[j][0][1])
-				coordinates[c_idx][1][2] = points[i][2] + (0.05 * belief[i].ts[j][0][2])
+				coordinates[c_idx][1][0] = points[i][0] + (pca_ll * belief[i].ts[j][0][0])
+				coordinates[c_idx][1][1] = points[i][1] + (pca_ll * belief[i].ts[j][0][1])
+				coordinates[c_idx][1][2] = points[i][2] + (pca_ll * belief[i].ts[j][0][2])
 				colors[c_idx][:] = coolwarm(belief[i].weights[j] * (1.0 / max_weight))
-		lines = Line3DCollection(coordinates, color=colors, linewidths=0.5)
+		lines = Line3DCollection(coordinates, color=colors, linewidths=nn_lw)
 		ax.add_collection(lines)
 		ax.set_title("Tangent Space Belief (iter %d)" % iter_num)
 		plt.savefig(output_dir + ("ts_bel_iter%s.svg" % str(iter_num).zfill(4)))
@@ -707,7 +712,7 @@ flush()
 
 fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
 ax = fig.add_subplot(111, projection='3d')
-plot_neighbors_3d(points, color, pruned_neighbors, ax, point_size=3, line_width=0.5, edge_thickness=0.5, show_labels=False)
+plot_neighbors_3d(points, color, pruned_neighbors, ax, point_size=data_sp_rad**2, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False)
 ax.set_title("Pruned Nearest Neighbors (k=%d, thresh=%f)" % (neighbors_k, pruning_angle_thresh))
 plt.savefig(output_dir + "pruned_nearest_neighbors.svg")
 angles = np.linspace(0, 360, 40+1)[:-1]
@@ -773,7 +778,7 @@ else:
 
 fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
 ax = fig.add_subplot(111, projection='3d')
-plot_neighbors_3d(points, color, pruned_neighbors, ax, point_size=3, line_width=0.5, edge_thickness=0.5, show_labels=False)
+plot_neighbors_3d(points, color, pruned_neighbors, ax, point_size=data_sp_rad**2, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False)
 ax.set_title("Added Edges after Pruning")
 plt.savefig(output_dir + "added_edges.svg")
 plt.close(fig)
