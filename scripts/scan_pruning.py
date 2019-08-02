@@ -46,29 +46,29 @@ for i in range(num_methods):
 	plt.ylabel("Embedded Coordinate")
 	plt.show()
 
-methods = []
-methods.append(LocallyLinearEmbedding(n_neighbors=k, n_components=2, n_jobs=-1))
-methods.append(MDS(n_components=2, n_jobs=-1))
-methods.append(Isomap(n_neighbors=k, n_components=2, n_jobs=-1))
-methods.append(SpectralEmbedding(n_components=2, n_neighbors=k, n_jobs=-1))
-num_methods = len(methods)
+# methods = []
+# methods.append(LocallyLinearEmbedding(n_neighbors=k, n_components=2, n_jobs=-1))
+# methods.append(MDS(n_components=2, n_jobs=-1))
+# methods.append(Isomap(n_neighbors=k, n_components=2, n_jobs=-1))
+# methods.append(SpectralEmbedding(n_components=2, n_neighbors=k, n_jobs=-1))
+# num_methods = len(methods)
 
-method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding"]
+# method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding"]
 
-for i in range(num_methods):
-	solver = methods[i]
-	name = method_names[i]
-	write("Computing %s..." % name)
-	flush()
-	t0 = time.time()
-	feature_coords = solver.fit_transform(points)
-	t1 = time.time()
-	write("Done! dt=%f\n" % (t1-t0))
-	flush()
+# for i in range(num_methods):
+# 	solver = methods[i]
+# 	name = method_names[i]
+# 	write("Computing %s..." % name)
+# 	flush()
+# 	t0 = time.time()
+# 	feature_coords = solver.fit_transform(points)
+# 	t1 = time.time()
+# 	write("Done! dt=%f\n" % (t1-t0))
+# 	flush()
 	
-	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-	ax.scatter(feature_coords[:,0], feature_coords[:,1])
-	ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from %s" % name, 60)))
-	plt.xlabel("Actual Parameter Value")
-	plt.ylabel("Embedded Coordinate")
-	plt.show()
+# 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+# 	ax.scatter(feature_coords[:,0], feature_coords[:,1])
+# 	ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from %s" % name, 60)))
+# 	plt.xlabel("Actual Parameter Value")
+# 	plt.ylabel("Embedded Coordinate")
+# 	plt.show()
