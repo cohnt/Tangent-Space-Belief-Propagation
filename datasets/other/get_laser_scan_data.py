@@ -38,7 +38,6 @@ while True:
 
 		# Interpolate nan values in the middle
 		ranges = pd.Series(ranges).interpolate().get_values()
-		print ranges
 
 		# Fix nan values on the end to the closest not-nan value
 		ind = np.where(~np.isnan(ranges))[0]
