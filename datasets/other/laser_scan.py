@@ -4,4 +4,5 @@ data_file_name = "datasets/other/data.csv"
 
 def make_laser_scan_curve():
 	data = np.genfromtxt(data_file_name, delimiter=",")
-	return data
+	indices = np.arange(len(data))
+	return data, indices
