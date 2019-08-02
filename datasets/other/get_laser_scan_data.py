@@ -30,10 +30,15 @@ while True:
 		data_message = rospy.wait_for_message(topic_name, LaserScanMsg)
 
 		angles = np.linspace(data_message.angle_min, data_message.angle_max, len(data_message.ranges))
+		ranges = np.array(data_message.ranges)
+
+		# Replace infinity with range_max
+		range_max = data_message.range_max
+		ranges[ranges == np.inf] = range_max
 
 		# Interpolate nan values in the middle
-		ranges = np.array(data_message.ranges)
 		ranges = pd.Series(ranges).interpolate().get_values()
+		print ranges
 
 		# Fix nan values on the end to the closest not-nan value
 		ind = np.where(~np.isnan(ranges))[0]
@@ -42,9 +47,6 @@ while True:
 		ranges[last + 1:] = ranges[last]
 		inter_ranges = ranges.copy()
 
-		# Replace infinity with range_max
-		range_max = data_message.range_max
-		ranges[ranges == np.inf] = range_max
 	except KeyboardInterrupt:
 		break
 
@@ -52,12 +54,10 @@ while True:
 
 	# orig_data = np.multiply([np.cos(angles), -np.sin(angles)], data_message.ranges).transpose()
 	# inter_data = np.multiply([np.cos(angles), -np.sin(angles)], inter_ranges).transpose()
-	# final_data = np.multiply([np.cos(angles), -np.sin(angles)], ranges).transpose()
 
-	# fig, (ax1, ax2, ax3) = plt.subplots(nrows=1, ncols=3)
+	# fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2)
 	# ax1.scatter(orig_data[:,0], orig_data[:,1])
 	# ax2.scatter(inter_data[:,0], inter_data[:,1])
-	# ax3.scatter(final_data[:,0], final_data[:,1])
 	# plt.show()
 	# exit()
 
