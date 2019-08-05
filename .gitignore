@@ -1,4 +1,3 @@
-*.pyc
 results/*
 results_helix/*
 results_sheet/*
@@ -9,6 +8,10 @@ results_dmst/*
 results_eiv/*
 results_outlier/*
 testing_history/*
+
+datasets/other/data.csv
+
+*.pyc
 *.svg
 *.png
 *.gif
