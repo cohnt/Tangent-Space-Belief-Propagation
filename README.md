@@ -3,7 +3,6 @@ Run all scripts from the root of the repository as a module, i.e., to run ```pca
 ### TODO
 
 * Implement least squares regression of best fit line on the embedded parameter vs true parameter graphs to quantitatively measure how good an embedding is.
-* Make a diagram of a neighborhood within a graph (highlight or otherwise emphasize), and draw out the corresponding MRF network
 * Method to draw the underlying manifold
 * Find a recent publication relating to manifold learning
 * Remove all mentions of "unfortunately" in the paper
