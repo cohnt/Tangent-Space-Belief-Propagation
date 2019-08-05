@@ -16,19 +16,20 @@ global_t0 = time.time()
 
 dataset_name = "swiss_roll"
 dataset_seed = np.random.randint(0, 2**32)
-num_points = 1000    # Number of data points
-data_noise = 0.0005     # How much noise is added to the data
+num_points = 350    # Number of data points
+data_noise = 0.0025     # How much noise is added to the data
 source_dim = 3      # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 2      # The number of dimensions the data is being reduced to
 
-num_iters = 10      # Number of iterations of the message passing algorithm to run
-neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
-num_samples = 5     # Numbers of samples used in the belief propagation algorithm
+num_iters = 25      # Number of iterations of the message passing algorithm to run
+neighbors_k = 6    # The value of 'k' used for k-nearest-neighbors
+num_samples = 10     # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
 
 message_resample_cov = np.eye(target_dim) * 0.01 # TODO: Change
 pruning_angle_thresh = np.cos(30.0 * np.pi / 180.0)
 ts_noise_variance = 30 # Degrees
+initial_variance = 30 # Degree
 
 output_dir = "results_sheet/"
 error_histogram_num_bins = num_points / 10
@@ -286,7 +287,7 @@ for key, value in neighbor_pair_list:
 	# In other words, messages[key][value] === m_key->value
 	messages_prev[key][value] = Message(num_samples, source_dim, target_dim)
 	# messages_prev[key][value].ts = randomTangentSpaceList(num_samples, source_dim, target_dim)
-	messages_prev[key][value].ts = noisifyTSList(np.repeat([observations[value]], num_samples, axis=0), var=ts_noise_variance)
+	messages_prev[key][value].ts = noisifyTSList(np.repeat([observations[value]], num_samples, axis=0), var=initial_variance)
 	messages_prev[key][value].weights = np.zeros(num_samples) + (1.0 / num_samples) # Evenly weight each sample for now
 
 	# We don't initialize any values into messages_next
@@ -422,9 +423,9 @@ def resampleMessage(t, s):
 	start_ind = 0
 	max_weight_ind = np.argmax(belief[s].weights)
 	max_weight = belief[s].weights[max_weight_ind]
-	if max_weight != 1.0 / num_samples:
-		# Not all samples have the same weight, so we keep the highest weighted sample
-		start_ind = 1
+	# if max_weight != 1.0 / num_samples:
+	# 	# Not all samples have the same weight, so we keep the highest weighted sample
+	# 	start_ind = 1
 
 	# Note that we don't actually care about the weights we are assigning in this step, since
 	# all the samples will be properly weighted later on. In theory, we don't have to assign
@@ -575,6 +576,7 @@ try:
 			mle_bases[i] = belief[i].ts[max_ind]
 
 		fig, ax = make3DFigure()
+		ax.view_init(elev=0, azim=-90)
 		# Not squared because it's squared inside plot_neighbors_3d
 		plot_pca_3d(points, color, mle_bases, ax, point_size=data_sp_rad, point_line_width=data_sp_lw, line_width=nn_lw, line_length=pca_ll)
 		ax.set_title("Tangent Space MLE (iter %d)" % iter_num)
@@ -582,6 +584,7 @@ try:
 		plt.close(fig)
 
 		fig, ax = make3DFigure()
+		ax.view_init(elev=0, azim=-90)
 		ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=data_sp_rad**2, linewidth=data_sp_lw)
 
 		num_comps = len(belief[0].ts[0])

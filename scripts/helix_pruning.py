@@ -415,9 +415,9 @@ def resampleMessage(t, s):
 	start_ind = 0
 	max_weight_ind = np.argmax(belief[s].weights)
 	max_weight = belief[s].weights[max_weight_ind]
-	if max_weight != 1.0 / num_samples:
-		# Not all samples have the same weight, so we keep the highest weighted sample
-		start_ind = 1
+	# if max_weight != 1.0 / num_samples:
+	# 	# Not all samples have the same weight, so we keep the highest weighted sample
+	# 	start_ind = 1
 
 	# Note that we don't actually care about the weights we are assigning in this step, since
 	# all the samples will be properly weighted later on. In theory, we don't have to assign
