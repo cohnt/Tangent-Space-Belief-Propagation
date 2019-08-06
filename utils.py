@@ -73,5 +73,5 @@ def randomSmallRotation(dimension, variance=None):
 	rotMat[1,0] = np.sin(theta)
 	rotMat[1,1] = np.cos(theta)
 	basis = special_ortho_group.rvs(dimension)
-	basis_inv = np.linalg.inv(basis)
+	basis_inv = basis.transpose()
 	return basis.dot(rotMat).dot(basis_inv)
