@@ -7,6 +7,8 @@ results_pmst/*
 results_dmst/*
 results_eiv/*
 results_outlier/*
+results_scan/*
+
 testing_history/*
 
 datasets/other/data.csv
