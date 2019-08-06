@@ -10,6 +10,7 @@ data_file_name = "data.csv"
 topic_name = "/base_scan"
 node_name = "laser_scan_data_record_node"
 rate = 0.1
+density = 4
 
 try:
 	open(data_file_name, "r")
@@ -46,6 +47,9 @@ while True:
 		ranges[last + 1:] = ranges[last]
 		inter_ranges = ranges.copy()
 
+		# Downsample
+		ranges = ranges[0::density]
+
 	except KeyboardInterrupt:
 		break
 
@@ -69,3 +73,4 @@ while True:
 	iter_num = iter_num + 1
 
 data_file.close()
+print "Data dimension: %d" % len(ranges)
