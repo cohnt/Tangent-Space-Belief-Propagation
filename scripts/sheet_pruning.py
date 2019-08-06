@@ -28,8 +28,8 @@ explore_perc = 0.1  # Fraction of uniform samples to keep exploring
 
 message_resample_cov = np.eye(target_dim) * 0.01 # TODO: Change
 pruning_angle_thresh = np.cos(30.0 * np.pi / 180.0)
-ts_noise_variance = 30 # Degrees
-initial_variance = 30 # Degree
+ts_noise_variance = 0.1 # Degrees
+initial_variance = 0.1 # Degree
 
 output_dir = "results_sheet/"
 error_histogram_num_bins = num_points / 10
@@ -85,6 +85,7 @@ f.write("num_samples=%d\n" % num_samples)
 f.write("explore=%s\n" % str(explore_perc))
 f.write("prune_thresh=%s\n" % str(pruning_angle_thresh))
 f.write("ts_noise_variance=%s\n" % str(ts_noise_variance))
+f.write("initial_variance=%s\n" % str(initial_variance))
 
 f.write("\n[Embedding]\n")
 f.write("embedding_method=%s\n" % embedding_name)
@@ -163,7 +164,7 @@ plot_neighbors_3d(points, color, neighbor_graph, ax, point_size=data_sp_rad, lin
 ax.set_title("Nearest Neighbors (k=%d)" % neighbors_k)
 plt.savefig(output_dir + "nearest_neighbors.svg")
 angles = np.linspace(0, 360, 40+1)[:-1]
-rotanimate(ax, angles, output_dir + "nearest_neighbors.gif", delay=30, width=14.4, height=10.8, folder=output_dir, elevation=disp_elev)
+# rotanimate(ax, angles, output_dir + "nearest_neighbors.gif", delay=30, width=14.4, height=10.8, folder=output_dir, elevation=disp_elev)
 plt.close(fig)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
@@ -268,10 +269,13 @@ def randomTangentSpaceList(num_samples, source_dim, target_dim):
 	return ts
 
 def noisifyTS(ts, var):
-	rotMat = randomSmallRotation(source_dim, variance=var)
+	# rotMat = randomSmallRotation(source_dim, variance=var)
 	# theta = np.random.normal(0, var) * np.pi / 180.0
 	# rotMat = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
-	return np.array([np.dot(rotMat, ts[0]), np.dot(rotMat, ts[1])])
+	noise_mat = np.random.normal(0, ts_noise_variance, ts.shape)
+	ts = ts + noise_mat
+	ts = scipy.linalg.orth(ts.T).T
+	return np.array(ts)
 
 def noisifyTSList(ts_list, var=5):
 	for i in range(len(ts_list)):
