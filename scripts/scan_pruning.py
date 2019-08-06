@@ -2,6 +2,7 @@ import numpy as np
 import scipy
 import random
 import matplotlib
+matplotlib.use('Agg')
 from textwrap import wrap
 import matplotlib.pyplot as plt
 import time
@@ -629,7 +630,6 @@ ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from 
 plt.xlabel("Actual Parameter Value")
 plt.ylabel("Embedded Coordinate")
 plt.savefig(output_dir + "coord_bp.svg")
-plt.show()
 
 ##############################################################################
 ##############################################################################
@@ -750,7 +750,6 @@ ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from 
 plt.xlabel("Actual Parameter Value")
 plt.ylabel("Embedded Coordinate")
 plt.savefig(output_dir + "pca_pruning.svg")
-plt.show()
 
 ###################################################
 ###################################################
@@ -789,7 +788,7 @@ for i in range(num_methods):
 	plt.xlabel("Actual Parameter Value")
 	plt.ylabel("Embedded Coordinate")
 	plt.savefig(output_dir + name + ".svg")
-	plt.show()
+
 
 # methods = []
 # methods.append(LocallyLinearEmbedding(n_neighbors=k, n_components=2, n_jobs=-1))
@@ -816,7 +815,6 @@ for i in range(num_methods):
 # 	ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from %s" % name, 60)))
 # 	plt.xlabel("Actual Parameter Value")
 # 	plt.ylabel("Embedded Coordinate")
-# 	plt.show()
 
 global_t1 = time.time()
 write("\nTotal program runtime: %d seconds.\n\n" % (global_t1-global_t0))
