@@ -39,7 +39,7 @@ num_samples = 5     # Numbers of samples used in the belief propagation algorith
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
 
 message_resample_cov = np.eye(target_dim) * 0.01 # TODO: Change
-pruning_angle_thresh = np.cos(30.0 * np.pi / 180.0)
+pruning_angle_thresh = np.cos(60.0 * np.pi / 180.0)
 ts_noise_variance = 30 # In degrees
 
 embedding_name = "KernelPCA" # Could also be MDS
@@ -144,7 +144,20 @@ flush()
 # Initialize Messages #
 #######################
 from scipy.stats import special_ortho_group
-from utils import randomSmallRotation
+
+def randomSmallRotation(dimension, variance=None):
+	if variance is None:
+		variance = 0.05 * dimension * 180.0 / np.pi
+	theta = np.random.normal(0, variance) * np.pi / 180.0
+	rotMat = np.eye(dimension)
+	rotMat[0,0] = np.cos(theta)
+	rotMat[0,1] = -np.sin(theta)
+	rotMat[1,0] = np.sin(theta)
+	rotMat[1,1] = np.cos(theta)
+	# basis = special_ortho_group.rvs(dimension)
+	# basis_inv = basis.transpose()
+	# return basis.dot(rotMat).dot(basis_inv)
+	return np.eye(dimension)
 
 class Message():
 	def __init__(self, num_samples, source_dim, target_dim):
@@ -483,6 +496,7 @@ for i in range(0, num_points):
 			vec = points[j] - points[i]
 			proj_vec = projSubspace(mle_bases[i], vec)
 			dprod = np.abs(np.dot(vec, np.dot(proj_vec, mle_bases[i])) / (np.linalg.norm(vec) * np.linalg.norm(proj_vec)))
+			# print dprod
 			if dprod < pruning_angle_thresh:
 				pruned_neighbors[i,j] = 0
 				pruned_neighbors[j,i] = 0
