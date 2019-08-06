@@ -33,7 +33,7 @@ num_points = None # Get from the data
 source_dim = None # Get from the data
 target_dim = 1
 
-num_iters = 10      # Number of iterations of the message passing algorithm to run
+num_iters = 25      # Number of iterations of the message passing algorithm to run
 neighbors_k = 6    # The value of 'k' used for k-nearest-neighbors
 num_samples = 5     # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
@@ -70,7 +70,7 @@ points, true_vals = make_laser_scan_curve()
 num_points = len(points)
 source_dim = len(points[0])
 
-k = 8
+k = 6
 
 #######################
 # k-Nearest-Neighbors #
