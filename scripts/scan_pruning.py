@@ -40,7 +40,7 @@ explore_perc = 0.1  # Fraction of uniform samples to keep exploring
 
 message_resample_cov = np.eye(target_dim) * 0.01 # TODO: Change
 pruning_angle_thresh = np.cos(60.0 * np.pi / 180.0)
-ts_noise_variance = 30 # In degrees
+ts_noise_variance = 0.01 # In degrees
 
 embedding_name = "KernelPCA" # Could also be MDS
 kpca_eigen_solver = "auto"
@@ -60,6 +60,8 @@ combined_sp_lw = 0.5
 
 write("\n")
 
+output_dir = "results_scan/"
+
 ################
 # Load Dataset #
 ################
@@ -71,6 +73,33 @@ num_points = len(points)
 source_dim = len(points[0])
 
 k = 6
+
+###############
+# Save Params #
+###############
+
+f = open(output_dir + "parameters.ini", "w")
+
+f.write("[Dataset]\n")
+f.write("name=%s\n" % dataset_name)
+f.write("num_points=%d\n" % num_points)
+f.write("source_dim=%d\n" % source_dim)
+f.write("target_dim=%d\n" % target_dim)
+
+f.write("\n[Belief Propagation]\n")
+f.write("max_iters=%d\n" % num_iters)
+f.write("num_neighbors=%d\n" % neighbors_k)
+f.write("num_samples=%d\n" % num_samples)
+f.write("explore=%s\n" % str(explore_perc))
+f.write("prune_thresh=%s\n" % str(pruning_angle_thresh))
+
+f.write("\n[Embedding]\n")
+f.write("embedding_method=%s\n" % embedding_name)
+f.write("embedding_eigen_solver=%s\n" % kpca_eigen_solver)
+f.write("embedding_tol=%s\n" % str(kpca_tol))
+f.write("embedding_max_iter=%d\n" % kpca_max_iter)
+
+f.close()
 
 #######################
 # k-Nearest-Neighbors #
@@ -178,10 +207,13 @@ def randomTangentSpaceList(num_samples, source_dim, target_dim):
 	return ts
 
 def noisifyTS(ts, var):
-	rotMat = randomSmallRotation(source_dim, variance=var)
+	# rotMat = randomSmallRotation(source_dim, variance=var)
 	# theta = np.random.normal(0, var) * np.pi / 180.0
 	# rotMat = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
-	return np.array([np.dot(rotMat, ts[0])])
+	noise_mat = np.random.normal(0, ts_noise_variance, ts.shape)
+	ts = ts + noise_mat
+	ts = scipy.linalg.orth(ts.T).T
+	return np.array(ts)
 
 def noisifyTSList(ts_list, var=5):
 	for i in range(len(ts_list)):
@@ -596,32 +628,149 @@ ax.scatter(true_vals, feature_coords, s=embedding_sp_rad**2, linewidths=embeddin
 ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from BP Tangent Correction for Edge Pruning", 60)))
 plt.xlabel("Actual Parameter Value")
 plt.ylabel("Embedded Coordinate")
-# plt.savefig(output_dir + "coord_bp.svg")
-# plt.close(fig)
+plt.savefig(output_dir + "coord_bp.svg")
 plt.show()
 
-global_t1 = time.time()
-write("\nTotal program runtime: %d seconds.\n\n" % (global_t1-global_t0))
+##############################################################################
+##############################################################################
+##############################################################################
+##############################################################################
+##############################################################################
+print "Comparing to PCA pruning"
+
+write("Pruning edges...")
+flush()
+t0 = time.time()
+
+pruned_neighbors = scipy.sparse.lil_matrix(neighbor_graph)
+for i in range(0, num_points):
+	for j in range(0, num_points):
+		if i != j:
+			vec = points[j] - points[i]
+			proj_vec = projSubspace(observations[i], vec)
+			dprod = np.abs(np.dot(vec, np.dot(proj_vec, observations[i])) / (np.linalg.norm(vec) * np.linalg.norm(proj_vec)))
+			# print dprod
+			if dprod < pruning_angle_thresh:
+				pruned_neighbors[i,j] = 0
+				pruned_neighbors[j,i] = 0
+
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
 flush()
 
+write("Connecting graph...\n")
+flush()
+t0 = time.time()
+
+# Uses the disjoint-set datatype
+# http://p-nand-q.com/python/data-types/general/disjoint-sets.html
+class DisjointSet():
+	def __init__(self, vals):
+		self.sets = set([self.makeSet(elt) for elt in vals])
+	def makeSet(self, elt):
+		return frozenset([elt])
+	def findSet(self, elt):
+		for subset in self.sets:
+			if elt in subset:
+				return subset
+	def union(self, set_a, set_b):
+		self.sets.add(frozenset.union(set_a, set_b))
+		self.sets.remove(set_a)
+		self.sets.remove(set_b)
+	def write(self):
+		for subset in self.sets:
+			print subset
+
+connected_components = DisjointSet(range(num_points))
+for i in range(num_points):
+	for j in range(num_points):
+		if pruned_neighbors[i,j] != 0:
+			set_i = connected_components.findSet(i)
+			if not j in set_i:
+				set_j = connected_components.findSet(j)
+				connected_components.union(set_i, set_j)
+
+if len(connected_components.sets) == 1:
+	write("Graph already connected!\n")
+	flush()
+else:
+	while len(connected_components.sets) > 1:
+		write("There are %d connected components.\n" % len(connected_components.sets))
+		min_edge_idx = (-1, -1)
+		min_edge_length = np.Inf
+		for set_a in connected_components.sets:
+			for set_b in connected_components.sets:
+				if set_a != set_b:
+					for i in set_a:
+						for j in set_b:
+							dist = np.linalg.norm(points[i] - points[j])
+							if dist < min_edge_length:
+								min_edge_length = dist
+								min_edge_idx = (i, j)
+		i = min_edge_idx[0]
+		j = min_edge_idx[1]
+		pruned_neighbors[i, j] = min_edge_length
+		pruned_neighbors[j, i] = min_edge_length
+		set_a = connected_components.findSet(i)
+		set_b = connected_components.findSet(j)
+		connected_components.union(set_a, set_b)
+
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+from sklearn.utils.graph_shortest_path import graph_shortest_path
+write("Finding shortest paths...")
+flush()
+t0 = time.time()
+shortest_distances = graph_shortest_path(pruned_neighbors, directed=False)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+write("Fitting KernelPCA...")
+flush()
+t0 = time.time()
+
+# from sklearn.manifold import MDS
+# mds = MDS(n_components=target_dim, max_iter=3000, eps=1e-9, n_init=25, dissimilarity="precomputed", n_jobs=-1, metric=True)
+# feature_coords = mds.fit_transform(shortest_distances)
+
+from sklearn.decomposition import KernelPCA
+kpca = KernelPCA(n_components=target_dim, kernel="precomputed", eigen_solver=kpca_eigen_solver, tol=kpca_tol, max_iter=kpca_max_iter, n_jobs=-1)
+feature_coords = kpca.fit_transform((shortest_distances**2) * -0.5)
+
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(true_vals, feature_coords, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
+ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from PCA Edge Pruning", 60)))
+plt.xlabel("Actual Parameter Value")
+plt.ylabel("Embedded Coordinate")
+plt.savefig(output_dir + "pca_pruning.svg")
+plt.show()
+
 ###################################################
 ###################################################
 ###################################################
 ###################################################
 ###################################################
 
-k = 6
+k = neighbors_k
 
-from sklearn.manifold import LocallyLinearEmbedding, MDS, Isomap, SpectralEmbedding
+from sklearn.manifold import LocallyLinearEmbedding, MDS, Isomap, SpectralEmbedding, TSNE
 
 methods = []
 methods.append(LocallyLinearEmbedding(n_neighbors=k, n_components=1, n_jobs=-1))
 methods.append(MDS(n_components=1, n_jobs=-1))
 methods.append(Isomap(n_neighbors=k, n_components=1, n_jobs=-1))
 methods.append(SpectralEmbedding(n_components=1, n_neighbors=k, n_jobs=-1))
+methods.append(TSNE(n_components=1))
 num_methods = len(methods)
 
-method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding"]
+method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding", "t-SNE"]
 
 for i in range(num_methods):
 	solver = methods[i]
@@ -639,6 +788,7 @@ for i in range(num_methods):
 	ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from %s" % name, 60)))
 	plt.xlabel("Actual Parameter Value")
 	plt.ylabel("Embedded Coordinate")
+	plt.savefig(output_dir + name + ".svg")
 	plt.show()
 
 # methods = []
@@ -667,3 +817,7 @@ for i in range(num_methods):
 # 	plt.xlabel("Actual Parameter Value")
 # 	plt.ylabel("Embedded Coordinate")
 # 	plt.show()
+
+global_t1 = time.time()
+write("\nTotal program runtime: %d seconds.\n\n" % (global_t1-global_t0))
+flush()
