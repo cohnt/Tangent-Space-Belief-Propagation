@@ -22,3 +22,4 @@ convert dataset.png nearest_neighbors.png pca_observations.png ts_mle_iter*.png 
 
 mv *.gif ../gif
 cd ..
+mv *.gif ./gif
