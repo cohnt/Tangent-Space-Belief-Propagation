@@ -35,7 +35,7 @@ source_dim = None # Get from the data
 target_dim = 1
 
 num_iters = 25      # Number of iterations of the message passing algorithm to run
-neighbors_k = 6    # The value of 'k' used for k-nearest-neighbors
+neighbors_k = 8    # The value of 'k' used for k-nearest-neighbors
 num_samples = 5     # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
 
