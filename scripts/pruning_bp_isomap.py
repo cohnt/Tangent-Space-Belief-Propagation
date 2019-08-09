@@ -23,7 +23,7 @@ target_dim = 1      # The number of dimensions the data is being reduced to
 
 num_iters = 10     # Number of iterations of the message passing algorithm to run
 neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
-num_samples = 5   # Numbers of samples used in the belief propagation algorithm
+num_samples = 10   # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
 
 message_resample_cov = np.eye(target_dim) * 0.01 # TODO: Change
@@ -838,7 +838,7 @@ write("Done! dt=%f\n" % (t1-t0))
 flush()
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral)
+ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from BP Tangent Correction for Edge Pruning", 60)))
 plt.xlabel("Actual Parameter Value")
 plt.ylabel("Embedded Coordinate")
