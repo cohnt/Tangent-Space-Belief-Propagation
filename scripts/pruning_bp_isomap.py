@@ -14,10 +14,10 @@ from utils import write, flush
 
 global_t0 = time.time()
 
-dataset_name = "o_curve"
+dataset_name = "long_spiral_curve"
 dataset_seed = np.random.randint(0, 2**32)
 num_points = 500    # Number of data points
-data_noise = 0.00025 # How much noise is added to the data
+data_noise = 0.001 # How much noise is added to the data
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1      # The number of dimensions the data is being reduced to
 
@@ -37,7 +37,18 @@ kpca_eigen_solver = "auto"
 kpca_tol = 1e-9
 kpca_max_iter = 3000
 
+data_sp_rad = 7.0
+data_sp_lw = 1.0
+nn_lw = 1.0
+pca_ll = 0.1
+embedding_sp_rad = 7.0
+embedding_sp_lw = 1.0
+combined_sp_rad = 4.0
+combined_sp_lw = 0.5
+
 write("\n")
+
+matplotlib.rcParams.update({'font.size': 25})
 
 ####################
 # Write Parameters #
@@ -71,7 +82,14 @@ f.write("embedding_tol=%s\n" % str(kpca_tol))
 f.write("embedding_max_iter=%d\n" % kpca_max_iter)
 
 f.write("\n[Display]\n")
-f.write("; TODO\n")
+f.write("data_sp_rad=%s\n" % str(data_sp_rad))
+f.write("data_sp_lw=%s\n" % str(data_sp_lw))
+f.write("nn_lw=%s\n" % str(nn_lw))
+f.write("pca_ll=%s\n" % str(pca_ll))
+f.write("embedding_sp_rad=%s\n" % str(embedding_sp_rad))
+f.write("embedding_sp_lw=%s\n" % str(embedding_sp_lw))
+f.write("combined_sp_rad=%s\n" % str(combined_sp_rad))
+f.write("combined_sp_lw=%s\n" % str(combined_sp_lw))
 
 f.close()
 
@@ -87,7 +105,7 @@ from datasets.dim_2.long_spiral_curve import make_long_spiral_curve
 write("Generating dataset...")
 flush()
 t0 = time.time()
-points, color, true_tangents, dataset_seed = make_o_curve(num_points, data_noise, rs_seed=dataset_seed)
+points, color, true_tangents, dataset_seed = make_long_spiral_curve(num_points, data_noise, rs_seed=dataset_seed)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
@@ -96,8 +114,8 @@ write("Saving dataset plot...")
 flush()
 t0 = time.time()
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-ax.scatter(points[:,0], points[:,1], c=color, cmap=plt.cm.Spectral, s=2**2, zorder=2, linewidth=0.25)
-ax.set_title("Dataset (num=%d, variance=%f, seed=%d)" % (num_points, data_noise, dataset_seed))
+ax.scatter(points[:,0], points[:,1], c=color, cmap=plt.cm.Spectral, s=data_sp_rad**2, zorder=2, linewidth=data_sp_lw)
+ax.set_title("Dataset (num=%d, variance=%f, seed=%d)\n" % (num_points, data_noise, dataset_seed))
 plt.savefig(output_dir + "dataset.svg")
 plt.close(fig)
 t1 = time.time()
@@ -127,8 +145,8 @@ write("Saving nearest neighbors plot...")
 flush()
 t0 = time.time()
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-plot_neighbors_2d(points, color, neighbor_graph, ax, point_size=2, line_width=0.25, edge_thickness=0.5, show_labels=False)
-ax.set_title("Nearest Neighbors (k=%d)" % neighbors_k)
+plot_neighbors_2d(points, color, neighbor_graph, ax, point_size=data_sp_rad, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False)
+ax.set_title("Nearest Neighbors (k=%d)\n" % neighbors_k)
 plt.savefig(output_dir + "nearest_neighbors.svg")
 plt.close(fig)
 t1 = time.time()
@@ -139,7 +157,7 @@ write("Saving ground truth tangent plot...")
 flush()
 t0 = time.time()
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-plot_pca_2d(points, color, true_tangents, ax, point_size=2, point_line_width=0.25, line_width=0.5, line_length=0.05)
+plot_pca_2d(points, color, true_tangents, ax, point_size=data_sp_rad, point_line_width=data_sp_lw, line_width=nn_lw, line_length=pca_ll)
 ax.set_title("Exact Tangents")
 plt.savefig(output_dir + "true_tangents.svg")
 plt.close(fig)
@@ -199,8 +217,8 @@ write("Saving PCA observations plot...")
 flush()
 t0 = time.time()
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-plot_neighbors_2d(points, color, neighbor_graph, ax, point_size=2, line_width=0.25, edge_thickness=0.1, show_labels=False)
-plot_pca_2d(points, color, observations, ax, point_size=2, point_line_width=0.25, line_width=0.5, line_length=0.05)
+# plot_neighbors_2d(points, color, neighbor_graph, ax, point_size=2, line_width=0.25, edge_thickness=0.1, show_labels=False)
+plot_pca_2d(points, color, observations, ax, point_size=data_sp_rad, point_line_width=data_sp_lw, line_width=nn_lw, line_length=pca_ll)
 ax.set_title("Measured Tangent Spaces (PCA)")
 plt.savefig(output_dir + "pca_observations.svg")
 plt.close(fig)
@@ -539,13 +557,13 @@ try:
 			mle_bases[i] = belief[i].ts[max_ind]
 
 		fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-		plot_pca_2d(points, color, mle_bases, ax, point_size=2, point_line_width=0.25, line_width=0.5, line_length=0.05)
+		plot_pca_2d(points, color, mle_bases, ax, point_size=data_sp_rad, point_line_width=data_sp_lw, line_width=nn_lw, line_length=pca_ll)
 		ax.set_title("Tangent Space MLE (iter %d)" % iter_num)
 		plt.savefig(output_dir + ("ts_mle_iter%s.svg" % str(iter_num).zfill(4)))
 		plt.close(fig)
 
 		fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-		ax.scatter(points[:,0], points[:,1], c=color, cmap=plt.cm.Spectral, s=2**2, zorder=2, linewidth=0.25)
+		ax.scatter(points[:,0], points[:,1], c=color, cmap=plt.cm.Spectral, s=data_sp_rad**2, zorder=2, linewidth=data_sp_lw)
 
 		coordinates = np.zeros((num_points*num_samples, 2, 2))
 		colors = np.zeros((num_points*num_samples, 4))
@@ -555,10 +573,10 @@ try:
 				c_idx = i*num_samples + j
 				coordinates[c_idx][0][0] = points[i][0]
 				coordinates[c_idx][0][1] = points[i][1]
-				coordinates[c_idx][1][0] = points[i][0] + (0.05 * belief[i].ts[j][0][0])
-				coordinates[c_idx][1][1] = points[i][1] + (0.05 * belief[i].ts[j][0][1])
+				coordinates[c_idx][1][0] = points[i][0] + (pca_ll * belief[i].ts[j][0][0])
+				coordinates[c_idx][1][1] = points[i][1] + (pca_ll * belief[i].ts[j][0][1])
 				colors[c_idx][:] = coolwarm(belief[i].weights[j] * (1.0 / max_weight))
-		lines = LineCollection(coordinates, color=colors, linewidths=0.5)
+		lines = LineCollection(coordinates, color=colors, linewidths=nn_lw)
 		ax.add_collection(lines)
 		ax.set_title("Tangent Space Belief (iter %d)" % iter_num)
 		plt.savefig(output_dir + ("ts_bel_iter%s.svg" % str(iter_num).zfill(4)))
@@ -722,7 +740,7 @@ write("Done! dt=%f\n" % (t1-t0))
 flush()
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-plot_neighbors_2d(points, color, pruned_neighbors, ax, point_size=2, line_width=0.25, edge_thickness=0.5, show_labels=False)
+plot_neighbors_2d(points, color, pruned_neighbors, ax, point_size=data_sp_rad, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False)
 ax.set_title("Pruned Nearest Neighbors (k=%d, thresh=%f)" % (neighbors_k, pruning_angle_thresh))
 plt.savefig(output_dir + "pruned_nearest_neighbors.svg")
 plt.close(fig)
@@ -785,7 +803,7 @@ else:
 		connected_components.union(set_a, set_b)
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-plot_neighbors_2d(points, color, pruned_neighbors, ax, point_size=2, line_width=0.25, edge_thickness=0.5, show_labels=False)
+plot_neighbors_2d(points, color, pruned_neighbors, ax, point_size=data_sp_rad, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False)
 ax.set_title("Added Edges after Pruning")
 plt.savefig(output_dir + "added_edges.svg")
 plt.close(fig)
@@ -858,7 +876,7 @@ for i in range(num_methods):
 	flush()
 	
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-	ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral)
+	ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 	ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from %s" % name, 60)))
 	plt.xlabel("Actual Parameter Value")
 	plt.ylabel("Embedded Coordinate")
@@ -874,7 +892,7 @@ write("Done! dt=%f\n" % (t1-t0))
 flush()
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral)
+ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Classical LTSA", 60)))
 plt.xlabel("Actual Parameter Value")
 plt.ylabel("Embedded Coordinate")
@@ -890,7 +908,7 @@ write("Done! dt=%f\n" % (t1-t0))
 flush()
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral)
+ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction", 60)))
 plt.xlabel("Actual Parameter Value")
 plt.ylabel("Embedded Coordinate")
@@ -907,7 +925,7 @@ write("Done! dt=%f\n" % (t1-t0))
 flush()
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral)
+ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction and Edge Pruning", 60)))
 plt.xlabel("Actual Parameter Value")
 plt.ylabel("Embedded Coordinate")
@@ -929,26 +947,26 @@ for i in range(num_methods):
 	name = method_names[i]
 	feature_coords = solver.fit_transform(points)
 
-	axes_list[i].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=2, linewidths=0.25)
+	axes_list[i].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
 	axes_list[i].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from %s" % name, 25)))
 
 feature_coords = compute_ltsa(points, neighbor_dict, observations, source_dim, target_dim)
-axes_list[4].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=2, linewidths=0.25)
+axes_list[4].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
 axes_list[4].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Classical LTSA", 25)))
 
 feature_coords = compute_ltsa(points, neighbor_dict, mle_bases, source_dim, target_dim)
-axes_list[5].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=2, linewidths=0.25)
+axes_list[5].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
 axes_list[5].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction", 25)))
 
 feature_coords = compute_ltsa(points, pruned_neighbor_dict, mle_bases, source_dim, target_dim)
-axes_list[6].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=2, linewidths=0.25)
+axes_list[6].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
 axes_list[6].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction and Edge Pruning", 25)))
 
 # mds = MDS(n_components=target_dim, max_iter=3000, eps=1e-9, n_init=25, dissimilarity="precomputed", n_jobs=-1)
 # feature_coords = mds.fit_transform(shortest_distances)
 kpca = KernelPCA(n_components=target_dim, kernel="precomputed", eigen_solver=kpca_eigen_solver, tol=kpca_tol, max_iter=kpca_max_iter, n_jobs=-1)
 feature_coords = kpca.fit_transform((shortest_distances**2) * -0.5)
-axes_list[7].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=2, linewidths=0.25)
+axes_list[7].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
 axes_list[7].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from BP Tangent Correction for Edge Pruning", 25)))
 
 for i in range(8):
