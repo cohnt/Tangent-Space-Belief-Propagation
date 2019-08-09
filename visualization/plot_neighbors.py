@@ -6,16 +6,17 @@ from mpl_toolkits.mplot3d.art3d import Line3DCollection
 def plot_neighbors_2d(points, color, neighbors_graph, ax, line_color="grey", point_size=5, line_width=1, edge_thickness=1, show_labels=False):
 	# See https://stackoverflow.com/questions/50040310/efficient-way-to-connect-the-k-nearest-neighbors-in-a-scatterplot-using-matplotl/50040839
 	num_points = len(points)
-	num_neighbors = np.count_nonzero(neighbors_graph[0].todense())
-	coordinates = np.zeros((num_points, num_neighbors, 2, 2))
+	num_edges = np.count_nonzero(neighbors_graph.toarray())
+	coordinates = np.zeros((num_edges, 2, 2))
+	c_idx = 0
 	for point_idx in range(num_points):
+		num_neighbors = len(np.where(neighbors_graph.toarray()[point_idx])[0])
 		for neighbor_idx in range(num_neighbors):
-			if neighbor_idx >= len(np.where(neighbors_graph[point_idx].toarray()[0])[0]):
-				break
-			target_idx = (np.where(neighbors_graph[point_idx].toarray()[0])[0])[neighbor_idx] # Evil numpy f***ery because sparse matrices behave strangely
-			coordinates[point_idx, neighbor_idx, :, 0] = np.array([points[point_idx, :][0], points[target_idx, :][0]])
-			coordinates[point_idx, neighbor_idx, :, 1] = np.array([points[point_idx, :][1], points[target_idx, :][1]])
-	lines = LineCollection(coordinates.reshape((num_points*num_neighbors, 2, 2)), color=line_color, zorder=1, linewidths=edge_thickness)
+			target_idx = (np.where(neighbors_graph.toarray()[point_idx])[0])[neighbor_idx]
+			coordinates[c_idx, :, 0] = np.array([points[point_idx, :][0], points[target_idx, :][0]])
+			coordinates[c_idx, :, 1] = np.array([points[point_idx, :][1], points[target_idx, :][1]])
+			c_idx = c_idx + 1
+	lines = LineCollection(coordinates, color=line_color, zorder=1, linewidths=edge_thickness)
 	ax.scatter(points[:,0], points[:,1], c=color, cmap=plt.cm.Spectral, s=point_size**2, zorder=2, linewidth=line_width)
 	ax.add_collection(lines)
 	if show_labels:
@@ -24,17 +25,18 @@ def plot_neighbors_2d(points, color, neighbors_graph, ax, line_color="grey", poi
 
 def plot_neighbors_3d(points, color, neighbors_graph, ax, line_color="grey", point_size=5, line_width=1, edge_thickness=1, show_labels=False):
 	num_points = len(points)
-	num_neighbors = np.count_nonzero(neighbors_graph[0].todense())
-	coordinates = np.zeros((num_points, num_neighbors, 2, 3))
+	num_edges = np.count_nonzero(neighbors_graph.toarray())
+	coordinates = np.zeros((num_edges, 2, 3))
+	c_idx = 0
 	for point_idx in range(num_points):
+		num_neighbors = len(np.where(neighbors_graph.toarray()[point_idx])[0])
 		for neighbor_idx in range(num_neighbors):
-			if neighbor_idx >= len(np.where(neighbors_graph[point_idx].toarray()[0])[0]):
-				break
-			target_idx = (np.where(neighbors_graph[point_idx].toarray()[0])[0])[neighbor_idx] # Evil numpy f***ery because sparse matrices behave strangely
-			coordinates[point_idx, neighbor_idx, :, 0] = np.array([points[point_idx, :][0], points[target_idx, :][0]])
-			coordinates[point_idx, neighbor_idx, :, 1] = np.array([points[point_idx, :][1], points[target_idx, :][1]])
-			coordinates[point_idx, neighbor_idx, :, 2] = np.array([points[point_idx, :][2], points[target_idx, :][2]])
-	lines = Line3DCollection(coordinates.reshape((num_points*num_neighbors, 2, 3)), color=line_color, zorder=1, linewidths=edge_thickness)
+			target_idx = (np.where(neighbors_graph.toarray()[point_idx])[0])[neighbor_idx]
+			coordinates[c_idx, :, 0] = np.array([points[point_idx, :][0], points[target_idx, :][0]])
+			coordinates[c_idx, :, 1] = np.array([points[point_idx, :][1], points[target_idx, :][1]])
+			coordinates[c_idx, :, 2] = np.array([points[point_idx, :][2], points[target_idx, :][2]])
+			c_idx = c_idx + 1
+	lines = Line3DCollection(coordinates, color=line_color, zorder=1, linewidths=edge_thickness)
 	ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=point_size**2, zorder=2, linewidth=line_width)
 	ax.add_collection(lines)
 	if show_labels:

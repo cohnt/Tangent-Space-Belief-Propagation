@@ -105,7 +105,6 @@ f.write("combined_sp_lw=%s\n" % str(combined_sp_lw))
 f.write("disp_elev=%s\n" % str(disp_elev))
 f.write("disp_azim=%s\n" % str(disp_azim))
 
-
 f.close()
 
 ################
@@ -155,6 +154,30 @@ flush()
 # is a nearest neighbor of point y, but point y is *not* a nearest neighbor of point x.
 # We fix this later on...
 
+####################
+# Initialize Graph #
+####################
+from utils import sparseMatrixToDict, sparseMaximum
+
+write("Initializing graph data structures...")
+flush()
+t0 = time.time()
+# Make the matrix symmetric by taking max(G, G^T)
+neighbor_graph = sparseMaximum(neighbor_graph, neighbor_graph.T)
+# This dictionary will have the structure point_idx: [list, of, neighbor_idx]
+neighbor_dict = sparseMatrixToDict(neighbor_graph)
+# This extracts all pairs of neighbors from the dictionary and stores them as a list of tuples.
+# neighbor_pair_list represents the identification of the messages, i.e., "message 0" is
+# so defined by being at index 0 of neighbor_pair_list.
+neighbor_pair_list = [(key, value) for key, arr in neighbor_dict.items() for value in arr]
+num_messages = len(neighbor_pair_list)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+write("Number of points: %d\n" % num_points)
+write("Number of edges: %d\n" % len(neighbor_pair_list))
+
 write("Saving nearest neighbors plot...")
 flush()
 t0 = time.time()
@@ -182,30 +205,6 @@ plt.close(fig)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
-
-####################
-# Initialize Graph #
-####################
-from utils import sparseMatrixToDict, sparseMaximum
-
-write("Initializing graph data structures...")
-flush()
-t0 = time.time()
-# Make the matrix symmetric by taking max(G, G^T)
-neighbor_graph = sparseMaximum(neighbor_graph, neighbor_graph.T)
-# This dictionary will have the structure point_idx: [list, of, neighbor_idx]
-neighbor_dict = sparseMatrixToDict(neighbor_graph)
-# This extracts all pairs of neighbors from the dictionary and stores them as a list of tuples.
-# neighbor_pair_list represents the identification of the messages, i.e., "message 0" is
-# so defined by being at index 0 of neighbor_pair_list.
-neighbor_pair_list = [(key, value) for key, arr in neighbor_dict.items() for value in arr]
-num_messages = len(neighbor_pair_list)
-t1 = time.time()
-write("Done! dt=%f\n" % (t1-t0))
-flush()
-
-write("Number of points: %d\n" % num_points)
-write("Number of edges: %d\n" % len(neighbor_pair_list))
 
 ###############
 # Measure PCA #

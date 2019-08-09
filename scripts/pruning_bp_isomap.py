@@ -15,7 +15,7 @@ from utils import write, flush
 global_t0 = time.time()
 
 dataset_name = "long_spiral_curve"
-dataset_seed = np.random.randint(0, 2**32)
+dataset_seed = 4045775215 # np.random.randint(0, 2**32)
 num_points = 500    # Number of data points
 data_noise = 0.001 # How much noise is added to the data
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
@@ -141,30 +141,6 @@ flush()
 # is a nearest neighbor of point y, but point y is *not* a nearest neighbor of point x.
 # We fix this later on...
 
-write("Saving nearest neighbors plot...")
-flush()
-t0 = time.time()
-fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-plot_neighbors_2d(points, color, neighbor_graph, ax, point_size=data_sp_rad, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False)
-ax.set_title("Nearest Neighbors (k=%d)\n" % neighbors_k)
-plt.savefig(output_dir + "nearest_neighbors.svg")
-plt.close(fig)
-t1 = time.time()
-write("Done! dt=%f\n" % (t1-t0))
-flush()
-
-write("Saving ground truth tangent plot...")
-flush()
-t0 = time.time()
-fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-plot_pca_2d(points, color, true_tangents, ax, point_size=data_sp_rad, point_line_width=data_sp_lw, line_width=nn_lw, line_length=pca_ll)
-ax.set_title("Exact Tangents")
-plt.savefig(output_dir + "true_tangents.svg")
-plt.close(fig)
-t1 = time.time()
-write("Done! dt=%f\n" % (t1-t0))
-flush()
-
 ####################
 # Initialize Graph #
 ####################
@@ -188,6 +164,30 @@ flush()
 
 write("Number of points: %d\n" % num_points)
 write("Number of edges: %d\n" % len(neighbor_pair_list))
+
+write("Saving nearest neighbors plot...")
+flush()
+t0 = time.time()
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+plot_neighbors_2d(points, color, neighbor_graph, ax, point_size=data_sp_rad, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False)
+ax.set_title("Nearest Neighbors (k=%d)\n" % neighbors_k)
+plt.savefig(output_dir + "nearest_neighbors.svg")
+plt.close(fig)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+write("Saving ground truth tangent plot...")
+flush()
+t0 = time.time()
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+plot_pca_2d(points, color, true_tangents, ax, point_size=data_sp_rad, point_line_width=data_sp_lw, line_width=nn_lw, line_length=pca_ll)
+ax.set_title("Exact Tangents")
+plt.savefig(output_dir + "true_tangents.svg")
+plt.close(fig)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
 
 ###############
 # Measure PCA #
