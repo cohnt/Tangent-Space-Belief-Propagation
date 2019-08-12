@@ -629,7 +629,7 @@ ax.scatter(true_vals, feature_coords, s=embedding_sp_rad**2, linewidths=embeddin
 ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from BP Tangent Correction for Edge Pruning", 60)))
 plt.xlabel("Actual Parameter Value")
 plt.ylabel("Embedded Coordinate")
-plt.savefig(output_dir + "coord_bp.svg")
+plt.savefig(output_dir + ("coord_bp_%d_iters.svg" % (iter_num-1)))
 
 ##############################################################################
 ##############################################################################
@@ -763,17 +763,40 @@ k = neighbors_k
 
 from sklearn.manifold import LocallyLinearEmbedding, MDS, Isomap, SpectralEmbedding, TSNE
 
+methods = []
+methods.append(MDS(n_components=1, n_jobs=-1))
+methods.append(TSNE(n_components=1))
+num_methods = len(methods)
+method_names = ["MDS", "t-SNE"]
+
+for i in range(num_methods):
+	solver = methods[i]
+	name = method_names[i]
+	write("Computing %s..." % name)
+	flush()
+	t0 = time.time()
+	feature_coords = solver.fit_transform(points)
+	t1 = time.time()
+	write("Done! dt=%f\n" % (t1-t0))
+	flush()
+	
+	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+	ax.scatter(true_vals, feature_coords)
+	ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from %s" % name, 60)))
+	plt.xlabel("Actual Parameter Value")
+	plt.ylabel("Embedded Coordinate")
+	plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + name + ".svg")
+	plt.close(fig)
+
 for k in range(3, 2*neighbors_k):
 	print "\t\t\t\t\tk value: %d" % k
 	methods = []
 	methods.append(LocallyLinearEmbedding(n_neighbors=k, n_components=1, n_jobs=-1))
-	methods.append(MDS(n_components=1, n_jobs=-1))
 	methods.append(Isomap(n_neighbors=k, n_components=1, n_jobs=-1))
 	methods.append(SpectralEmbedding(n_components=1, n_neighbors=k, n_jobs=-1))
-	methods.append(TSNE(n_components=1))
 	num_methods = len(methods)
 
-	method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding", "t-SNE"]
+	method_names = ["LLE", "Isomap", "SpectralEmbedding"]
 
 	for i in range(num_methods):
 		solver = methods[i]
@@ -792,7 +815,7 @@ for k in range(3, 2*neighbors_k):
 		plt.xlabel("Actual Parameter Value")
 		plt.ylabel("Embedded Coordinate")
 		plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + name + ".svg")
-		fig.close()
+		plt.close(fig)
 
 
 	# methods = []
