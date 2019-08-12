@@ -13,9 +13,9 @@ import cv2
 data_file_name = "data.csv"
 topic_name = "/base_scan"
 node_name = "laser_scan_data_record_node"
-rate = 0.1
-density = 2
-image_rate = 10
+rate = 0.01
+density = 4
+image_rate = 25
 
 bridge = CvBridge()
 image_topic_name = "/head_camera/rgb/image_raw"
