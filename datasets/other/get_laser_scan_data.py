@@ -41,14 +41,13 @@ while True:
 
 		if iter_num % image_rate == 0:
 			image_message = rospy.wait_for_message(image_topic_name, ImageMsg)
-			fname = "iter%s.svg" % str(iter_num).zfill(3)
 
 			try:
-				cv2_img = bridge.imgmsg_to_cv2(msg, "bgr8")
+				cv2_img = bridge.imgmsg_to_cv2(image_message, "bgr8")
 			except CvBridgeError, e:
 				print e
 			else:
-				cv2.imwrite(image_dir + fname, cv2_img)
+				cv2.imwrite(image_dir + ("iter%s.png" % str(iter_num).zfill(3)), cv2_img)
 
 		angles = np.linspace(data_message.angle_min, data_message.angle_max, len(data_message.ranges))
 		ranges = np.array(data_message.ranges)
@@ -86,8 +85,8 @@ while True:
 
 	######
 
-	str = ','.join([`num` for num in ranges])
-	data_file.write("%s\n" % str)
+	data = ','.join([`num` for num in ranges])
+	data_file.write("%s\n" % data)
 
 	sleep(rate)
 	iter_num = iter_num + 1
