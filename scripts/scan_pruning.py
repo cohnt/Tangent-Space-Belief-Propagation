@@ -791,7 +791,7 @@ for i in range(num_methods):
 for k in range(3, 2*neighbors_k):
 	print "\t\t\t\t\tk value: %d" % k
 	methods = []
-	methods.append(LocallyLinearEmbedding(n_neighbors=k, n_components=1, n_jobs=-1))
+	methods.append(LocallyLinearEmbedding(n_neighbors=k, n_components=1, n_jobs=-1, eigen_solver="dense"))
 	methods.append(Isomap(n_neighbors=k, n_components=1, n_jobs=-1))
 	methods.append(SpectralEmbedding(n_components=1, n_neighbors=k, n_jobs=-1))
 	num_methods = len(methods)
