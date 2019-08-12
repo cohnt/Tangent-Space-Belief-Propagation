@@ -4,13 +4,22 @@ import rospy
 import matplotlib.pyplot as plt
 
 from sensor_msgs.msg import LaserScan as LaserScanMsg
+from sensor_msgs.msg import Image as ImageMsg
 from time import sleep, time
+
+from cv_bridge import CvBridge, CvBridgeError
+import cv2
 
 data_file_name = "data.csv"
 topic_name = "/base_scan"
 node_name = "laser_scan_data_record_node"
 rate = 0.1
-density = 4
+density = 2
+image_rate = 10
+
+bridge = CvBridge()
+image_topic_name = "/head_camera/rgb/image_raw"
+image_dir = "images/"
 
 try:
 	open(data_file_name, "r")
@@ -29,6 +38,17 @@ while True:
 	try:
 		print "Recording data #%d" % iter_num
 		data_message = rospy.wait_for_message(topic_name, LaserScanMsg)
+
+		if iter_num % image_rate == 0:
+			image_message = rospy.wait_for_message(image_topic_name, ImageMsg)
+			fname = "iter%s.svg" % str(iter_num).zfill(3)
+
+			try:
+				cv2_img = bridge.imgmsg_to_cv2(msg, "bgr8")
+			except CvBridgeError, e:
+				print e
+			else:
+				cv2.imwrite(image_dir + fname, cv2_img)
 
 		angles = np.linspace(data_message.angle_min, data_message.angle_max, len(data_message.ranges))
 		ranges = np.array(data_message.ranges)
