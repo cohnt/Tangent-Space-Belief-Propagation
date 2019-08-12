@@ -792,6 +792,7 @@ for k in range(3, 2*neighbors_k):
 		plt.xlabel("Actual Parameter Value")
 		plt.ylabel("Embedded Coordinate")
 		plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + name + ".svg")
+		fig.close()
 
 
 	# methods = []
