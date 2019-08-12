@@ -15,7 +15,7 @@ topic_name = "/base_scan"
 node_name = "laser_scan_data_record_node"
 rate = 0.01
 density = 4
-image_rate = 25
+image_rate = 10
 
 bridge = CvBridge()
 image_topic_name = "/head_camera/rgb/image_raw"
