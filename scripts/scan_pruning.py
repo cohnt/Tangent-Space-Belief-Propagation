@@ -792,7 +792,7 @@ for i in range(num_methods):
 	plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + name + ".svg")
 	plt.close(fig)
 
-for k in range(1, 2*neighbors_k):
+for k in range(min_k, max_k):
 	print "\t\t\t\t\tk value: %d" % k
 	methods = []
 	methods.append(LocallyLinearEmbedding(n_neighbors=k, n_components=1, n_jobs=-1, eigen_solver="dense"))
