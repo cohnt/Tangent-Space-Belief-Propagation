@@ -633,7 +633,7 @@ for neighbors_k in range(min_k, max_k+1):
 	ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from BP Tangent Correction for Edge Pruning (k=%d)" % neighbors_k, 60)))
 	plt.xlabel("Actual Parameter Value")
 	plt.ylabel("Embedded Coordinate")
-	plt.savefig(output_dir + ("coord_bp_%d_iters_k_%d.svg" % (iter_num-1, neighbors_k)))
+	plt.savefig(output_dir + ("coord_bp_%d_iters_k_%s.svg" % (iter_num-1, str(neighbors_k).zfill(2))))
 
 ##############################################################################
 ##############################################################################
