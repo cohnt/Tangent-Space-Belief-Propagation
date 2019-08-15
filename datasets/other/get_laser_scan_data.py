@@ -13,8 +13,8 @@ import cv2
 data_file_name = "data.csv"
 topic_name = "/base_scan"
 node_name = "laser_scan_data_record_node"
-rate = 0.01
-density = 4
+rate = 0.05
+density = 2
 image_rate = 10
 
 bridge = CvBridge()
