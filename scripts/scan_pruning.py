@@ -60,7 +60,7 @@ combined_sp_rad = 4.0
 combined_sp_lw = 0.5
 
 min_k = 1
-max_k = 25
+max_k = 15
 
 write("\n")
 
