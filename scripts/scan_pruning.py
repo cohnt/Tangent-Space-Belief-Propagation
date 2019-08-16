@@ -766,6 +766,7 @@ plt.savefig(output_dir + "pca_pruning.svg")
 k = neighbors_k
 
 from sklearn.manifold import LocallyLinearEmbedding, MDS, Isomap, SpectralEmbedding, TSNE
+from ltsa import compute_ltsa
 
 methods = []
 methods.append(MDS(n_components=1, n_jobs=-1))
@@ -792,7 +793,7 @@ for i in range(num_methods):
 	plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + name + ".svg")
 	plt.close(fig)
 
-for k in range(min_k, max_k):
+for k in range(min_k, max_k+1):
 	print "\t\t\t\t\tk value: %d" % k
 	methods = []
 	methods.append(LocallyLinearEmbedding(n_neighbors=k, n_components=1, n_jobs=-1, eigen_solver="dense"))
@@ -820,6 +821,36 @@ for k in range(min_k, max_k):
 		plt.ylabel("Embedded Coordinate")
 		plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + name + ".svg")
 		plt.close(fig)
+
+	write("Computing Classical LTSA...")
+
+	neighbor_graph = kneighbors_graph(points, k, mode="distance", n_jobs=-1)
+	neighbor_graph = sparseMaximum(neighbor_graph, neighbor_graph.T)
+	neighbor_dict = sparseMatrixToDict(neighbor_graph)
+	pca = PCA(n_components=target_dim)
+	observations = [None for i in range(num_points)]
+	for i in range(num_points):
+		og_point = points[i]
+		row = neighbor_graph.toarray()[i]
+		neighbors = np.nonzero(row)[0]
+		neighborhood = points[neighbors]
+		pca.fit(neighborhood)
+		observations[i] = pca.components_[0:target_dim]
+
+	flush()
+	t0 = time.time()
+	feature_coords = compute_ltsa(points, neighbor_dict, observations, source_dim, target_dim)
+	t1 = time.time()
+	write("Done! dt=%f\n" % (t1-t0))
+	flush()
+
+	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+	ax.scatter(true_vals, feature_coords)
+	ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Classical LTSA", 60)))
+	plt.xlabel("Actual Parameter Value")
+	plt.ylabel("Embedded Coordinate")
+	plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + "LTSA.svg")
+	plt.close(fig)
 
 
 	# methods = []
