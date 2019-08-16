@@ -50,6 +50,8 @@ while True:
 				cv2.imwrite(image_dir + ("iter%s.png" % str(iter_num).zfill(3)), cv2_img)
 
 		angles = np.linspace(data_message.angle_min, data_message.angle_max, len(data_message.ranges))
+		if iter_num == 1:
+			print "angle_min: %f, angle_max, %f" % (data_message.angle_min, data_message.angle_max)
 		ranges = np.array(data_message.ranges)
 
 		# Replace infinity with range_max
