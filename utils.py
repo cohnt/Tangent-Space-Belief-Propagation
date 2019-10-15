@@ -65,13 +65,13 @@ def projSubspace(orthonormal_basis, point):
 
 def randomSmallRotation(dimension, variance=None):
 	if variance is None:
-		variance = 0.05 * dimension
-	theta = np.random.normal(0, variance)
+		variance = 0.05 * dimension * 180.0 / np.pi
+	theta = np.random.normal(0, variance) * np.pi / 180.0
 	rotMat = np.eye(dimension)
 	rotMat[0,0] = np.cos(theta)
 	rotMat[0,1] = -np.sin(theta)
 	rotMat[1,0] = np.sin(theta)
 	rotMat[1,1] = np.cos(theta)
 	basis = special_ortho_group.rvs(dimension)
-	basis_inv = np.linalg.inv(basis)
+	basis_inv = basis.transpose()
 	return basis.dot(rotMat).dot(basis_inv)

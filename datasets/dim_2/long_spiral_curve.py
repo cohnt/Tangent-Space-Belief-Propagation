@@ -17,7 +17,7 @@ def make_long_spiral_curve(n_samples, noise_factor, b_val=0.05, rs_seed=None):
 	# The s curve is parameterized by 
 	# x(t) = btcos(t)
 	# y(t) = btsin(t)
-	# for 2pi <= t <= 12pi
+	# for 2pi <= t <= 8pi
 	# See for graph: https://www.desmos.com/calculator/ete1b4p535
 	lowerBound = 2.0 * np.pi
 	upperBound = 8.0 * np.pi
@@ -44,6 +44,6 @@ def make_long_spiral_curve(n_samples, noise_factor, b_val=0.05, rs_seed=None):
 
 if __name__ == "__main__":
 	import matplotlib.pyplot as plt
-	data, color, ts = make_long_spiral_curve(500, 0.001, b_val=0.05)
+	data, color, ts, seed = make_long_spiral_curve(500, 0.001, b_val=0.05)
 	plt.scatter(data[:,0], data[:,1], c=color, cmap=plt.cm.Spectral)
 	plt.show()
