@@ -21,7 +21,7 @@ target_dim = 1      # The number of dimensions the data is being reduced to
 
 t = 4
 
-output_dir = "results_dmst/"
+output_dir = "other_results/results_dmst/"
 
 write("\n")
 

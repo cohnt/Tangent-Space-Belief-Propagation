@@ -24,7 +24,7 @@ r = 0.5
 T = 20
 edge_thresh = 0.1
 
-output_dir = "results_pmst/"
+output_dir = "other_results/results_pmst/"
 
 write("\n")
 

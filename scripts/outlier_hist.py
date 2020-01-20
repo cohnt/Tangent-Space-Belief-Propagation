@@ -22,7 +22,7 @@ target_dim = 1      # The number of dimensions the data is being reduced to
 neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
 l_max = 8
 
-output_dir = "results_outlier/"
+output_dir = "other_results/results_outlier/"
 
 write("\n")
 

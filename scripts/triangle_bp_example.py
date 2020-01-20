@@ -17,7 +17,7 @@ explore_perc = 0
 
 message_resample_cov = np.eye(2) * 0.1 # TODO: Change
 
-output_dir = "results_triangle/"
+output_dir = "other_results/results_triangle/"
 
 write("\n")
 
