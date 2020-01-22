@@ -27,11 +27,9 @@ from datasets.dim_2.long_spiral_curve import make_long_spiral_curve
 from sklearn.preprocessing import MinMaxScaler
 
 points, color, true_tangents, dataset_seed = make_long_spiral_curve(num_points, data_noise, rs_seed=dataset_seed)
-scaler = MinMaxScaler()
-data_scaled = scaler.fit_transform(points)
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-ax.scatter(data_scaled[:,0], data_scaled[:,1], c=color, cmap=plt.cm.Spectral, s=data_sp_rad**2, zorder=2, linewidth=data_sp_lw)
+ax.scatter(points[:,0], points[:,1], c=color, cmap=plt.cm.Spectral, s=data_sp_rad**2, zorder=2, linewidth=data_sp_lw)
 ax.set_title("Dataset (num=%d, variance=%f, seed=%d)\n" % (num_points, data_noise, dataset_seed))
 plt.show()
 
@@ -48,7 +46,7 @@ choke_layer = Dense(target_dim, activation="tanh")(encoder_layer_3)
 decoder_layer_3 = Dense(32, activation="tanh")(choke_layer)
 decoder_layer_2 = Dense(32, activation="tanh")(decoder_layer_3)
 decoder_layer_1 = Dense(64, activation="tanh")(decoder_layer_2)
-output_layer = Dense(source_dim, activation="sigmoid")(decoder_layer_1)
+output_layer = Dense(source_dim, activation="linear")(decoder_layer_1)
 
 encoder = Model(input_layer, choke_layer)
 autoencoder = Model(input_layer, output_layer)
@@ -57,14 +55,14 @@ train_test_cutoff = int(0.8 * num_points)
 
 autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
 autoencoder.fit(
-	data_scaled[:train_test_cutoff], data_scaled[:train_test_cutoff],
+	points[:train_test_cutoff], points[:train_test_cutoff],
 	epochs=50,
 	batch_size=256,
 	shuffle=True,
-	validation_data=(data_scaled[train_test_cutoff:], data_scaled[train_test_cutoff:])
+	validation_data=(points[train_test_cutoff:], points[train_test_cutoff:])
 )
 
-embedded_points = encoder.predict(data_scaled)
+embedded_points = encoder.predict(points)
 
 ############################
 
@@ -92,11 +90,9 @@ from datasets.dim_3.helix_curve import make_helix_curve
 from datasets.dim_3.tight_spiral_curve import make_tight_spiral_curve
 
 points, color, true_tangents, dataset_seed = make_tight_spiral_curve(num_points, data_noise, rs_seed=dataset_seed)
-scaler = MinMaxScaler()
-data_scaled = scaler.fit_transform(points)
 fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
 ax = fig.add_subplot(111, projection='3d')
-ax.scatter(data_scaled[:,0], data_scaled[:,1], data_scaled[:,2], c=color, cmap=plt.cm.Spectral, s=data_sp_rad**2, linewidth=data_sp_lw)
+ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=data_sp_rad**2, linewidth=data_sp_lw)
 ax.set_title("Dataset (num=%d, variance=%f, seed=%d)" % (num_points, data_noise, dataset_seed))
 plt.show()
 
@@ -110,7 +106,7 @@ choke_layer = Dense(target_dim, activation="tanh")(encoder_layer_3)
 decoder_layer_3 = Dense(32, activation="tanh")(choke_layer)
 decoder_layer_2 = Dense(32, activation="tanh")(decoder_layer_3)
 decoder_layer_1 = Dense(64, activation="tanh")(decoder_layer_2)
-output_layer = Dense(source_dim, activation="sigmoid")(decoder_layer_1)
+output_layer = Dense(source_dim, activation="linear")(decoder_layer_1)
 
 encoder = Model(input_layer, choke_layer)
 autoencoder = Model(input_layer, output_layer)
@@ -119,14 +115,14 @@ train_test_cutoff = int(0.8 * num_points)
 
 autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
 autoencoder.fit(
-	data_scaled[:train_test_cutoff], data_scaled[:train_test_cutoff],
+	points[:train_test_cutoff], points[:train_test_cutoff],
 	epochs=50,
 	batch_size=256,
 	shuffle=True,
-	validation_data=(data_scaled[train_test_cutoff:], data_scaled[train_test_cutoff:])
+	validation_data=(points[train_test_cutoff:], points[train_test_cutoff:])
 )
 
-embedded_points = encoder.predict(data_scaled)
+embedded_points = encoder.predict(points)
 
 ############################
 
@@ -163,10 +159,8 @@ def make3DFigure():
 	return f, a
 
 points, color, true_tangents, dataset_seed = make_swiss_roll_sheet(num_points, data_noise, rs_seed=dataset_seed)
-scaler = MinMaxScaler()
-data_scaled = scaler.fit_transform(points)
 fig, ax = make3DFigure()
-ax.scatter(data_scaled[:,0], data_scaled[:,1], data_scaled[:,2], c=color, cmap=plt.cm.Spectral, s=data_sp_rad**2, linewidth=data_sp_lw)
+ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=data_sp_rad**2, linewidth=data_sp_lw)
 ax.set_title("Dataset (num=%d, variance=%f, seed=%d)" % (num_points, data_noise, dataset_seed))
 plt.show()
 
@@ -180,7 +174,7 @@ choke_layer = Dense(target_dim, activation="tanh")(encoder_layer_3)
 decoder_layer_3 = Dense(32, activation="tanh")(choke_layer)
 decoder_layer_2 = Dense(32, activation="tanh")(decoder_layer_3)
 decoder_layer_1 = Dense(64, activation="tanh")(decoder_layer_2)
-output_layer = Dense(source_dim, activation="sigmoid")(decoder_layer_1)
+output_layer = Dense(source_dim, activation="linear")(decoder_layer_1)
 
 encoder = Model(input_layer, choke_layer)
 autoencoder = Model(input_layer, output_layer)
@@ -189,14 +183,14 @@ train_test_cutoff = int(0.8 * num_points)
 
 autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
 autoencoder.fit(
-	data_scaled[:train_test_cutoff], data_scaled[:train_test_cutoff],
+	points[:train_test_cutoff], points[:train_test_cutoff],
 	epochs=50,
 	batch_size=256,
 	shuffle=True,
-	validation_data=(data_scaled[train_test_cutoff:], data_scaled[train_test_cutoff:])
+	validation_data=(points[train_test_cutoff:], points[train_test_cutoff:])
 )
 
-embedded_points = encoder.predict(data_scaled)
+embedded_points = encoder.predict(points)
 
 ############################
 
