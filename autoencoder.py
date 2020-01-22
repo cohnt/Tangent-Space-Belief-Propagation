@@ -15,24 +15,24 @@ class Autoencoder():
 		self.num_encoder_layers = len(layer_sizes)
 
 		self.encoder_layers = []
-		self.encoder_layers.push(
+		self.encoder_layers.append(
 			Input(shape=(self.source_dim,))
 		)
 		for i in range(0, self.num_encoder_layers):
 			layer_size = self.layer_sizes[i]
-			layer_actiation = self.layer_activations[i]
-			self.encoder_layers.push(
+			layer_activation = self.layer_activations[i]
+			self.encoder_layers.append(
 				Dense(layer_size, activation=layer_activation)(self.encoder_layers[i])
 			)
 
 		self.decoder_layers = []
-		self.decoder_layers.push(
+		self.decoder_layers.append(
 			Dense(self.target_dim, activation=self.choke_activation)(self.encoder_layers[-1])
 		)
 		for i in range(0, self.num_encoder_layers):
 			layer_size = self.layer_sizes[-1-i]
 			layer_activation = self.layer_activations[-1-i]
-			self.decoder_layers.push(
+			self.decoder_layers.append(
 				Dense(layer_size, activation=layer_activation)(self.decoder_layers[i])
 			)
 		self.output_layer = Dense(self.source_dim, activation=self.output_activation)(self.decoder_layers[-1])
@@ -42,7 +42,7 @@ class Autoencoder():
 		self.autoencoder.compile(optimizer=optimizer, loss=loss)
 
 	def train(self, data, train_test_ratio=0.8, epochs=50, batch_size=256, shuffle=True):
-		cutoff = int(len(data) * train_test_cutoff)
+		cutoff = int(len(data) * train_test_ratio)
 		self.autoencoder.fit(
 			data[:cutoff], data[:cutoff],
 			epochs=epochs,
