@@ -53,7 +53,7 @@ autoencoder = Model(input_layer, output_layer)
 
 train_test_cutoff = int(0.8 * num_points)
 
-autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
+autoencoder.compile(optimizer='adadelta', loss='mean_squared_error')
 autoencoder.fit(
 	points[:train_test_cutoff], points[:train_test_cutoff],
 	epochs=50,
@@ -113,7 +113,7 @@ autoencoder = Model(input_layer, output_layer)
 
 train_test_cutoff = int(0.8 * num_points)
 
-autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
+autoencoder.compile(optimizer='adadelta', loss='mean_squared_error')
 autoencoder.fit(
 	points[:train_test_cutoff], points[:train_test_cutoff],
 	epochs=50,
@@ -181,7 +181,7 @@ autoencoder = Model(input_layer, output_layer)
 
 train_test_cutoff = int(0.8 * num_points)
 
-autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
+autoencoder.compile(optimizer='adadelta', loss='mean_squared_error')
 autoencoder.fit(
 	points[:train_test_cutoff], points[:train_test_cutoff],
 	epochs=50,
