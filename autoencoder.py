@@ -4,7 +4,7 @@ from keras.layers import Input, Dense
 from keras.models import Model
 
 class Autoencoder():
-	def __init__(self, source_dim, target_dim, layer_sizes, layer_activations, choke_activation, output_activation, optimizer, loss):
+	def __init__(self, source_dim, target_dim, layer_sizes, layer_activations, choke_activation="tanh", output_activation="linear", optimizer="adadelta", loss="mean_squared_error"):
 		self.source_dim = source_dim
 		self.target_dim = target_dim
 		self.layer_sizes = layer_sizes
