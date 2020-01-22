@@ -41,8 +41,15 @@ class Autoencoder():
 		self.autoencoder = Model(self.encoder_layers[0], self.output_layer)
 		self.autoencoder.compile(optimizer=optimizer, loss=loss)
 
-	def train(self):
-		pass
+	def train(self, data, train_test_ratio=0.8, epochs=50, batch_size=256, shuffle=True):
+		cutoff = int(len(data) * train_test_cutoff)
+		self.autoencoder.fit(
+			data[:cutoff], data[:cutoff],
+			epochs=epochs,
+			batch_size=batch_size,
+			shuffle=shuffle,
+			validation_data=(data[cutoff:], data[cutoff:])
+		)
 
-	def embed(self):
-		pass
+	def embed(self, data):
+		return self.encoder.predict(data)
