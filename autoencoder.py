@@ -53,3 +53,6 @@ class Autoencoder():
 
 	def embed(self, data):
 		return self.encoder.predict(data)
+
+	def reconstruct(self, data):
+		return self.autoencoder.predict(data)
