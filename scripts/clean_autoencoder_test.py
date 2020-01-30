@@ -11,7 +11,7 @@ from autoencoder import Autoencoder
 
 dataset_name = "long_spiral_curve"
 dataset_seed = 4045775215 # np.random.randint(0, 2**32)
-num_points = 500 # Number of data points
+num_points = 5000 # Number of data points
 data_noise = 0.001 # How much noise is added to the data
 source_dim = 2 # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1 # The number of dimensions the data is being reduced to
@@ -28,7 +28,7 @@ from datasets.dim_2.eight_curve import make_eight_curve
 from datasets.dim_2.long_spiral_curve import make_long_spiral_curve
 from sklearn.preprocessing import MinMaxScaler
 
-points, color, true_tangents, dataset_seed = make_long_spiral_curve(num_points, data_noise, rs_seed=dataset_seed)
+points, color, true_tangents, dataset_seed = make_s_curve(num_points, data_noise, rs_seed=dataset_seed)
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(points[:,0], points[:,1], c=color, cmap=plt.cm.Spectral, s=data_sp_rad**2, zorder=2, linewidth=data_sp_lw)
@@ -37,9 +37,15 @@ plt.show()
 
 ############################
 
-autoencoder = Autoencoder(2, 1, [64, 32, 32], ["tanh", "tanh", "tanh"])
+autoencoder = Autoencoder(2, 1, [64, 32, 32], ["relu", "relu", "relu"])
 autoencoder.train(points)
 embedded_points = autoencoder.embed(points)
+reconstructed_points = autoencoder.reconstruct(points)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(reconstructed_points[:,0], reconstructed_points[:,1], c=color, cmap=plt.cm.Spectral, s=data_sp_rad**2, zorder=2, linewidth=data_sp_lw)
+ax.set_title("Reconstructed Data")
+plt.show()
 
 ############################
 
@@ -58,7 +64,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 dataset_name = "tight_spiral_curve"
 dataset_seed = np.random.randint(0, 2**32)
-num_points = 500 # Number of data points
+num_points = 5000 # Number of data points
 data_noise = 0.0005 # How much noise is added to the data
 source_dim = 3 # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1 # The number of dimensions the data is being reduced to
@@ -75,9 +81,16 @@ plt.show()
 
 ############################
 
-autoencoder = Autoencoder(3, 1, [64, 32, 32], ["tanh", "tanh", "tanh"])
+autoencoder = Autoencoder(3, 1, [64, 32, 32], ["relu", "relu", "relu"])
 autoencoder.train(points)
 embedded_points = autoencoder.embed(points)
+reconstructed_points = autoencoder.reconstruct(points)
+
+fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
+ax = fig.add_subplot(111, projection='3d')
+ax.scatter(reconstructed_points[:,0], reconstructed_points[:,1], reconstructed_points[:,2], c=color, cmap=plt.cm.Spectral, s=data_sp_rad**2, linewidth=data_sp_lw)
+ax.set_title("Reconstructed Dataset")
+plt.show()
 
 ############################
 
@@ -121,7 +134,7 @@ plt.show()
 
 ############################
 
-autoencoder = Autoencoder(3, 2, [64, 32, 32], ["tanh", "tanh", "tanh"])
+autoencoder = Autoencoder(3, 2, [64, 32, 32], ["relu", "relu", "relu"])
 autoencoder.train(points)
 embedded_points = autoencoder.embed(points)
 
