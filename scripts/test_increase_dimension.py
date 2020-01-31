@@ -1,10 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from utils import increaseDimension
+from utils import increaseDimensionMatrix
 
 data = np.array([[i] for i in range(0, 25)])
-new_data = increaseDimension(data, 2)
+mat = increaseDimensionMatrix(1, 2)
+new_data = np.matmul(data, mat)
 print data
 print new_data
 
