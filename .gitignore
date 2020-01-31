@@ -1,4 +1,7 @@
 results/*
+results_helix/*
+results_scan/*
+results_sheet/*
 other_results/*
 
 testing_history/*
