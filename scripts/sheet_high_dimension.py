@@ -726,13 +726,6 @@ else:
 		set_b = connected_components.findSet(j)
 		connected_components.union(set_a, set_b)
 
-fig, ax = make3DFigure()
-# Not squared because it's squared inside plot_neighbors_3d
-plot_neighbors_3d(points, color, pruned_neighbors, ax, point_size=data_sp_rad, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False, line_color="grey")
-ax.set_title("Added Edges after Pruning")
-plt.savefig(output_dir + "added_edges.svg")
-plt.close(fig)
-
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
