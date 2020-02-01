@@ -20,6 +20,7 @@ num_points = 500    # Number of data points
 data_noise = 0.001 # How much noise is added to the data
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1      # The number of dimensions the data is being reduced to
+new_dim = 25        # The higher dimension the data will be mapped to
 
 num_iters = 25      # Number of iterations of the message passing algorithm to run
 neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
@@ -68,6 +69,7 @@ f.write("num_points=%d\n" % num_points)
 f.write("noise=%s\n" % str(data_noise))
 f.write("source_dim=%d\n" % source_dim)
 f.write("target_dim=%d\n" % target_dim)
+f.write("new_dim=%d\n" % new_dim)
 
 f.write("\n[Belief Propagation]\n")
 f.write("max_iters=%d\n" % num_iters)
@@ -127,7 +129,6 @@ flush()
 from utils import increaseDimensionMatrix
 write("Increasing dimenion.\n")
 flush()
-new_dim = 8
 mat = increaseDimensionMatrix(source_dim, new_dim)
 points = np.matmul(points, mat)
 true_tangents = np.matmul(true_tangents, mat)
