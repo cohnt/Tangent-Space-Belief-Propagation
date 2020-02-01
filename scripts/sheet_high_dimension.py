@@ -29,7 +29,7 @@ explore_perc = 0.1  # Fraction of uniform samples to keep exploring
 
 message_resample_cov = np.eye(target_dim) * 0.01 # TODO: Change
 pruning_angle_thresh = np.cos(30.0 * np.pi / 180.0)
-ts_noise_variance = 30 # Degrees
+ts_noise_variance = 30 # In degrees
 initial_variance = 30 # Degree
 
 output_dir = "results_sheet/"
@@ -237,10 +237,13 @@ def randomTangentSpaceList(num_samples, source_dim, target_dim):
 	return ts
 
 def noisifyTS(ts, var):
-	rotMat = randomSmallRotation(source_dim, variance=var)
-	# theta = np.random.normal(0, var) * np.pi / 180.0
-	# rotMat = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
-	return np.array([np.dot(rotMat, ts[0]), np.dot(rotMat, ts[1])])
+		# rotMat = randomSmallRotation(source_dim, variance=var)
+		# theta = np.random.normal(0, var) * np.pi / 180.0
+		# rotMat = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
+		noise_mat = np.random.normal(0, ts_noise_variance, ts.shape)
+		ts = ts + noise_mat
+		ts = scipy.linalg.orth(ts.T).T
+		return np.array(ts)
 
 def noisifyTSList(ts_list, var=5):
 	for i in range(len(ts_list)):
