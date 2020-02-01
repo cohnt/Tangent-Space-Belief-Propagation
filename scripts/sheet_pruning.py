@@ -730,19 +730,6 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
-fig, ax = make3DFigure()
-# Not squared because it's squared inside plot_neighbors_3d
-plot_neighbors_3d(points, color, pruned_neighbors, ax, point_size=data_sp_rad, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False, line_color="grey")
-ax.set_title("Pruned Nearest Neighbors (k=%d, thresh=%f)" % (neighbors_k, pruning_angle_thresh))
-plt.savefig(output_dir + "pruned_nearest_neighbors.svg")
-angles = np.linspace(0, 360, 40+1)[:-1]
-rotanimate(ax, angles, output_dir + "pruned_nearest_neighbors.gif", delay=30, width=14.4, height=10.8, folder=output_dir, elevation=disp_elev)
-plt.close(fig)
-
-write("Connecting graph...\n")
-flush()
-t0 = time.time()
-
 # Uses the disjoint-set datatype
 # http://p-nand-q.com/python/data-types/general/disjoint-sets.html
 class DisjointSet():
@@ -795,13 +782,6 @@ else:
 		set_a = connected_components.findSet(i)
 		set_b = connected_components.findSet(j)
 		connected_components.union(set_a, set_b)
-
-fig, ax = make3DFigure()
-# Not squared because it's squared inside plot_neighbors_3d
-plot_neighbors_3d(points, color, pruned_neighbors, ax, point_size=data_sp_rad, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False, line_color="grey")
-ax.set_title("Added Edges after Pruning")
-plt.savefig(output_dir + "added_edges.svg")
-plt.close(fig)
 
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
