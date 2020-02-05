@@ -8,9 +8,9 @@ def relativeErrorBarChart(ax, dict):
 	ax.set_xticklabels(list(dict.keys()))
 	ax.tick_params(axis='x', which='major', labelsize=10)
 
-	autolabel(rect)
+	autolabel(ax, rect)
 
-def autolabel(rects, xpos='center'):
+def autolabel(ax, rects, xpos='center'):
 	xpos = xpos.lower()
 	ha = {'center': 'center', 'right': 'left', 'left': 'right'}
 	offset = {'center': 0.5, 'right': 0.57, 'left': 0.43}  # x_txt = x + w*off
