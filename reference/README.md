@@ -80,6 +80,7 @@
 * https://matplotlib.org/gallery/lines_bars_and_markers/barchart.html#sphx-glr-gallery-lines-bars-and-markers-barchart-py
 * https://matplotlib.org/gallery/api/barchart.html
 * https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.tick_params.html
+* https://matplotlib.org/gallery/api/barchart.html
 
 ### Other
 
