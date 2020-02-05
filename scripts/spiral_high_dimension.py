@@ -52,6 +52,8 @@ combined_sp_lw = 0.5
 
 write("\n")
 
+matplotlib.rcParams.update({'font.size': 15})
+
 ####################
 # Write Parameters #
 ####################

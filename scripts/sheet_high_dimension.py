@@ -53,6 +53,8 @@ disp_azim = -85.0
 
 write("\n")
 
+matplotlib.rcParams.update({'font.size': 15})
+
 def make3DFigure():
 	f = plt.figure(figsize=(14.4, 10.8), dpi=100)
 	a = f.add_subplot(111, projection='3d')
