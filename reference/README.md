@@ -25,6 +25,22 @@
 * https://pdfs.semanticscholar.org/9cd5/fa5f0bac6e8ea9a14b169cd4b4a7ed2f9f13.pdf
 * https://en.wikipedia.org/wiki/Local_tangent_space_alignment
 
+##### Autoencoders
+
+* https://towardsdatascience.com/applied-deep-learning-part-3-autoencoders-1c083af4d798
+* https://towardsdatascience.com/autoencoders-vs-pca-when-to-use-which-73de063f5d7
+* https://towardsdatascience.com/understanding-pca-autoencoders-algorithms-everyone-can-understand-28ee89b570e2
+* https://towardsdatascience.com/autoencoder-on-dimension-reduction-100f2c98608c
+* https://blog.keras.io/building-autoencoders-in-keras.html
+* https://www.guru99.com/autoencoder-deep-learning.html#1
+* https://stackoverflow.com/questions/52271644/extract-encoder-and-decoder-from-trained-autoencoder
+* https://keras.io/getting-started/functional-api-guide/
+* https://keras.io/losses/
+* https://keras.io/optimizers/
+* https://en.wikipedia.org/wiki/Sigmoid_function
+* https://en.wikipedia.org/wiki/Rectifier_(neural_networks)
+* https://towardsdatascience.com/activation-functions-neural-networks-1cbd9f8d91d6
+
 ### Mathematics
 
 ##### Linear Algebra
