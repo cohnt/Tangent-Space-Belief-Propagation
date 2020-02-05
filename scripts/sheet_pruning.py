@@ -60,6 +60,8 @@ def make3DFigure():
 	a.view_init(elev=disp_elev, azim=disp_azim)
 	return f, a
 
+matplotlib.rcParams.update({'font.size': 15})
+
 ####################
 # Write Parameters #
 ####################

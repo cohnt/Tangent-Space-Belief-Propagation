@@ -5,6 +5,8 @@ from textwrap import wrap
 
 from autoencoder import Autoencoder
 
+matplotlib.rcParams.update({'font.size': 15})
+
 ############
 # 2D -> 1D #
 ############
