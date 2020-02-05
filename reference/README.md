@@ -84,3 +84,4 @@
 ### Other
 
 * http://blog.davidecoppola.com/2015/02/how-to-create-git-submodule-from-repository-subdirectory/
+* https://scikit-learn.org/stable/modules/generated/sklearn.metrics.pairwise_distances.html
