@@ -11,6 +11,7 @@ import copy
 from joblib import Parallel, delayed
 from tqdm import tqdm
 from utils import write, flush, pairwiseDistErr
+from collections import OrderedDict
 
 global_t0 = time.time()
 
@@ -852,7 +853,8 @@ plt.close(fig)
 # Compare to Other Methods #
 ############################
 
-method_errs = {"TSBP" : tsbp_err}
+method_errs = OrderedDict()
+method_errs["TSBP"] = tsbp_err
 
 write("\nComparing to other methods...\n")
 flush()
