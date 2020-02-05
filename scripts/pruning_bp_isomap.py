@@ -881,8 +881,9 @@ for i in range(num_methods):
 	write("Done! dt=%f\n" % (t1-t0))
 	flush()
 
-	method_errs[name] = pairwiseDistErr(feature_coords, true_parameters)
-	print "%s Error: %f" % (name, method_errs[name])
+	if name != "t-SNE":
+		method_errs[name] = pairwiseDistErr(feature_coords, true_parameters)
+		print "%s Error: %f" % (name, method_errs[name])
 
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 	ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
