@@ -82,3 +82,10 @@ def increaseDimensionMatrix(old_dimension, new_dimension):
 	rotation_matrix = special_ortho_group.rvs(new_dimension)
 	final_matrix = np.matmul(expand_matrix, rotation_matrix)
 	return final_matrix
+
+from sklearn.metrics import pairwise_distances
+def pairwiseDistErr(embedded_points, true_parameters, dist_metric="l2", mat_norm="fro"):
+	embedded_dists = pairwise_distances(embedded_points, metric=dist_metric, n_jobs=-1)
+	true_dists = pairwise_distances(true_parameters, metric=dist_metric, n_jobs=-1)
+	err = np.linalg.norm(embedded_dists - true_dists, ord=mat_norm, axis=None)
+	return err
