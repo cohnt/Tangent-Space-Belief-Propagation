@@ -76,6 +76,10 @@
 * https://stackoverflow.com/questions/4325733/save-a-subplot-in-matplotlib
 * https://matplotlib.org/api/_as_gen/matplotlib.pyplot.hist.html
 * https://zulko.wordpress.com/2012/09/29/animate-your-3d-plots-with-pythons-matplotlib/
+* https://stackoverflow.com/questions/6390393/matplotlib-make-tick-labels-font-size-smaller/11386056#11386056
+* https://matplotlib.org/gallery/lines_bars_and_markers/barchart.html#sphx-glr-gallery-lines-bars-and-markers-barchart-py
+* https://matplotlib.org/gallery/api/barchart.html
+* https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.tick_params.html
 
 ### Other
 
