@@ -28,7 +28,7 @@ from datasets.dim_2.eight_curve import make_eight_curve
 from datasets.dim_2.long_spiral_curve import make_long_spiral_curve
 from sklearn.preprocessing import MinMaxScaler
 
-points, color, true_tangents, dataset_seed = make_s_curve(num_points, data_noise, rs_seed=dataset_seed)
+points, color, true_tangents, true_parameters, dataset_seed = make_s_curve(num_points, data_noise, rs_seed=dataset_seed)
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(points[:,0], points[:,1], c=color, cmap=plt.cm.Spectral, s=data_sp_rad**2, zorder=2, linewidth=data_sp_lw)
