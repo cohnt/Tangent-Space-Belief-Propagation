@@ -75,3 +75,10 @@ def randomSmallRotation(dimension, variance=None):
 	basis = special_ortho_group.rvs(dimension)
 	basis_inv = basis.transpose()
 	return basis.dot(rotMat).dot(basis_inv)
+
+def increaseDimensionMatrix(old_dimension, new_dimension):
+	expand_matrix = np.zeros((old_dimension, new_dimension))
+	expand_matrix[0:old_dimension, 0:old_dimension] = np.eye(old_dimension)
+	rotation_matrix = special_ortho_group.rvs(new_dimension)
+	final_matrix = np.matmul(expand_matrix, rotation_matrix)
+	return final_matrix

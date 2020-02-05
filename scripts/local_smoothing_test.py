@@ -24,7 +24,7 @@ num_iters = 100
 eps = 10e-12
 gamma = 1.0
 
-output_dir = "results_local_smoothing/"
+output_dir = "other_results/results_local_smoothing/"
 
 write("\n")
 

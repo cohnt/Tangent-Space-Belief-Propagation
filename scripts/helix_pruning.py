@@ -21,9 +21,9 @@ data_noise = 0.0005      # How much noise is added to the data
 source_dim = 3      # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1      # The number of dimensions the data is being reduced to
 
-num_iters = 10      # Number of iterations of the message passing algorithm to run
+num_iters = 25      # Number of iterations of the message passing algorithm to run
 neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
-num_samples = 5     # Numbers of samples used in the belief propagation algorithm
+num_samples = 10     # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
 
 message_resample_cov = np.eye(target_dim) * 0.01 # TODO: Change
