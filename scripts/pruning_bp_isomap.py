@@ -10,7 +10,7 @@ import sys
 import copy
 from joblib import Parallel, delayed
 from tqdm import tqdm
-from utils import write, flush
+from utils import write, flush, pairwiseDistErr
 
 global_t0 = time.time()
 
@@ -21,7 +21,7 @@ data_noise = 0.001 # How much noise is added to the data
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1      # The number of dimensions the data is being reduced to
 
-num_iters = 10     # Number of iterations of the message passing algorithm to run
+num_iters = 25     # Number of iterations of the message passing algorithm to run
 neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
 num_samples = 10   # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
@@ -48,7 +48,7 @@ combined_sp_lw = 0.5
 
 write("\n")
 
-matplotlib.rcParams.update({'font.size': 25})
+matplotlib.rcParams.update({'font.size': 15})
 
 ####################
 # Write Parameters #
@@ -837,9 +837,12 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
+tsbp_err = pairwiseDistErr(feature_coords, true_parameters)
+print "TSBP Error: %f" % tsbp_err
+
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
-ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from BP Tangent Correction for Edge Pruning", 50)))
+ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from BP Tangent Correction for Edge Pruning\n Reconstruction Error: %f" % tsbp_err, 50)))
 plt.xlabel("Actual Parameter Value")
 plt.ylabel("Embedded Coordinate")
 plt.savefig(output_dir + "coord_bp.svg")
@@ -848,6 +851,8 @@ plt.close(fig)
 ############################
 # Compare to Other Methods #
 ############################
+
+method_errs = {"TSBP" : tsbp_err}
 
 write("\nComparing to other methods...\n")
 flush()
@@ -875,7 +880,10 @@ for i in range(num_methods):
 	t1 = time.time()
 	write("Done! dt=%f\n" % (t1-t0))
 	flush()
-	
+
+	method_errs[name] = pairwiseDistErr(feature_coords, true_parameters)
+	print "%s Error: %f" % (name, method_errs[name])
+
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 	ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 	ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from %s" % name, 50)))
@@ -892,6 +900,9 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
+method_errs["LTSA"] = pairwiseDistErr(feature_coords, true_parameters)
+print "LTSA Error: %f" % method_errs["LTSA"]
+
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Classical LTSA", 50)))
@@ -907,6 +918,9 @@ feature_coords = compute_ltsa(points, neighbor_dict, mle_bases, source_dim, targ
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
+
+method_errs["LTSA BPT"] = pairwiseDistErr(feature_coords, true_parameters)
+print "LTSA BPT Error: %f" % method_errs["LTSA BPT"]
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
@@ -925,6 +939,9 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
+method_errs["LTSA Pruning"] = pairwiseDistErr(feature_coords, true_parameters)
+print "LTSA Pruning Error: %f" % method_errs["LTSA Pruning"]
+
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction and Edge Pruning", 50)))
@@ -933,7 +950,7 @@ plt.ylabel("Embedded Coordinate")
 plt.savefig(output_dir + "comparison_pruned_LTSA.svg")
 plt.close(fig)
 
-write("Computing HLLE")
+write("Computing HLLE...")
 flush()
 t0 = time.time()
 feature_coords = LocallyLinearEmbedding(n_neighbors=neighbors_k, n_components=target_dim, n_jobs=-1, method="hessian").fit_transform(points)
@@ -941,12 +958,21 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
+method_errs["HLLE"] = pairwiseDistErr(feature_coords, true_parameters)
+print "HLLE Error: %f" % method_errs["HLLE"]
+
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from HLLE", 50)))
 plt.xlabel("Actual Parameter Value")
 plt.ylabel("Embedded Coordinate")
 plt.savefig(output_dir + "comparison_HLLE.svg")
+plt.close(fig)
+
+from visualization.error_plots import relativeErrorBarChart
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+relativeErrorBarChart(ax, method_errs)
+plt.savefig(output_dir + "reconstruction_error.svg")
 plt.close(fig)
 
 write("Creating combined image...")
