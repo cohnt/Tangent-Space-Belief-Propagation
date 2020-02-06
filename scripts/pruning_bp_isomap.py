@@ -890,9 +890,8 @@ for i in range(num_methods):
 	write("Done! dt=%f\n" % (t1-t0))
 	flush()
 
-	if name != "t-SNE":
-		method_errs[name] = pairwiseDistErr(feature_coords, true_parameters, dist_metric=err_dist_metric, mat_norm=err_mat_norm)
-		print "%s Error: %f" % (name, method_errs[name])
+	method_errs[name] = pairwiseDistErr(feature_coords, true_parameters, dist_metric=err_dist_metric, mat_norm=err_mat_norm)
+	print "%s Error: %f" % (name, method_errs[name])
 
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 	ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
@@ -979,6 +978,7 @@ plt.ylabel("Embedded Coordinate")
 plt.savefig(output_dir + "comparison_HLLE.svg")
 plt.close(fig)
 
+method_errs.pop("t-SNE")
 from visualization.error_plots import relativeErrorBarChart
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 relativeErrorBarChart(ax, method_errs)
