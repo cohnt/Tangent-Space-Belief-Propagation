@@ -978,7 +978,7 @@ plt.ylabel("Embedded Coordinate")
 plt.savefig(output_dir + "comparison_HLLE.svg")
 plt.close(fig)
 
-method_errs.pop("LTSA BTP")
+method_errs.pop("LTSA BPT")
 method_errs.pop("LTSA Pruning")
 from visualization.error_plots import relativeErrorBarChart
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
