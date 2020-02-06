@@ -16,9 +16,11 @@ from collections import OrderedDict
 global_t0 = time.time()
 
 dataset_name = "long_spiral_curve"
-dataset_seed = 4045775215 # np.random.randint(0, 2**32)
+# dataset_seed = 4045775215
+dataset_seed = np.random.randint(0, 2**32)
 num_points = 500    # Number of data points
-data_noise = 0.001 # How much noise is added to the data
+# data_noise = 0.0025 # How much noise is added to the data
+data_noise = 0
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1      # The number of dimensions the data is being reduced to
 
@@ -32,6 +34,8 @@ pruning_angle_thresh = np.cos(30.0 * np.pi / 180.0)
 
 output_dir = "results/"
 error_histogram_num_bins = num_points / 10
+err_dist_metric = "l2"
+err_mat_norm = "fro"
 
 embedding_name = "KernelPCA" # Could also be MDS
 kpca_eigen_solver = "auto"
@@ -81,6 +85,10 @@ f.write("embedding_method=%s\n" % embedding_name)
 f.write("embedding_eigen_solver=%s\n" % kpca_eigen_solver)
 f.write("embedding_tol=%s\n" % str(kpca_tol))
 f.write("embedding_max_iter=%d\n" % kpca_max_iter)
+
+f.write("\n[Evaluation]\n")
+f.write("err_dist_metric=%s\n" % err_dist_metric)
+f.write("err_mat_norm=%s\n" % err_mat_norm)
 
 f.write("\n[Display]\n")
 f.write("data_sp_rad=%s\n" % str(data_sp_rad))
@@ -838,7 +846,7 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
-tsbp_err = pairwiseDistErr(feature_coords, true_parameters)
+tsbp_err = pairwiseDistErr(feature_coords, true_parameters, dist_metric=err_dist_metric, mat_norm=err_mat_norm)
 print "TSBP Error: %f" % tsbp_err
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
@@ -884,7 +892,7 @@ for i in range(num_methods):
 	flush()
 
 	if name != "t-SNE":
-		method_errs[name] = pairwiseDistErr(feature_coords, true_parameters)
+		method_errs[name] = pairwiseDistErr(feature_coords, true_parameters, dist_metric=err_dist_metric, mat_norm=err_mat_norm)
 		print "%s Error: %f" % (name, method_errs[name])
 
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
@@ -903,7 +911,7 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
-method_errs["LTSA"] = pairwiseDistErr(feature_coords, true_parameters)
+method_errs["LTSA"] = pairwiseDistErr(feature_coords, true_parameters, dist_metric=err_dist_metric, mat_norm=err_mat_norm)
 print "LTSA Error: %f" % method_errs["LTSA"]
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
@@ -922,7 +930,7 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
-method_errs["LTSA BPT"] = pairwiseDistErr(feature_coords, true_parameters)
+method_errs["LTSA BPT"] = pairwiseDistErr(feature_coords, true_parameters, dist_metric=err_dist_metric, mat_norm=err_mat_norm)
 print "LTSA BPT Error: %f" % method_errs["LTSA BPT"]
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
@@ -942,7 +950,7 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
-method_errs["LTSA Pruning"] = pairwiseDistErr(feature_coords, true_parameters)
+method_errs["LTSA Pruning"] = pairwiseDistErr(feature_coords, true_parameters, dist_metric=err_dist_metric, mat_norm=err_mat_norm)
 print "LTSA Pruning Error: %f" % method_errs["LTSA Pruning"]
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
@@ -961,7 +969,7 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
-method_errs["HLLE"] = pairwiseDistErr(feature_coords, true_parameters)
+method_errs["HLLE"] = pairwiseDistErr(feature_coords, true_parameters, dist_metric=err_dist_metric, mat_norm=err_mat_norm)
 print "HLLE Error: %f" % method_errs["HLLE"]
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
