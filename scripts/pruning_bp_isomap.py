@@ -16,8 +16,8 @@ from collections import OrderedDict
 global_t0 = time.time()
 
 dataset_name = "long_spiral_curve"
-dataset_seed = 4045775215
-# dataset_seed = np.random.randint(0, 2**32)
+# dataset_seed = 4045775215
+dataset_seed = np.random.randint(0, 2**32)
 num_points = 500    # Number of data points
 data_noise = 0.001 # How much noise is added to the data
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
@@ -978,7 +978,6 @@ plt.ylabel("Embedded Coordinate")
 plt.savefig(output_dir + "comparison_HLLE.svg")
 plt.close(fig)
 
-method_errs.pop("t-SNE")
 from visualization.error_plots import relativeErrorBarChart
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 relativeErrorBarChart(ax, method_errs)
