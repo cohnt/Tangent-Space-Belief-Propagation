@@ -896,7 +896,7 @@ for i in range(num_methods):
 
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 	ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
-	ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from %s" % name, 50)))
+	ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from %s\n Reconstruction Error: %f" % (name, method_errs[name]), 50)))
 	plt.xlabel("Actual Parameter Value")
 	plt.ylabel("Embedded Coordinate")
 	plt.savefig(output_dir + ("comparison_%s.svg" % name))
@@ -915,7 +915,7 @@ print "LTSA Error: %f" % method_errs["LTSA"]
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
-ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Classical LTSA", 50)))
+ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Classical LTSA\n Reconstruction Error: %f" % method_errs["LTSA"], 50)))
 plt.xlabel("Actual Parameter Value")
 plt.ylabel("Embedded Coordinate")
 plt.savefig(output_dir + "comparison_orig_LTSA.svg")
@@ -934,7 +934,7 @@ print "LTSA BPT Error: %f" % method_errs["LTSA BPT"]
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
-ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction", 50)))
+ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction\n Reconstruction Error: %f" % method_errs["LTSA BPT"], 50)))
 plt.xlabel("Actual Parameter Value")
 plt.ylabel("Embedded Coordinate")
 plt.savefig(output_dir + "comparison_corrected_LTSA.svg")
@@ -954,7 +954,7 @@ print "LTSA Pruning Error: %f" % method_errs["LTSA Pruning"]
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
-ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction and Edge Pruning", 50)))
+ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction and Edge Pruning\n Reconstruction Error: %f" % method_errs["LTSA Pruning"], 50)))
 plt.xlabel("Actual Parameter Value")
 plt.ylabel("Embedded Coordinate")
 plt.savefig(output_dir + "comparison_pruned_LTSA.svg")
@@ -973,7 +973,7 @@ print "HLLE Error: %f" % method_errs["HLLE"]
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
-ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from HLLE", 50)))
+ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from HLLE\n Reconstruction Error: %f" % method_errs["HLLE"], 50)))
 plt.xlabel("Actual Parameter Value")
 plt.ylabel("Embedded Coordinate")
 plt.savefig(output_dir + "comparison_HLLE.svg")
