@@ -89,7 +89,7 @@ flush()
 
 from sklearn.manifold import TSNE
 
-perplexity_range = np.arange(5, 50+0.5, 0.5)
+perplexity_range = np.array([5, 10, 15, 20, 25, 30, 35, 40, 45, 50])
 learning_rate_range = np.array([10, 15, 20, 25, 50, 100, 150, 200, 250, 500, 750, 1000], dtype=float)
 
 for perplexity in perplexity_range:
