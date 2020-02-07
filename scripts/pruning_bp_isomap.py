@@ -17,6 +17,7 @@ global_t0 = time.time()
 
 dataset_name = "long_spiral_curve"
 # dataset_seed = 4045775215
+# dataset_seed = 4015005259
 dataset_seed = np.random.randint(0, 2**32)
 num_points = 500    # Number of data points
 data_noise = 0.001 # How much noise is added to the data
