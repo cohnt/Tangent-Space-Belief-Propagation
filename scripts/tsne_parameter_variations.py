@@ -91,10 +91,11 @@ from sklearn.manifold import TSNE
 
 perplexity_range = np.array([5, 10, 15, 20, 25, 30, 35, 40, 45, 50])
 learning_rate_range = np.array([10, 15, 20, 25, 50, 100, 150, 200, 250, 500, 750, 1000], dtype=float)
+num_runs = 3
 
 for perplexity in perplexity_range:
 	for learning_rate in learning_rate_range:
-		for test_num in range(0, 10):
+		for test_num in range(0, num_runs):
 			tsne = TSNE(n_components=target_dim, perplexity=perplexity, learning_rate=learning_rate, init="random")
 
 			write("Computing perplexity %.1f\tlearning_rate %.1f\ttest_num %d..." % (perplexity, learning_rate, test_num))
@@ -105,7 +106,7 @@ for perplexity in perplexity_range:
 			write("Done! dt=%f\n" % (t1-t0))
 			flush()
 
-			err = pairwiseDistErr(feature_coords, true_parameters, dist_metric=err_dist_metric, mat_norm=err_mat_norm)
+			err = pairwiseDistErr(feature_coords, true_parameters, normalize_data=True, dist_metric=err_dist_metric, mat_norm=err_mat_norm)
 			print "Embedding error: %f" % err
 
 			fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
@@ -126,7 +127,7 @@ for perplexity in perplexity_range:
 		write("Done! dt=%f\n" % (t1-t0))
 		flush()
 
-		err = pairwiseDistErr(feature_coords, true_parameters, dist_metric=err_dist_metric, mat_norm=err_mat_norm)
+		err = pairwiseDistErr(feature_coords, true_parameters, normalize_data=True, dist_metric=err_dist_metric, mat_norm=err_mat_norm)
 		print "Embedding error: %f" % err
 
 		fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
