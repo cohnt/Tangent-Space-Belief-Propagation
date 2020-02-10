@@ -85,7 +85,7 @@ def increaseDimensionMatrix(old_dimension, new_dimension):
 
 from sklearn.metrics import pairwise_distances
 from sklearn.preprocessing import normalize
-def pairwiseDistErr(embedded_points, true_parameters, normalize_data=False, dist_metric="l2", mat_norm="fro"):
+def pairwiseDistErr(embedded_points, true_parameters, normalize_data=False, normalize_dists=True, dist_metric="l2", mat_norm="fro"):
 	embedded_dists = None
 	true_dists = None
 	if normalize_data:
@@ -94,5 +94,10 @@ def pairwiseDistErr(embedded_points, true_parameters, normalize_data=False, dist
 	else:
 		embedded_dists = pairwise_distances(embedded_points, metric=dist_metric, n_jobs=-1)
 		true_dists = pairwise_distances(true_parameters, metric=dist_metric, n_jobs=-1)
-	err = np.linalg.norm(embedded_dists - true_dists, ord=mat_norm, axis=None)
+
+	err = None
+	if normalize_dists:
+		err = np.linalg.norm((embedded_dists/np.max(embedded_dists)) - (true_dists/np.max(true_dists)), ord=mat_norm, axis=None)
+	else:
+		err = np.linalg.norm(embedded_dists - true_dists, ord=mat_norm, axis=None)
 	return err
