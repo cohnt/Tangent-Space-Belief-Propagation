@@ -848,7 +848,7 @@ method_errs["TSBP"] = tsbp_err
 write("\nComparing to other methods...\n")
 flush()
 
-from sklearn.manifold import LocallyLinearEmbedding, MDS, Isomap, SpectralEmbedding
+from sklearn.manifold import LocallyLinearEmbedding, MDS, Isomap, SpectralEmbedding, TSNE
 from ltsa import compute_ltsa
 
 methods = []
@@ -856,9 +856,10 @@ methods.append(LocallyLinearEmbedding(n_neighbors=neighbors_k, n_components=targ
 methods.append(MDS(n_components=target_dim, n_jobs=-1))
 methods.append(Isomap(n_neighbors=neighbors_k, n_components=target_dim, n_jobs=-1))
 methods.append(SpectralEmbedding(n_components=target_dim, n_neighbors=neighbors_k, n_jobs=-1))
+methods.append(TSNE(n_components=target_dim))
 num_methods = len(methods)
 
-method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding"]
+method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding", "t-SNE"]
 
 for i in range(num_methods):
 	solver = methods[i]
@@ -973,7 +974,7 @@ t0 = time.time()
 
 matplotlib.rcParams.update({'font.size': 6})
 
-fig, axes = plt.subplots(nrows=2, ncols=4, figsize=(19.2, 10.8), dpi=100)
+fig, axes = plt.subplots(nrows=3, ncols=3, figsize=(19.2, 10.8), dpi=100)
 plt.tight_layout(pad=5, h_pad=10, w_pad=5)
 axes_list = np.concatenate(axes)
 
@@ -986,23 +987,23 @@ for i in range(num_methods):
 	axes_list[i].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from %s" % name, 25)))
 
 feature_coords = compute_ltsa(points, neighbor_dict, observations, source_dim, target_dim)
-axes_list[4].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
-axes_list[4].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Classical LTSA", 25)))
+axes_list[5].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
+axes_list[5].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Classical LTSA", 25)))
 
 feature_coords = compute_ltsa(points, neighbor_dict, mle_bases, source_dim, target_dim)
-axes_list[5].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
-axes_list[5].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction", 25)))
+axes_list[6].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
+axes_list[6].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction", 25)))
 
 feature_coords = compute_ltsa(points, pruned_neighbor_dict, mle_bases, source_dim, target_dim)
-axes_list[6].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
-axes_list[6].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction and Edge Pruning", 25)))
+axes_list[7].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
+axes_list[7].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction and Edge Pruning", 25)))
 
 # mds = MDS(n_components=target_dim, max_iter=3000, eps=1e-9, n_init=25, dissimilarity="precomputed", n_jobs=-1)
 # feature_coords = mds.fit_transform(shortest_distances)
 kpca = KernelPCA(n_components=target_dim, kernel="precomputed", eigen_solver=kpca_eigen_solver, tol=kpca_tol, max_iter=kpca_max_iter, n_jobs=-1)
 feature_coords = kpca.fit_transform((shortest_distances**2) * -0.5)
-axes_list[7].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
-axes_list[7].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from BP Tangent Correction for Edge Pruning", 25)))
+axes_list[8].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
+axes_list[8].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from BP Tangent Correction for Edge Pruning", 25)))
 
 for i in range(8):
 	axes_list[i].set_xlabel("Actual Parameter Value")
