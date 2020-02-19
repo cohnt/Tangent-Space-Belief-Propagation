@@ -41,11 +41,13 @@ for landmark in landmark_coords:
 	print landmark
 
 # Build up a list of points to measure at
-x_vals = np.linspace(0, 10, num=41)
-y_vals = np.linspace(0, 10, num=41)
+x_vals = np.linspace(0, 10, num=21)
+y_vals = np.linspace(0, 10, num=21)
 xx, yy = np.meshgrid(x_vals, y_vals)
 points = np.stack((np.ravel(xx), np.ravel(yy)), axis=-1)
-points = points[np.random.choice(range(len(points)), 100, replace=False)]
+# points = points[np.random.choice(range(len(points)), 400, replace=False)]
+mask = np.logical_or(np.logical_or(points[:,1] > 8.5, points[:,1] < 5.5), np.logical_or(points[:,0] > 7, points[:,0] < 3))
+points = points[mask]
 num_points = len(points)
 
 range_data = np.zeros((num_points, num_landmarks))
