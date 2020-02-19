@@ -95,8 +95,12 @@ def pairwiseDistErr(embedded_points, true_parameters, normalize_data=True, norma
 		embedded_dists = pairwise_distances(embedded_points, metric=dist_metric, n_jobs=-1)
 		true_dists = pairwise_distances(true_parameters, metric=dist_metric, n_jobs=-1)
 	err = None
-	if normalize_dists:
-		err = np.linalg.norm((embedded_dists/np.max(embedded_dists)) - (true_dists/np.max(true_dists)), ord=mat_norm, axis=None)
+	if mat_norm == "max":
+		return np.max(embedded_dists - true_dists)
 	else:
-		err = np.linalg.norm(embedded_dists - true_dists, ord=mat_norm, axis=None)
-	return err
+		#
+		if normalize_dists:
+			err = np.linalg.norm((embedded_dists/np.max(embedded_dists)) - (true_dists/np.max(true_dists)), ord=mat_norm, axis=None)
+		else:
+			err = np.linalg.norm(embedded_dists - true_dists, ord=mat_norm, axis=None)
+		return err
