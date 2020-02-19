@@ -94,3 +94,4 @@
 
 * https://docs.scipy.org/doc/numpy/reference/generated/numpy.triu_indices.html
 * https://docs.scipy.org/doc/numpy/reference/generated/numpy.linalg.norm.html
+* https://stackoverflow.com/questions/42438370/create-all-x-y-pairs-from-two-coordinate-arrays
