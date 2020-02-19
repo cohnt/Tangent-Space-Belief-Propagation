@@ -15,24 +15,24 @@ embedding_point_radius = 7.0
 # 	np.array([0.,10.])
 # ]
 # num_landmarks = len(landmark_coords)
-# landmark_coords = []
-# num_landmarks = 3
-# for _ in range(num_landmarks):
-# 	landmark_coords.append(np.random.uniform(low=0.0, high=10.0, size=(2)))
-landmark_coords = [
-	np.array([6.93128243, 2.88532531]),
-	np.array([3.54094086, 5.58023536]),
-	np.array([1.46209511, 9.62733474])
-]
-num_landmarks = len(landmark_coords)
+landmark_coords = []
+num_landmarks = 4
+for _ in range(num_landmarks):
+	landmark_coords.append(np.random.uniform(low=0.0, high=10.0, size=(2)))
+# landmark_coords = [
+# 	np.array([6.93128243, 2.88532531]),
+# 	np.array([3.54094086, 5.58023536]),
+# 	np.array([1.46209511, 9.62733474])
+# ]
+# num_landmarks = len(landmark_coords)
 
 print "Landmarks:"
 for landmark in landmark_coords:
 	print landmark
 
 # Build up a list of points to measure at
-x_vals = np.linspace(0, 10, num=41)
-y_vals = np.linspace(0, 10, num=41)
+x_vals = np.linspace(0, 10, num=21)
+y_vals = np.linspace(0, 10, num=21)
 xx, yy = np.meshgrid(x_vals, y_vals)
 points = np.stack((np.ravel(xx), np.ravel(yy)), axis=-1)
 num_points = len(points)
