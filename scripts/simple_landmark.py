@@ -3,7 +3,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-neighbors_k = 8
+neighbors_k = 5
 
 output_dir = "results_landmark/"
 
@@ -31,17 +31,18 @@ for landmark in landmark_coords:
 	print landmark
 
 # Build up a list of points to measure at
-x_vals = np.linspace(0, 10, num=21)
-y_vals = np.linspace(0, 10, num=21)
+x_vals = np.linspace(0, 10, num=41)
+y_vals = np.linspace(0, 10, num=41)
 xx, yy = np.meshgrid(x_vals, y_vals)
 points = np.stack((np.ravel(xx), np.ravel(yy)), axis=-1)
+points = points[np.random.choice(range(len(points)), 400, replace=False)]
 num_points = len(points)
 
 range_data = np.zeros((num_points, num_landmarks))
 
 def noise():
-	# return np.random.uniform(low=-0.5, high=0.5)
-	return np.random.normal(loc=0.0, scale=0.5)
+	return np.random.uniform(low=-0.5, high=0.5)
+	# return np.random.normal(loc=0.0, scale=0.5)
 
 for i in range(num_points):
 	for j in range(num_landmarks):
@@ -111,7 +112,7 @@ num_iters = 10
 explore_perc = 0
 
 message_resample_cov = np.eye(target_dim) * 0.01 # TODO: Change
-pruning_angle_thresh = np.cos(60.0 * np.pi / 180.0)
+pruning_angle_thresh = np.cos(89.0 * np.pi / 180.0)
 ts_noise_variance = 0.01 # In degrees
 
 embedding_name = "KernelPCA" # Could also be MDS
@@ -544,6 +545,7 @@ for i in range(num_points):
 	max_ind = np.argmax(belief[i].weights)
 	mle_bases[i] = belief[i].ts[max_ind]
 
+num_pruned = 0
 pruned_neighbors = scipy.sparse.lil_matrix(neighbor_graph)
 for i in range(0, num_points):
 	for j in range(0, num_points):
@@ -555,10 +557,13 @@ for i in range(0, num_points):
 			if dprod < pruning_angle_thresh:
 				pruned_neighbors[i,j] = 0
 				pruned_neighbors[j,i] = 0
+				num_pruned = num_pruned + 1
 
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
+
+print "Pruned %d edges!" % num_pruned
 
 write("Connecting graph...\n")
 flush()
