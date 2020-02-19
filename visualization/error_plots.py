@@ -30,7 +30,7 @@ def regressionErrorCharacteristic(ax, embedded_points, true_parameters, dist_met
 
 	num_points = err_mat.shape[0]
 	x_vals = np.sort(err_mat[np.triu_indices(num_points)])
-	y_vals = np.arange(1, num_points+1) / float(num_points)
+	y_vals = np.arange(1, len(x_vals)+1) / float(len(x_vals))
 	ax.scatter(x_vals, y_vals)
 	ax.set_xlim(left=0, right=np.max(err_mat))
 	ax.set_ylim(bottom=0, top=1)
