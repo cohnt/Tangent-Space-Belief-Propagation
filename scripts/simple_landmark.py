@@ -46,7 +46,7 @@ y_vals = np.linspace(0, 10, num=21)
 xx, yy = np.meshgrid(x_vals, y_vals)
 points = np.stack((np.ravel(xx), np.ravel(yy)), axis=-1)
 # points = points[np.random.choice(range(len(points)), 400, replace=False)]
-mask = np.logical_or(np.logical_or(points[:,1] > 8.5, points[:,1] < 5.5), np.logical_or(points[:,0] > 7, points[:,0] < 3))
+mask = np.logical_or(np.logical_or(points[:,1] > 8.5, points[:,1] < 4.5), np.logical_or(points[:,0] > 8, points[:,0] < 2))
 points = points[mask]
 num_points = len(points)
 
