@@ -18,4 +18,4 @@ def autolabel(ax, rects, xpos='center'):
 	for rect in rects:
 		height = rect.get_height()
 		ax.text(rect.get_x() + rect.get_width()*offset[xpos], 1.01*height,
-		        '{0:.2f}'.format(height), ha=ha[xpos], va='bottom', size=10)
+		        '{0:.4f}'.format(height), ha=ha[xpos], va='bottom', size=10)
