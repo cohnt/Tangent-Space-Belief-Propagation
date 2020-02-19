@@ -97,6 +97,10 @@ def pairwiseDistErr(embedded_points, true_parameters, normalize_data=True, norma
 	err = None
 	if mat_norm == "max":
 		return np.max(embedded_dists - true_dists)
+	elif mat_norm == "mean":
+		return np.mean(embedded_dists - true_dists)
+	elif mat_norm == "median":
+		return np.median(embedded_dists - true_dists)
 	else:
 		#
 		if normalize_dists:
