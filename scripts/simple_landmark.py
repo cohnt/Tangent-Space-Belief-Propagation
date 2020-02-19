@@ -54,13 +54,8 @@ plt.show()
 from utils import pairwiseDistErr
 from visualization.error_plots import regressionErrorCharacteristic, listRegressionErrorCharacteristic
 
-# max_err = pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="max")
-# print "Maximum error: %f" % max_err
-
-# fig, ax = plt.subplots()
-# regressionErrorCharacteristic(ax, feature_coords, points, dist_metric="l2")
-# ax.set_title("Regression Error Characteristic")
-# plt.show()
+isomap_error = pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="max")
+isomap_feature_coords = feature_coords.copy()
 
 ################
 
@@ -642,4 +637,10 @@ flush()
 fig, axes = plt.subplots(nrows=1, ncols=2)
 axes[0].scatter(feature_coords[:,0], feature_coords[:,1], c=points[:,0]/10.0, cmap=plt.cm.Spectral)
 axes[1].scatter(feature_coords[:,0], feature_coords[:,1], c=points[:,1]/10.0, cmap=plt.cm.Spectral)
+plt.show()
+
+##################
+
+fig, ax = plt.subplots()
+listRegressionErrorCharacteristic(ax, [isomap_feature_coords, feature_coords, points], points, ["ISOMAP", "TSBP", "Ground Truth"], dist_metric="l2")
 plt.show()
