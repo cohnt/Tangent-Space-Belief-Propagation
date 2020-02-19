@@ -15,16 +15,26 @@ embedding_point_radius = 7.0
 # 	np.array([0.,10.])
 # ]
 # num_landmarks = len(landmark_coords)
-landmark_coords = []
-num_landmarks = 4
-for _ in range(num_landmarks):
-	landmark_coords.append(np.random.uniform(low=0.0, high=10.0, size=(2)))
+
+# landmark_coords = []
+# num_landmarks = 4
+# for _ in range(num_landmarks):
+# 	landmark_coords.append(np.random.uniform(low=0.0, high=10.0, size=(2)))
+
 # landmark_coords = [
 # 	np.array([6.93128243, 2.88532531]),
 # 	np.array([3.54094086, 5.58023536]),
 # 	np.array([1.46209511, 9.62733474])
 # ]
 # num_landmarks = len(landmark_coords)
+
+landmark_coords = [
+	np.array([6.98200123, 6.30701217]),
+	np.array([6.72636139, 6.84291166]),
+	np.array([3.45049685, 6.74195935]),
+	np.array([9.48523194, 5.73978978])
+]
+num_landmarks = len(landmark_coords)
 
 print "Landmarks:"
 for landmark in landmark_coords:
