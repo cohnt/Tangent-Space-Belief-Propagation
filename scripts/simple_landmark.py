@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+neighbors_k = 8
+
 # landmark_coords = [
 # 	np.array([0., 0.]),
 # 	np.array([5., 5.]),
@@ -17,8 +19,8 @@ for landmark in landmark_coords:
 	print landmark
 
 # Build up a list of points to measure at
-x_vals = np.linspace(0, 10, num=41)
-y_vals = np.linspace(0, 10, num=41)
+x_vals = np.linspace(0, 10, num=21)
+y_vals = np.linspace(0, 10, num=21)
 xx, yy = np.meshgrid(x_vals, y_vals)
 points = np.stack((np.ravel(xx), np.ravel(yy)), axis=-1)
 num_points = len(points)
@@ -35,7 +37,7 @@ for i in range(num_points):
 
 from sklearn.manifold import LocallyLinearEmbedding, MDS, Isomap, SpectralEmbedding, TSNE
 
-method = Isomap(n_neighbors=8, n_components=2, n_jobs=-1)
+method = Isomap(n_neighbors=neighbors_k, n_components=2, n_jobs=-1)
 feature_coords = method.fit_transform(range_data)
 
 fig, axes = plt.subplots(nrows=1, ncols=2)
@@ -46,10 +48,24 @@ plt.show()
 from utils import pairwiseDistErr
 from visualization.error_plots import regressionErrorCharacteristic, listRegressionErrorCharacteristic
 
-max_err = pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="max")
-print "Maximum error: %f" % max_err
+# max_err = pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="max")
+# print "Maximum error: %f" % max_err
 
-fig, ax = plt.subplots()
-regressionErrorCharacteristic(ax, feature_coords, points, dist_metric="l2")
-ax.set_title("Regression Error Characteristic")
+# fig, ax = plt.subplots()
+# regressionErrorCharacteristic(ax, feature_coords, points, dist_metric="l2")
+# ax.set_title("Regression Error Characteristic")
+# plt.show()
+
+from sklearn.neighbors import kneighbors_graph
+from visualization.plot_neighbors import plot_neighbors_2d
+from utils import sparseMatrixToDict, sparseMaximum
+
+neighbor_graph = kneighbors_graph(range_data, neighbors_k, mode="distance", n_jobs=-1)
+neighbor_graph = sparseMaximum(neighbor_graph, neighbor_graph.T)
+neighbor_dict = sparseMatrixToDict(neighbor_graph)
+neighbor_pair_list = [(key, value) for key, arr in neighbor_dict.items() for value in arr]
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+plot_neighbors_2d(points, points[:,0]/10.0, neighbor_graph, ax, show_labels=False)
+ax.set_title("Nearest Neighbors (k=%d)\n" % neighbors_k)
 plt.show()
