@@ -1,3 +1,4 @@
+import numpy as np
 import matplotlib.pyplot as plt
 
 def relativeErrorBarChart(ax, dict):
@@ -19,3 +20,19 @@ def autolabel(ax, rects, xpos='center'):
 		height = rect.get_height()
 		ax.text(rect.get_x() + rect.get_width()*offset[xpos], 1.01*height,
 		        '{0:.4f}'.format(height), ha=ha[xpos], va='bottom', size=10)
+
+from sklearn.metrics import pairwise_distances
+from sklearn.preprocessing import normalize
+def regressionErrorCharacteristic(ax, embedded_points, true_parameters, dist_metric="l2"):
+	embedded_dists = pairwise_distances(normalize(embedded_points, axis=0, copy=True), metric=dist_metric, n_jobs=-1)
+	true_dists = pairwise_distances(normalize(true_parameters, axis=0, copy=True), metric=dist_metric, n_jobs=-1)
+	err_mat = np.abs(embedded_dists - true_dists)
+
+	num_points = err_mat.shape[0]
+	x_vals = np.sort(err_mat[np.triu_indices(num_points)])
+	y_vals = np.arange(1, num_points+1) / float(num_points)
+	ax.scatter(x_vals, y_vals)
+	ax.set_xlim(left=0, right=np.max(err_mat))
+	ax.set_ylim(bottom=0, top=1)
+	ax.set_xlabel("Distance Error Threshold")
+	ax.set_ylabel("Proportion of Pairwise Distances")
