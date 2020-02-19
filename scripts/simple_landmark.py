@@ -54,8 +54,12 @@ plt.show()
 from utils import pairwiseDistErr
 from visualization.error_plots import regressionErrorCharacteristic, listRegressionErrorCharacteristic
 
-isomap_error = pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="max")
-print "ISOMAP error: %f" % isomap_error
+# isomap_error = pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="max")
+# print "ISOMAP error: %f" % isomap_error
+print "ISOMAP max error: %f" % pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="max")
+print "ISOMAP avg error: %f" % pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="mean")
+print "ISOMAP med error: %f" % pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="median")
+print "ISOMAP fro error: %f" % pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="fro")
 isomap_feature_coords = feature_coords.copy()
 
 ################
@@ -640,8 +644,12 @@ axes[0].scatter(feature_coords[:,0], feature_coords[:,1], c=points[:,0]/10.0, cm
 axes[1].scatter(feature_coords[:,0], feature_coords[:,1], c=points[:,1]/10.0, cmap=plt.cm.Spectral)
 plt.show()
 
-tsbp_error = pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="max")
-print "TSBP error: %f" % tsbp_error
+# tsbp_error = pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="max")
+# print "TSBP error: %f" % tsbp_error
+print "TSBP max error: %f" % pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="max")
+print "TSBP avg error: %f" % pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="mean")
+print "TSBP med error: %f" % pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="median")
+print "TSBP fro error: %f" % pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="fro")
 
 ##################
 
