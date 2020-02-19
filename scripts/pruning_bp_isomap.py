@@ -35,7 +35,7 @@ pruning_angle_thresh = np.cos(30.0 * np.pi / 180.0)
 output_dir = "results/"
 error_histogram_num_bins = num_points / 10
 err_dist_metric = "l2"
-err_mat_norm = "fro"
+err_mat_norm = "max"
 
 embedding_name = "KernelPCA" # Could also be MDS
 kpca_eigen_solver = "auto"

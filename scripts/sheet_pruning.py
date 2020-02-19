@@ -35,7 +35,7 @@ initial_variance = 30 # Degree
 output_dir = "results_sheet/"
 error_histogram_num_bins = num_points / 10
 err_dist_metric = "l2"
-err_mat_norm = "fro"
+err_mat_norm = "max"
 
 embedding_name = "KernelPCA" # Could also be MDS
 kpca_eigen_solver = "auto"
