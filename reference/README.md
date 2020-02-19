@@ -86,3 +86,8 @@
 
 * http://blog.davidecoppola.com/2015/02/how-to-create-git-submodule-from-repository-subdirectory/
 * https://scikit-learn.org/stable/modules/generated/sklearn.metrics.pairwise_distances.html
+
+### Numpy
+
+* https://docs.scipy.org/doc/numpy/reference/generated/numpy.triu_indices.html
+* https://docs.scipy.org/doc/numpy/reference/generated/numpy.linalg.norm.html
