@@ -660,9 +660,9 @@ print "TSBP fro error: %f" % pairwiseDistErr(feature_coords, true_vals, dist_met
 
 ##################
 
-# fig, ax = plt.subplots()
-# listRegressionErrorCharacteristic(ax, [isomap_feature_coords, feature_coords, points], points, ["ISOMAP", "TSBP", "Ground Truth"], dist_metric="l2")
-# plt.show()
+fig, ax = plt.subplots()
+listRegressionErrorCharacteristic(ax, [isomap_feature_coords, feature_coords, true_vals], true_vals, ["ISOMAP", "TSBP", "Ground Truth"], dist_metric="l2")
+plt.show()
 
 ##################
 
