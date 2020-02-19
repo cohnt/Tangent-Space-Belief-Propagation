@@ -662,7 +662,8 @@ print "TSBP fro error: %f" % pairwiseDistErr(feature_coords, true_vals, dist_met
 
 fig, ax = plt.subplots()
 listRegressionErrorCharacteristic(ax, [isomap_feature_coords, feature_coords, true_vals], true_vals, ["ISOMAP", "TSBP", "Ground Truth"], dist_metric="l2")
-plt.show()
+plt.savefig(output_dir + "rec.svg")
+plt.close(fig)
 
 ##################
 
@@ -670,3 +671,4 @@ fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
 axes[0].scatter(true_vals[:,0], true_vals[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
 axes[1].scatter(true_vals[:,0], true_vals[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
 plt.savefig(output_dir + "ideal_embedding.svg")
+plt.close(fig)
