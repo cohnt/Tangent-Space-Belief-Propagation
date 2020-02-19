@@ -1,7 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')
 
 neighbors_k = 8
+
+output_dir = "results_landmark/"
+
+embedding_point_radius = 7.0
 
 # landmark_coords = [
 # 	np.array([0., 0.]),
@@ -46,10 +52,11 @@ from sklearn.manifold import LocallyLinearEmbedding, MDS, Isomap, SpectralEmbedd
 method = Isomap(n_neighbors=neighbors_k, n_components=2, n_jobs=-1)
 feature_coords = method.fit_transform(range_data)
 
-fig, axes = plt.subplots(nrows=1, ncols=2)
-axes[0].scatter(feature_coords[:,0], feature_coords[:,1], c=points[:,0]/10.0, cmap=plt.cm.Spectral)
-axes[1].scatter(feature_coords[:,0], feature_coords[:,1], c=points[:,1]/10.0, cmap=plt.cm.Spectral)
-plt.show()
+fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
+axes[0].scatter(feature_coords[:,0], feature_coords[:,1], c=points[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+axes[1].scatter(feature_coords[:,0], feature_coords[:,1], c=points[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+plt.savefig(output_dir + "isomap_embedding.svg")
+plt.close(fig)
 
 from utils import pairwiseDistErr
 from visualization.error_plots import regressionErrorCharacteristic, listRegressionErrorCharacteristic
@@ -639,10 +646,10 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
-fig, axes = plt.subplots(nrows=1, ncols=2)
-axes[0].scatter(feature_coords[:,0], feature_coords[:,1], c=points[:,0]/10.0, cmap=plt.cm.Spectral)
-axes[1].scatter(feature_coords[:,0], feature_coords[:,1], c=points[:,1]/10.0, cmap=plt.cm.Spectral)
-plt.show()
+fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
+axes[0].scatter(feature_coords[:,0], feature_coords[:,1], c=points[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+axes[1].scatter(feature_coords[:,0], feature_coords[:,1], c=points[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+plt.savefig(output_dir + "tsbp_embedding.svg")
 
 # tsbp_error = pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="max")
 # print "TSBP error: %f" % tsbp_error
@@ -653,6 +660,13 @@ print "TSBP fro error: %f" % pairwiseDistErr(feature_coords, points, dist_metric
 
 ##################
 
-fig, ax = plt.subplots()
-listRegressionErrorCharacteristic(ax, [isomap_feature_coords, feature_coords, points], points, ["ISOMAP", "TSBP", "Ground Truth"], dist_metric="l2")
-plt.show()
+# fig, ax = plt.subplots()
+# listRegressionErrorCharacteristic(ax, [isomap_feature_coords, feature_coords, points], points, ["ISOMAP", "TSBP", "Ground Truth"], dist_metric="l2")
+# plt.show()
+
+##################
+
+fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
+axes[0].scatter(points[:,0], points[:,1], c=points[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+axes[1].scatter(points[:,0], points[:,1], c=points[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+plt.savefig(output_dir + "ideal_embedding.svg")
