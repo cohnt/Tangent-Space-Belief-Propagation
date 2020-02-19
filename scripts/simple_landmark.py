@@ -25,8 +25,8 @@ for landmark in landmark_coords:
 	print landmark
 
 # Build up a list of points to measure at
-x_vals = np.linspace(0, 10, num=21)
-y_vals = np.linspace(0, 10, num=21)
+x_vals = np.linspace(0, 10, num=41)
+y_vals = np.linspace(0, 10, num=41)
 xx, yy = np.meshgrid(x_vals, y_vals)
 points = np.stack((np.ravel(xx), np.ravel(yy)), axis=-1)
 num_points = len(points)
@@ -55,6 +55,7 @@ from utils import pairwiseDistErr
 from visualization.error_plots import regressionErrorCharacteristic, listRegressionErrorCharacteristic
 
 isomap_error = pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="max")
+print "ISOMAP error: %f" % isomap_error
 isomap_feature_coords = feature_coords.copy()
 
 ################
@@ -638,6 +639,9 @@ fig, axes = plt.subplots(nrows=1, ncols=2)
 axes[0].scatter(feature_coords[:,0], feature_coords[:,1], c=points[:,0]/10.0, cmap=plt.cm.Spectral)
 axes[1].scatter(feature_coords[:,0], feature_coords[:,1], c=points[:,1]/10.0, cmap=plt.cm.Spectral)
 plt.show()
+
+tsbp_error = pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="max")
+print "TSBP error: %f" % tsbp_error
 
 ##################
 
