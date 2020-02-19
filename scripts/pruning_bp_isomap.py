@@ -857,7 +857,7 @@ plt.ylabel("Embedded Coordinate")
 plt.savefig(output_dir + "coord_bp.svg")
 plt.close(fig)
 
-from visualization.error_plots import regressionErrorCharacteristic
+from visualization.error_plots import regressionErrorCharacteristic, listRegressionErrorCharacteristic
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 regressionErrorCharacteristic(ax, feature_coords, true_parameters, dist_metric=err_dist_metric)
@@ -871,6 +871,11 @@ plt.close(fig)
 
 method_errs = OrderedDict()
 method_errs["TSBP"] = tsbp_err
+
+embeddings_list = []
+embeddings_name_list = []
+embeddings_list.append(feature_coords)
+embeddings_name_list.append("TSBP")
 
 write("\nComparing to other methods...\n")
 flush()
@@ -902,6 +907,9 @@ for i in range(num_methods):
 	method_errs[name] = pairwiseDistErr(feature_coords, true_parameters, dist_metric=err_dist_metric, mat_norm=err_mat_norm)
 	print "%s Error: %f" % (name, method_errs[name])
 
+	embeddings_list.append(feature_coords)
+	embeddings_name_list.append(name)
+
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 	ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 	ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from %s\n Reconstruction Error: %f" % (name, method_errs[name]), 50)))
@@ -926,6 +934,9 @@ flush()
 
 method_errs["LTSA"] = pairwiseDistErr(feature_coords, true_parameters, dist_metric=err_dist_metric, mat_norm=err_mat_norm)
 print "LTSA Error: %f" % method_errs["LTSA"]
+
+embeddings_list.append(feature_coords)
+embeddings_name_list.append("LTSA")
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
@@ -1003,6 +1014,9 @@ flush()
 method_errs["HLLE"] = pairwiseDistErr(feature_coords, true_parameters, dist_metric=err_dist_metric, mat_norm=err_mat_norm)
 print "HLLE Error: %f" % method_errs["HLLE"]
 
+embeddings_list.append(feature_coords)
+embeddings_name_list.append("HLLE")
+
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from HLLE\n Reconstruction Error: %f" % method_errs["HLLE"], 50)))
@@ -1023,6 +1037,12 @@ from visualization.error_plots import relativeErrorBarChart
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 relativeErrorBarChart(ax, method_errs)
 plt.savefig(output_dir + "reconstruction_error.svg")
+plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+listRegressionErrorCharacteristic(ax, embeddings_list, true_parameters, embeddings_name_list, dist_metric=err_dist_metric)
+ax.set_title("\n".join(wrap("Regression Error Characteristic from All Methods", 50)))
+plt.savefig(output_dir + "rec_combined.svg")
 plt.close(fig)
 
 write("Creating combined image...")
