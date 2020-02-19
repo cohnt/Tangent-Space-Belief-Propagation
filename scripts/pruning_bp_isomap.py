@@ -857,6 +857,14 @@ plt.ylabel("Embedded Coordinate")
 plt.savefig(output_dir + "coord_bp.svg")
 plt.close(fig)
 
+from visualization.error_plots import regressionErrorCharacteristic
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+regressionErrorCharacteristic(ax, feature_coords, true_parameters, dist_metric=err_dist_metric)
+ax.set_title("\n".join(wrap("Regression Error Characteristic from BP Tangent Correction for Edge Pruning", 50)))
+plt.savefig(output_dir + "rec_coord_bp.svg")
+plt.close(fig)
+
 ############################
 # Compare to Other Methods #
 ############################
@@ -902,6 +910,12 @@ for i in range(num_methods):
 	plt.savefig(output_dir + ("comparison_%s.svg" % name))
 	plt.close(fig)
 
+	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+	regressionErrorCharacteristic(ax, feature_coords, true_parameters, dist_metric=err_dist_metric)
+	ax.set_title("\n".join(wrap("Regression Error Characteristic from %s" % name, 50)))
+	plt.savefig(output_dir + ("rec_%s.svg" % name))
+	plt.close(fig)
+
 write("Computing Classical LTSA...")
 flush()
 t0 = time.time()
@@ -921,6 +935,12 @@ plt.ylabel("Embedded Coordinate")
 plt.savefig(output_dir + "comparison_orig_LTSA.svg")
 plt.close(fig)
 
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+regressionErrorCharacteristic(ax, feature_coords, true_parameters, dist_metric=err_dist_metric)
+ax.set_title("\n".join(wrap("Regression Error Characteristic from Classical LTSA", 50)))
+plt.savefig(output_dir + "rec_orig_LTSA.svg")
+plt.close(fig)
+
 write("Computing LTSA with Tangent Space Correction...")
 flush()
 t0 = time.time()
@@ -938,6 +958,12 @@ ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from 
 plt.xlabel("Actual Parameter Value")
 plt.ylabel("Embedded Coordinate")
 plt.savefig(output_dir + "comparison_corrected_LTSA.svg")
+plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+regressionErrorCharacteristic(ax, feature_coords, true_parameters, dist_metric=err_dist_metric)
+ax.set_title("\n".join(wrap("Regression Error Characteristic from LTSA with Tangent Space Correction", 50)))
+plt.savefig(output_dir + "rec_corrected_LTSA.svg")
 plt.close(fig)
 
 write("Computing LTSA with Tangent Space Correction and Edge Pruning...")
@@ -960,6 +986,12 @@ plt.ylabel("Embedded Coordinate")
 plt.savefig(output_dir + "comparison_pruned_LTSA.svg")
 plt.close(fig)
 
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+regressionErrorCharacteristic(ax, feature_coords, true_parameters, dist_metric=err_dist_metric)
+ax.set_title("\n".join(wrap("Regression Error Characteristic from LTSA with Tangent Space Correction and Edge Pruning", 50)))
+plt.savefig(output_dir + "rec_pruned_LTSA.svg")
+plt.close(fig)
+
 write("Computing HLLE...")
 flush()
 t0 = time.time()
@@ -977,6 +1009,12 @@ ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from 
 plt.xlabel("Actual Parameter Value")
 plt.ylabel("Embedded Coordinate")
 plt.savefig(output_dir + "comparison_HLLE.svg")
+plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+regressionErrorCharacteristic(ax, feature_coords, true_parameters, dist_metric=err_dist_metric)
+ax.set_title("\n".join(wrap("Regression Error Characteristic from HLLE", 50)))
+plt.savefig(output_dir + "rec_HLLE.svg")
 plt.close(fig)
 
 method_errs.pop("LTSA BPT")
