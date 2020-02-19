@@ -3,7 +3,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-neighbors_k = 5
+neighbors_k = 6
 
 output_dir = "results_landmark/"
 
@@ -35,14 +35,14 @@ x_vals = np.linspace(0, 10, num=41)
 y_vals = np.linspace(0, 10, num=41)
 xx, yy = np.meshgrid(x_vals, y_vals)
 points = np.stack((np.ravel(xx), np.ravel(yy)), axis=-1)
-points = points[np.random.choice(range(len(points)), 400, replace=False)]
+points = points[np.random.choice(range(len(points)), 200, replace=False)]
 num_points = len(points)
 
 range_data = np.zeros((num_points, num_landmarks))
 
 def noise():
-	return np.random.uniform(low=-0.5, high=0.5)
-	# return np.random.normal(loc=0.0, scale=0.5)
+	# return np.random.uniform(low=-0.5, high=0.5)
+	return np.random.normal(loc=0.0, scale=0.1)
 
 for i in range(num_points):
 	for j in range(num_landmarks):
@@ -76,17 +76,18 @@ from sklearn.neighbors import kneighbors_graph
 from visualization.plot_neighbors import plot_neighbors_2d
 from utils import sparseMatrixToDict, sparseMaximum
 
-# neighbor_graph = kneighbors_graph(range_data, neighbors_k, mode="distance", n_jobs=-1)
-# neighbor_graph = sparseMaximum(neighbor_graph, neighbor_graph.T)
-# neighbor_dict = sparseMatrixToDict(neighbor_graph)
-# neighbor_pair_list = [(key, value) for key, arr in neighbor_dict.items() for value in arr]
+neighbor_graph = kneighbors_graph(range_data, neighbors_k, mode="distance", n_jobs=-1)
+neighbor_graph = sparseMaximum(neighbor_graph, neighbor_graph.T)
+neighbor_dict = sparseMatrixToDict(neighbor_graph)
+neighbor_pair_list = [(key, value) for key, arr in neighbor_dict.items() for value in arr]
 
-# fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-# plot_neighbors_2d(points, points[:,0]/10.0, neighbor_graph, ax, show_labels=False)
-# ax.set_title("Nearest Neighbors (k=%d)\n" % neighbors_k)
-# plt.show()
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+plot_neighbors_2d(points, points[:,0]/10.0, neighbor_graph, ax, show_labels=False)
+ax.set_title("Nearest Neighbors (k=%d)\n" % neighbors_k)
+plt.savefig(output_dir + "nearest_neighbors.svg")
+plt.close(fig)
 
-##################
+#################
 
 
 
@@ -106,13 +107,13 @@ from tqdm import tqdm
 target_dim = 2
 source_dim = num_landmarks
 
-num_samples = 5
-num_iters = 10
+num_samples = 10
+num_iters = 25
 
 explore_perc = 0
 
 message_resample_cov = np.eye(target_dim) * 0.01 # TODO: Change
-pruning_angle_thresh = np.cos(89.0 * np.pi / 180.0)
+pruning_angle_thresh = 0.9
 ts_noise_variance = 0.01 # In degrees
 
 embedding_name = "KernelPCA" # Could also be MDS
@@ -564,6 +565,12 @@ write("Done! dt=%f\n" % (t1-t0))
 flush()
 
 print "Pruned %d edges!" % num_pruned
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+plot_neighbors_2d(true_vals, points[:,0]/10.0, pruned_neighbors, ax, show_labels=False)
+ax.set_title("Pruned Nearest Neighbors")
+plt.savefig(output_dir + "pruned_neighbors.svg")
+plt.close(fig)
 
 write("Connecting graph...\n")
 flush()
