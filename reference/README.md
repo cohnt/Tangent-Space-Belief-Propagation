@@ -81,6 +81,9 @@
 * https://matplotlib.org/gallery/api/barchart.html
 * https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.tick_params.html
 * https://matplotlib.org/gallery/api/barchart.html
+* https://matplotlib.org/tutorials/intermediate/legend_guide.html
+* https://stackoverflow.com/questions/4971269/how-to-pick-a-new-color-for-each-plotted-line-within-a-figure-in-matplotlib
+* https://stackoverflow.com/questions/12236566/setting-different-color-for-each-series-in-scatter-plot-on-matplotlib
 
 ### Other
 
