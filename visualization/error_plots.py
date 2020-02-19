@@ -39,7 +39,7 @@ def regressionErrorCharacteristic(ax, embedded_points, true_parameters, dist_met
 	ax.set_ylabel("Proportion of Pairwise Distances")
 
 import matplotlib.cm as cm
-def listRegressionErrorCharacteristic(ax, embedded_points_list, true_parameters, name_list, dist_metric="l2", density=0.001):
+def listRegressionErrorCharacteristic(ax, embedded_points_list, true_parameters, name_list, dist_metric="l2", density=0.01):
 	max_err = 0
 	colors = cm.rainbow(np.linspace(0, 1, len(embedded_points_list)))
 	for i in range(len(embedded_points_list)):
