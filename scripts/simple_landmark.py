@@ -45,14 +45,14 @@ x_vals = np.linspace(0, 10, num=41)
 y_vals = np.linspace(0, 10, num=41)
 xx, yy = np.meshgrid(x_vals, y_vals)
 points = np.stack((np.ravel(xx), np.ravel(yy)), axis=-1)
-points = points[np.random.choice(range(len(points)), 200, replace=False)]
+points = points[np.random.choice(range(len(points)), 100, replace=False)]
 num_points = len(points)
 
 range_data = np.zeros((num_points, num_landmarks))
 
 def noise():
 	# return np.random.uniform(low=-0.5, high=0.5)
-	return np.random.normal(loc=0.0, scale=0.1)
+	return np.random.normal(loc=0.0, scale=0.0)
 
 for i in range(num_points):
 	for j in range(num_landmarks):
@@ -66,7 +66,7 @@ feature_coords = method.fit_transform(range_data)
 fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
 axes[0].scatter(feature_coords[:,0], feature_coords[:,1], c=points[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
 axes[1].scatter(feature_coords[:,0], feature_coords[:,1], c=points[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-plt.savefig(output_dir + "isomap_embedding.svg")
+plt.savefig(output_dir + "embedding_isomap.svg")
 plt.close(fig)
 
 from utils import pairwiseDistErr
@@ -242,13 +242,14 @@ def randomTangentSpaceList(num_samples, source_dim, target_dim):
 	return ts
 
 def noisifyTS(ts, var):
-	# rotMat = randomSmallRotation(source_dim, variance=var)
+	rotMat = randomSmallRotation(source_dim, variance=var)
+	return np.array([np.dot(rotMat, ts[0])])
 	# theta = np.random.normal(0, var) * np.pi / 180.0
 	# rotMat = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
-	noise_mat = np.random.normal(0, ts_noise_variance, ts.shape)
-	ts = ts + noise_mat
-	ts = scipy.linalg.orth(ts.T).T
-	return np.array(ts)
+	# noise_mat = np.random.normal(0, ts_noise_variance, ts.shape)
+	# ts = ts + noise_mat
+	# ts = scipy.linalg.orth(ts.T).T
+	# return np.array(ts)
 
 def noisifyTSList(ts_list, var=5):
 	for i in range(len(ts_list)):
@@ -671,7 +672,7 @@ flush()
 fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
 axes[0].scatter(feature_coords[:,0], feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
 axes[1].scatter(feature_coords[:,0], feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-plt.savefig(output_dir + "tsbp_embedding.svg")
+plt.savefig(output_dir + "embedding_tsbp.svg")
 
 # tsbp_error = pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="max")
 # print "TSBP error: %f" % tsbp_error
