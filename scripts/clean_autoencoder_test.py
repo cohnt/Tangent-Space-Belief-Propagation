@@ -5,6 +5,8 @@ from textwrap import wrap
 
 from autoencoder import Autoencoder
 
+matplotlib.rcParams.update({'font.size': 15})
+
 ############
 # 2D -> 1D #
 ############
@@ -28,7 +30,7 @@ from datasets.dim_2.eight_curve import make_eight_curve
 from datasets.dim_2.long_spiral_curve import make_long_spiral_curve
 from sklearn.preprocessing import MinMaxScaler
 
-points, color, true_tangents, dataset_seed = make_s_curve(num_points, data_noise, rs_seed=dataset_seed)
+points, color, true_tangents, true_parameters, dataset_seed = make_s_curve(num_points, data_noise, rs_seed=dataset_seed)
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(points[:,0], points[:,1], c=color, cmap=plt.cm.Spectral, s=data_sp_rad**2, zorder=2, linewidth=data_sp_lw)
@@ -72,7 +74,7 @@ target_dim = 1 # The number of dimensions the data is being reduced to
 from datasets.dim_3.helix_curve import make_helix_curve
 from datasets.dim_3.tight_spiral_curve import make_tight_spiral_curve
 
-points, color, true_tangents, dataset_seed = make_tight_spiral_curve(num_points, data_noise, rs_seed=dataset_seed)
+points, color, true_tangents, true_parameters, dataset_seed = make_tight_spiral_curve(num_points, data_noise, rs_seed=dataset_seed)
 fig = plt.figure(figsize=(14.4, 10.8), dpi=100)
 ax = fig.add_subplot(111, projection='3d')
 ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=data_sp_rad**2, linewidth=data_sp_lw)
@@ -126,7 +128,7 @@ def make3DFigure():
 	a.view_init(elev=disp_elev, azim=disp_azim)
 	return f, a
 
-points, color, true_tangents, dataset_seed = make_swiss_roll_sheet(num_points, data_noise, rs_seed=dataset_seed)
+points, color, true_tangents, true_parameters, dataset_seed = make_swiss_roll_sheet(num_points, data_noise, rs_seed=dataset_seed)
 fig, ax = make3DFigure()
 ax.scatter(points[:,0], points[:,1], points[:,2], c=color, cmap=plt.cm.Spectral, s=data_sp_rad**2, linewidth=data_sp_lw)
 ax.set_title("Dataset (num=%d, variance=%f, seed=%d)" % (num_points, data_noise, dataset_seed))

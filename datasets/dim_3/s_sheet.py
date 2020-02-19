@@ -54,13 +54,14 @@ def make_s_sheet(n_samples, noise_factor, rs_seed=None):
 	noise = rs.multivariate_normal(mean, cov, n_samples)
 
 	color = (t - tLowerBound) / (tUpperBound - tLowerBound)
+	params = np.matrix((s, t)).transpose()
 
-	return (data + noise, color, ts, rs_seed)
+	return (data + noise, color, ts, params, rs_seed)
 
 if __name__ == "__main__":
 	from mpl_toolkits.mplot3d import Axes3D
 	import matplotlib.pyplot as plt
-	data, color, ts, seed = make_s_sheet(500, 0.001)
+	data, color, ts, params, seed = make_s_sheet(500, 0.001)
 	fig = plt.figure()
 	ax = fig.add_subplot(111, projection='3d')
 	ax.scatter(data[:,0], data[:,1], data[:,2], c=color, cmap=plt.cm.Spectral)

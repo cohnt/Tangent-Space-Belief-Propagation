@@ -82,3 +82,29 @@ def increaseDimensionMatrix(old_dimension, new_dimension):
 	rotation_matrix = special_ortho_group.rvs(new_dimension)
 	final_matrix = np.matmul(expand_matrix, rotation_matrix)
 	return final_matrix
+
+from sklearn.metrics import pairwise_distances
+from sklearn.preprocessing import normalize
+def pairwiseDistErr(embedded_points, true_parameters, normalize_data=True, normalize_dists=False, dist_metric="l2", mat_norm="fro"):
+	embedded_dists = None
+	true_dists = None
+	if normalize_data:
+		embedded_dists = pairwise_distances(normalize(embedded_points, axis=0, copy=True), metric=dist_metric, n_jobs=-1)
+		true_dists = pairwise_distances(normalize(true_parameters, axis=0, copy=True), metric=dist_metric, n_jobs=-1)
+	else:
+		embedded_dists = pairwise_distances(embedded_points, metric=dist_metric, n_jobs=-1)
+		true_dists = pairwise_distances(true_parameters, metric=dist_metric, n_jobs=-1)
+	err = None
+	if mat_norm == "max":
+		return np.max(embedded_dists - true_dists)
+	elif mat_norm == "mean":
+		return np.mean(embedded_dists - true_dists)
+	elif mat_norm == "median":
+		return np.median(embedded_dists - true_dists)
+	else:
+		#
+		if normalize_dists:
+			err = np.linalg.norm((embedded_dists/np.max(embedded_dists)) - (true_dists/np.max(true_dists)), ord=mat_norm, axis=None)
+		else:
+			err = np.linalg.norm(embedded_dists - true_dists, ord=mat_norm, axis=None)
+		return err

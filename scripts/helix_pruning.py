@@ -10,7 +10,8 @@ import sys
 import copy
 from joblib import Parallel, delayed
 from tqdm import tqdm
-from utils import write, flush
+from utils import write, flush, pairwiseDistErr
+from collections import OrderedDict
 
 global_t0 = time.time()
 
@@ -32,6 +33,8 @@ ts_noise_variance = 30 # In degrees
 
 output_dir = "results_helix/"
 error_histogram_num_bins = num_points / 10
+err_dist_metric = "l2"
+err_mat_norm = "max"
 
 embedding_name = "KernelPCA" # Could also be MDS
 kpca_eigen_solver = "auto"
@@ -50,6 +53,8 @@ combined_sp_rad = 4.0
 combined_sp_lw = 0.5
 
 write("\n")
+
+matplotlib.rcParams.update({'font.size': 15})
 
 ####################
 # Write Parameters #
@@ -105,7 +110,7 @@ from mpl_toolkits.mplot3d import Axes3D
 write("Generating dataset...")
 flush()
 t0 = time.time()
-points, color, true_tangents, dataset_seed = make_tight_spiral_curve(num_points, data_noise, rs_seed=dataset_seed)
+points, color, true_tangents, true_parameters, dataset_seed = make_tight_spiral_curve(num_points, data_noise, rs_seed=dataset_seed)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
@@ -822,6 +827,9 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
+tsbp_err = pairwiseDistErr(feature_coords, true_parameters, dist_metric=err_dist_metric, mat_norm=err_mat_norm)
+print "TSBP Error: %f" % tsbp_err
+
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from BP Tangent Correction for Edge Pruning", 60)))
@@ -830,14 +838,30 @@ plt.ylabel("Embedded Coordinate")
 plt.savefig(output_dir + "coord_bp.svg")
 plt.close(fig)
 
+from visualization.error_plots import regressionErrorCharacteristic, listRegressionErrorCharacteristic
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+regressionErrorCharacteristic(ax, feature_coords, true_parameters, dist_metric=err_dist_metric)
+ax.set_title("\n".join(wrap("Regression Error Characteristic from BP Tangent Correction for Edge Pruning", 50)))
+plt.savefig(output_dir + "rec_coord_bp.svg")
+plt.close(fig)
+
 ############################
 # Compare to Other Methods #
 ############################
 
+method_errs = OrderedDict()
+method_errs["TSBP"] = tsbp_err
+
+embeddings_list = []
+embeddings_name_list = []
+embeddings_list.append(feature_coords)
+embeddings_name_list.append("TSBP")
+
 write("\nComparing to other methods...\n")
 flush()
 
-from sklearn.manifold import LocallyLinearEmbedding, MDS, Isomap, SpectralEmbedding
+from sklearn.manifold import LocallyLinearEmbedding, MDS, Isomap, SpectralEmbedding, TSNE
 from ltsa import compute_ltsa
 
 methods = []
@@ -845,9 +869,10 @@ methods.append(LocallyLinearEmbedding(n_neighbors=neighbors_k, n_components=targ
 methods.append(MDS(n_components=target_dim, n_jobs=-1))
 methods.append(Isomap(n_neighbors=neighbors_k, n_components=target_dim, n_jobs=-1))
 methods.append(SpectralEmbedding(n_components=target_dim, n_neighbors=neighbors_k, n_jobs=-1))
+methods.append(TSNE(n_components=target_dim))
 num_methods = len(methods)
 
-method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding"]
+method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding", "t-SNE"]
 
 for i in range(num_methods):
 	solver = methods[i]
@@ -859,6 +884,13 @@ for i in range(num_methods):
 	t1 = time.time()
 	write("Done! dt=%f\n" % (t1-t0))
 	flush()
+
+	method_errs[name] = pairwiseDistErr(feature_coords, true_parameters, dist_metric=err_dist_metric, mat_norm=err_mat_norm)
+	print "%s Error: %f" % (name, method_errs[name])
+
+	embeddings_list.append(feature_coords)
+	embeddings_name_list.append(name)
+	
 	
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 	ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
@@ -866,6 +898,12 @@ for i in range(num_methods):
 	plt.xlabel("Actual Parameter Value")
 	plt.ylabel("Embedded Coordinate")
 	plt.savefig(output_dir + ("comparison_%s.svg" % name))
+	plt.close(fig)
+
+	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+	regressionErrorCharacteristic(ax, feature_coords, true_parameters, dist_metric=err_dist_metric)
+	ax.set_title("\n".join(wrap("Regression Error Characteristic from %s" % name, 50)))
+	plt.savefig(output_dir + ("rec_%s.svg" % name))
 	plt.close(fig)
 
 write("Computing Classical LTSA...")
@@ -876,12 +914,24 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
+method_errs["LTSA"] = pairwiseDistErr(feature_coords, true_parameters, dist_metric=err_dist_metric, mat_norm=err_mat_norm)
+print "LTSA Error: %f" % method_errs["LTSA"]
+
+embeddings_list.append(feature_coords)
+embeddings_name_list.append("LTSA")
+
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Classical LTSA", 60)))
 plt.xlabel("Actual Parameter Value")
 plt.ylabel("Embedded Coordinate")
 plt.savefig(output_dir + "comparison_orig_LTSA.svg")
+plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+regressionErrorCharacteristic(ax, feature_coords, true_parameters, dist_metric=err_dist_metric)
+ax.set_title("\n".join(wrap("Regression Error Characteristic from Classical LTSA", 50)))
+plt.savefig(output_dir + "rec_orig_LTSA.svg")
 plt.close(fig)
 
 write("Computing LTSA with Tangent Space Correction...")
@@ -892,12 +942,21 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
+method_errs["LTSA BPT"] = pairwiseDistErr(feature_coords, true_parameters, dist_metric=err_dist_metric, mat_norm=err_mat_norm)
+print "LTSA BPT Error: %f" % method_errs["LTSA BPT"]
+
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction", 60)))
 plt.xlabel("Actual Parameter Value")
 plt.ylabel("Embedded Coordinate")
 plt.savefig(output_dir + "comparison_corrected_LTSA.svg")
+plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+regressionErrorCharacteristic(ax, feature_coords, true_parameters, dist_metric=err_dist_metric)
+ax.set_title("\n".join(wrap("Regression Error Characteristic from LTSA with Tangent Space Correction", 50)))
+plt.savefig(output_dir + "rec_corrected_LTSA.svg")
 plt.close(fig)
 
 write("Computing LTSA with Tangent Space Correction and Edge Pruning...")
@@ -909,6 +968,9 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
+method_errs["LTSA Pruning"] = pairwiseDistErr(feature_coords, true_parameters, dist_metric=err_dist_metric, mat_norm=err_mat_norm)
+print "LTSA Pruning Error: %f" % method_errs["LTSA Pruning"]
+
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction and Edge Pruning", 60)))
@@ -917,13 +979,61 @@ plt.ylabel("Embedded Coordinate")
 plt.savefig(output_dir + "comparison_pruned_LTSA.svg")
 plt.close(fig)
 
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+regressionErrorCharacteristic(ax, feature_coords, true_parameters, dist_metric=err_dist_metric)
+ax.set_title("\n".join(wrap("Regression Error Characteristic from LTSA with Tangent Space Correction and Edge Pruning", 50)))
+plt.savefig(output_dir + "rec_pruned_LTSA.svg")
+plt.close(fig)
+
+write("Computing HLLE...")
+flush()
+t0 = time.time()
+feature_coords = LocallyLinearEmbedding(n_neighbors=neighbors_k, n_components=target_dim, n_jobs=-1, method="hessian", eigen_solver="dense").fit_transform(points)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+method_errs["HLLE"] = pairwiseDistErr(feature_coords, true_parameters, dist_metric=err_dist_metric, mat_norm=err_mat_norm)
+print "HLLE Error: %f" % method_errs["HLLE"]
+
+embeddings_list.append(feature_coords)
+embeddings_name_list.append("HLLE")
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
+ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from HLLE\n Reconstruction Error: %f" % method_errs["HLLE"], 50)))
+plt.xlabel("Actual Parameter Value")
+plt.ylabel("Embedded Coordinate")
+plt.savefig(output_dir + "comparison_HLLE.svg")
+plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+regressionErrorCharacteristic(ax, feature_coords, true_parameters, dist_metric=err_dist_metric)
+ax.set_title("\n".join(wrap("Regression Error Characteristic from HLLE", 50)))
+plt.savefig(output_dir + "rec_HLLE.svg")
+plt.close(fig)
+
+method_errs.pop("LTSA BPT")
+method_errs.pop("LTSA Pruning")
+from visualization.error_plots import relativeErrorBarChart
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+relativeErrorBarChart(ax, method_errs)
+plt.savefig(output_dir + "reconstruction_error.svg")
+plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+listRegressionErrorCharacteristic(ax, embeddings_list, true_parameters, embeddings_name_list, dist_metric=err_dist_metric)
+ax.set_title("\n".join(wrap("Regression Error Characteristic from All Methods", 50)))
+plt.savefig(output_dir + "rec_combined.svg")
+plt.close(fig)
+
 write("Creating combined image...")
 flush()
 t0 = time.time()
 
 matplotlib.rcParams.update({'font.size': 6})
 
-fig, axes = plt.subplots(nrows=2, ncols=4, figsize=(19.2, 10.8), dpi=100)
+fig, axes = plt.subplots(nrows=3, ncols=3, figsize=(19.2, 10.8), dpi=100)
 plt.tight_layout(pad=5, h_pad=10, w_pad=5)
 axes_list = np.concatenate(axes)
 
@@ -936,23 +1046,23 @@ for i in range(num_methods):
 	axes_list[i].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from %s" % name, 25)))
 
 feature_coords = compute_ltsa(points, neighbor_dict, observations, source_dim, target_dim)
-axes_list[4].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
-axes_list[4].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Classical LTSA", 25)))
+axes_list[5].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
+axes_list[5].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Classical LTSA", 25)))
 
 feature_coords = compute_ltsa(points, neighbor_dict, mle_bases, source_dim, target_dim)
-axes_list[5].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
-axes_list[5].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction", 25)))
+axes_list[6].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
+axes_list[6].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction", 25)))
 
 feature_coords = compute_ltsa(points, pruned_neighbor_dict, mle_bases, source_dim, target_dim)
-axes_list[6].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
-axes_list[6].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction and Edge Pruning", 25)))
+axes_list[7].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
+axes_list[7].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction and Edge Pruning", 25)))
 
 # mds = MDS(n_components=target_dim, max_iter=3000, eps=1e-9, n_init=25, dissimilarity="precomputed", n_jobs=-1)
 # feature_coords = mds.fit_transform(shortest_distances)
 kpca = KernelPCA(n_components=target_dim, kernel="precomputed", eigen_solver=kpca_eigen_solver, tol=kpca_tol, max_iter=kpca_max_iter, n_jobs=-1)
 feature_coords = kpca.fit_transform((shortest_distances**2) * -0.5)
-axes_list[7].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
-axes_list[7].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from BP Tangent Correction for Edge Pruning", 25)))
+axes_list[8].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
+axes_list[8].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from BP Tangent Correction for Edge Pruning", 25)))
 
 for i in range(8):
 	axes_list[i].set_xlabel("Actual Parameter Value")

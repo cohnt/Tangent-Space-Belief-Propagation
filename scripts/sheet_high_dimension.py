@@ -53,6 +53,8 @@ disp_azim = -85.0
 
 write("\n")
 
+matplotlib.rcParams.update({'font.size': 15})
+
 def make3DFigure():
 	f = plt.figure(figsize=(14.4, 10.8), dpi=100)
 	a = f.add_subplot(111, projection='3d')
@@ -119,7 +121,7 @@ from mpl_toolkits.mplot3d import Axes3D
 write("Generating dataset...")
 flush()
 t0 = time.time()
-points, color, true_tangents, dataset_seed = make_swiss_roll_sheet(num_points, data_noise, rs_seed=dataset_seed)
+points, color, true_tangents, true_parameters, dataset_seed = make_swiss_roll_sheet(num_points, data_noise, rs_seed=dataset_seed)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
