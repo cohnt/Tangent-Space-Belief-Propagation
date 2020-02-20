@@ -139,10 +139,9 @@ methods.append(LocallyLinearEmbedding(n_neighbors=neighbors_k, n_components=targ
 methods.append(MDS(n_components=target_dim, n_jobs=-1))
 methods.append(Isomap(n_neighbors=neighbors_k, n_components=target_dim, n_jobs=-1))
 methods.append(SpectralEmbedding(n_components=target_dim, n_neighbors=neighbors_k, n_jobs=-1))
-methods.append(TSNE(n_components=target_dim))
 num_methods = len(methods)
 
-method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding", "t-SNE"]
+method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding"]
 
 embeddings_list = []
 embeddings_name_list = []
