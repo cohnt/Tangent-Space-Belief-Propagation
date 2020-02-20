@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+from collections import OrderedDict
 
 neighbors_k = 5
 
@@ -68,28 +69,6 @@ for i in range(num_points):
 	for j in range(num_landmarks):
 		range_data[i][j] = np.linalg.norm(points[i] - landmark_coords[j]) + noise()
 
-from sklearn.manifold import LocallyLinearEmbedding, MDS, Isomap, SpectralEmbedding, TSNE
-
-method = Isomap(n_neighbors=neighbors_k, n_components=2, n_jobs=-1)
-feature_coords = method.fit_transform(range_data)
-
-fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
-axes[0].scatter(feature_coords[:,0], feature_coords[:,1], c=points[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-axes[1].scatter(feature_coords[:,0], feature_coords[:,1], c=points[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-plt.savefig(output_dir + "embedding_isomap.svg")
-plt.close(fig)
-
-from utils import pairwiseDistErr
-from visualization.error_plots import regressionErrorCharacteristic, listRegressionErrorCharacteristic
-
-# isomap_error = pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="max")
-# print "ISOMAP error: %f" % isomap_error
-print "ISOMAP max error: %f" % pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="max")
-print "ISOMAP avg error: %f" % pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="mean")
-print "ISOMAP med error: %f" % pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="median")
-print "ISOMAP fro error: %f" % pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="fro")
-isomap_feature_coords = feature_coords.copy()
-
 ################
 
 from sklearn.neighbors import kneighbors_graph
@@ -133,7 +112,7 @@ num_iters = 25
 explore_perc = 0
 
 message_resample_cov = np.eye(target_dim) * 0.01 # TODO: Change
-pruning_angle_thresh = 0.7
+pruning_angle_thresh = 0.9
 ts_noise_variance = 0.01 # In degrees
 
 embedding_name = "KernelPCA" # Could also be MDS
@@ -145,6 +124,101 @@ kpca_max_iter = 3000
 true_vals = points.copy()
 points = range_data.copy()
 
+
+##########
+
+# COMPARISONS
+
+from utils import pairwiseDistErr
+from visualization.error_plots import regressionErrorCharacteristic, listRegressionErrorCharacteristic
+
+from sklearn.manifold import LocallyLinearEmbedding, MDS, Isomap, SpectralEmbedding, TSNE
+from ltsa import compute_ltsa
+
+methods = []
+methods.append(LocallyLinearEmbedding(n_neighbors=neighbors_k, n_components=target_dim, n_jobs=-1))
+methods.append(MDS(n_components=target_dim, n_jobs=-1))
+methods.append(Isomap(n_neighbors=neighbors_k, n_components=target_dim, n_jobs=-1))
+methods.append(SpectralEmbedding(n_components=target_dim, n_neighbors=neighbors_k, n_jobs=-1))
+num_methods = len(methods)
+
+method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding"]
+
+embeddings_list = []
+embeddings_name_list = []
+
+rec_max_errors = OrderedDict()
+rec_mean_errors = OrderedDict()
+rec_fro_errors = OrderedDict()
+
+for i in range(num_methods):
+	solver = methods[i]
+	name = method_names[i]
+	write("Computing %s..." % name)
+	flush()
+	t0 = time.time()
+	feature_coords = solver.fit_transform(points)
+	t1 = time.time()
+	write("Done! dt=%f\n" % (t1-t0))
+	flush()
+
+	embeddings_list.append(feature_coords)
+	embeddings_name_list.append(name)
+
+	fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
+	axes[0].scatter(feature_coords[:,0], feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	axes[1].scatter(feature_coords[:,0], feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	plt.savefig(output_dir + "embedding_%s_1.svg" % name)
+	plt.close(fig)
+
+	fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
+	axes[0].scatter(feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	axes[1].scatter(feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	plt.savefig(output_dir + "embedding_%s_2.svg" % name)
+	plt.close(fig)
+
+	fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
+	axes[0].scatter(-feature_coords[:,0], feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	axes[1].scatter(-feature_coords[:,0], feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	plt.savefig(output_dir + "embedding_%s_3.svg" % name)
+	plt.close(fig)
+
+	fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
+	axes[0].scatter(-feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	axes[1].scatter(-feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	plt.savefig(output_dir + "embedding_%s_4.svg" % name)
+	plt.close(fig)
+
+	print "%s max error: %f" % (name, pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="max"))
+	print "%s avg error: %f" % (name, pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="mean"))
+	print "%s med error: %f" % (name, pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="median"))
+	print "%s fro error: %f" % (name, pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="fro"))
+
+	rec_max_errors[name] = pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="max")
+	rec_mean_errors[name] = pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="mean")
+	rec_fro_errors[name] = pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="fro")
+
+############
+
+fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
+axes[0].scatter(true_vals[:,0], true_vals[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+axes[1].scatter(true_vals[:,0], true_vals[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+plt.savefig(output_dir + "ideal_embedding.svg")
+plt.close(fig)
+
+############################
+# Write Current Code State #
+############################
+import inspect
+import sys
+
+lines = inspect.getsourcelines(sys.modules[__name__])[0]
+
+f = open(output_dir + "code.py", "w")
+for index, line in enumerate(lines):
+	f.write("{:4d} {}".format(index + 1, line))
+
+f.close()
 
 #######################
 # k-Nearest-Neighbors #
@@ -654,6 +728,12 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+plot_neighbors_2d(true_vals, points[:,0]/10.0, pruned_neighbors, ax, show_labels=False)
+ax.set_title("Reconnected Nearest Neighbors")
+plt.savefig(output_dir + "added_edges.svg")
+plt.close(fig)
+
 from sklearn.utils.graph_shortest_path import graph_shortest_path
 write("Finding shortest paths...")
 flush()
@@ -706,17 +786,50 @@ print "TSBP avg error: %f" % pairwiseDistErr(feature_coords, true_vals, dist_met
 print "TSBP med error: %f" % pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="median")
 print "TSBP fro error: %f" % pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="fro")
 
+def ordered_dict_prepend(dct, key, value, dict_setitem=dict.__setitem__):
+	root = dct._OrderedDict__root
+	first = root[1]
+	if key in dct:
+		link = dct._OrderedDict__map[key]
+		link_prev, link_next, _ = link
+		link_prev[1] = link_next
+		link_next[0] = link_prev
+		link[0] = root
+		link[1] = first
+		root[1] = first[0] = link
+	else:
+		root[1] = first[0] = dct._OrderedDict__map[key] = [root, first, key]
+		dict_setitem(dct, key, value)
+
+ordered_dict_prepend(rec_max_errors, "TSBP", pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="max"))
+ordered_dict_prepend(rec_mean_errors, "TSBP", pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="mean"))
+ordered_dict_prepend(rec_fro_errors, "TSBP", pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="fro"))
+
+embeddings_list.insert(0, feature_coords)
+embeddings_name_list.insert(0, "TSBP")
+
 ##################
 
 fig, ax = plt.subplots()
-listRegressionErrorCharacteristic(ax, [isomap_feature_coords, feature_coords], true_vals, ["ISOMAP", "TSBP"], dist_metric="l2")
+listRegressionErrorCharacteristic(ax, embeddings_list, true_vals, embeddings_name_list, dist_metric="l2")
 plt.savefig(output_dir + "rec.svg")
 plt.close(fig)
 
 ##################
 
-fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
-axes[0].scatter(true_vals[:,0], true_vals[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-axes[1].scatter(true_vals[:,0], true_vals[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-plt.savefig(output_dir + "ideal_embedding.svg")
+from visualization.error_plots import relativeErrorBarChart
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+relativeErrorBarChart(ax, rec_max_errors, title="Maximum Pairwise Error by Manifold Learning Algorithm")
+plt.savefig(output_dir + "reconstruction_error_max.svg")
+plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+relativeErrorBarChart(ax, rec_mean_errors, title="Mean Pairwise Error by Manifold Learning Algorithm")
+plt.savefig(output_dir + "reconstruction_error_mean.svg")
+plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+relativeErrorBarChart(ax, rec_fro_errors, title="Frobenius Reconstruction Error by Manifold Learning Algorithm")
+plt.savefig(output_dir + "reconstruction_error_fro.svg")
 plt.close(fig)
