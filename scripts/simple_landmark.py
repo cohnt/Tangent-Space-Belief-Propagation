@@ -3,7 +3,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-neighbors_k = 6
+neighbors_k = 5
 
 output_dir = "results_landmark/"
 
@@ -682,7 +682,22 @@ flush()
 fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
 axes[0].scatter(feature_coords[:,0], feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
 axes[1].scatter(feature_coords[:,0], feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-plt.savefig(output_dir + "embedding_tsbp.svg")
+plt.savefig(output_dir + "embedding_tsbp_1.svg")
+
+fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
+axes[0].scatter(feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+axes[1].scatter(feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+plt.savefig(output_dir + "embedding_tsbp_2.svg")
+
+fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
+axes[0].scatter(-feature_coords[:,0], feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+axes[1].scatter(-feature_coords[:,0], feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+plt.savefig(output_dir + "embedding_tsbp_3.svg")
+
+fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
+axes[0].scatter(-feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+axes[1].scatter(-feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+plt.savefig(output_dir + "embedding_tsbp_4.svg")
 
 # tsbp_error = pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="max")
 # print "TSBP error: %f" % tsbp_error
