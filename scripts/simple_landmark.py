@@ -200,6 +200,12 @@ for i in range(num_methods):
 
 ############
 
+fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
+axes[0].scatter(true_vals[:,0], true_vals[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+axes[1].scatter(true_vals[:,0], true_vals[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+plt.savefig(output_dir + "ideal_embedding.svg")
+plt.close(fig)
+
 ############################
 # Write Current Code State #
 ############################
@@ -826,12 +832,4 @@ plt.close(fig)
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 relativeErrorBarChart(ax, rec_fro_errors, title="Frobenius Reconstruction Error by Manifold Learning Algorithm")
 plt.savefig(output_dir + "reconstruction_error_fro.svg")
-plt.close(fig)
-
-##################
-
-fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
-axes[0].scatter(true_vals[:,0], true_vals[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-axes[1].scatter(true_vals[:,0], true_vals[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-plt.savefig(output_dir + "ideal_embedding.svg")
 plt.close(fig)
