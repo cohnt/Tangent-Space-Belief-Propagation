@@ -700,6 +700,12 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+plot_neighbors_2d(true_vals, points[:,0]/10.0, pruned_neighbors, ax, show_labels=False)
+ax.set_title("Reconnected Nearest Neighbors")
+plt.savefig(output_dir + "added_edges.svg")
+plt.close(fig)
+
 from sklearn.utils.graph_shortest_path import graph_shortest_path
 write("Finding shortest paths...")
 flush()
