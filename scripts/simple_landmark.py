@@ -4,7 +4,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from collections import OrderedDict
 
-neighbors_k = 4
+neighbors_k = 5
 
 output_dir = "results_landmark/"
 
@@ -50,8 +50,8 @@ for landmark in landmark_coords:
 	print landmark
 
 # Build up a list of points to measure at
-x_vals = np.linspace(0, 10, num=15)
-y_vals = np.linspace(0, 10, num=15)
+x_vals = np.linspace(0, 10, num=25)
+y_vals = np.linspace(0, 10, num=25)
 xx, yy = np.meshgrid(x_vals, y_vals)
 points = np.stack((np.ravel(xx), np.ravel(yy)), axis=-1)
 # points = points[np.random.choice(range(len(points)), 400, replace=False)]
