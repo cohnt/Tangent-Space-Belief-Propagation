@@ -46,7 +46,7 @@ y_vals = np.linspace(0, 10, num=21)
 xx, yy = np.meshgrid(x_vals, y_vals)
 points = np.stack((np.ravel(xx), np.ravel(yy)), axis=-1)
 # points = points[np.random.choice(range(len(points)), 400, replace=False)]
-mask = np.logical_or(np.logical_or(points[:,1] > 8.5, points[:,1] < 4.5), np.logical_or(points[:,0] > 8, points[:,0] < 2))
+mask = np.logical_or(np.logical_or(points[:,1] > 8.5, points[:,1] < 3.5), np.logical_or(points[:,0] > 8, points[:,0] < 2))
 points = points[mask]
 num_points = len(points)
 
@@ -125,7 +125,7 @@ num_iters = 25
 explore_perc = 0
 
 message_resample_cov = np.eye(target_dim) * 0.01 # TODO: Change
-pruning_angle_thresh = 0.9
+pruning_angle_thresh = 0.7
 ts_noise_variance = 0.01 # In degrees
 
 embedding_name = "KernelPCA" # Could also be MDS
