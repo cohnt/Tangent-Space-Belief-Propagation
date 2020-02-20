@@ -800,17 +800,17 @@ plt.close(fig)
 from visualization.error_plots import relativeErrorBarChart
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-relativeErrorBarChart(ax, rec_max_errors)
+relativeErrorBarChart(ax, rec_max_errors, title="Maximum Pairwise Error by Manifold Learning Algorithm")
 plt.savefig(output_dir + "reconstruction_error_max.svg")
 plt.close(fig)
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-relativeErrorBarChart(ax, rec_mean_errors)
+relativeErrorBarChart(ax, rec_mean_errors, title="Mean Pairwise Error by Manifold Learning Algorithm")
 plt.savefig(output_dir + "reconstruction_error_mean.svg")
 plt.close(fig)
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-relativeErrorBarChart(ax, rec_fro_errors)
+relativeErrorBarChart(ax, rec_fro_errors, title="Frobenius Reconstruction Error by Manifold Learning Algorithm")
 plt.savefig(output_dir + "reconstruction_error_fro.svg")
 plt.close(fig)
 
