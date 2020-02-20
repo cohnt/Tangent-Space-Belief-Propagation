@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+from collections import OrderedDict
 
 neighbors_k = 5
 
@@ -146,6 +147,10 @@ method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding"]
 embeddings_list = []
 embeddings_name_list = []
 
+max_errors = OrderedDict()
+mean_errors = OrderedDict()
+fro_errors = OrderedDict()
+
 for i in range(num_methods):
 	solver = methods[i]
 	name = method_names[i]
@@ -188,6 +193,10 @@ for i in range(num_methods):
 	print "%s avg error: %f" % (name, pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="mean"))
 	print "%s med error: %f" % (name, pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="median"))
 	print "%s fro error: %f" % (name, pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="fro"))
+
+	max_errors[name] = pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="max")
+	mean_errors[name] = pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="mean")
+	fro_errors[name] = pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="fro")
 
 ############
 
@@ -758,6 +767,10 @@ print "TSBP avg error: %f" % pairwiseDistErr(feature_coords, true_vals, dist_met
 print "TSBP med error: %f" % pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="median")
 print "TSBP fro error: %f" % pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="fro")
 
+max_errors["TSBP"] = pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="max")
+mean_errors["TSBP"] = pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="mean")
+fro_errors["TSBP"] = pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="fro")
+
 embeddings_list.insert(0, feature_coords)
 embeddings_name_list.insert(0, "TSBP")
 
@@ -766,6 +779,25 @@ embeddings_name_list.insert(0, "TSBP")
 fig, ax = plt.subplots()
 listRegressionErrorCharacteristic(ax, embeddings_list, true_vals, embeddings_name_list, dist_metric="l2")
 plt.savefig(output_dir + "rec.svg")
+plt.close(fig)
+
+##################
+
+from visualization.error_plots import relativeErrorBarChart
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+relativeErrorBarChart(ax, max_errors)
+plt.savefig(output_dir + "reconstruction_error_max.svg")
+plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+relativeErrorBarChart(ax, mean_errors)
+plt.savefig(output_dir + "reconstruction_error_mean.svg")
+plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+relativeErrorBarChart(ax, fro_errors)
+plt.savefig(output_dir + "reconstruction_error_fro.svg")
 plt.close(fig)
 
 ##################
