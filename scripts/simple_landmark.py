@@ -766,9 +766,24 @@ print "TSBP avg error: %f" % pairwiseDistErr(feature_coords, true_vals, dist_met
 print "TSBP med error: %f" % pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="median")
 print "TSBP fro error: %f" % pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="fro")
 
-rec_max_errors["TSBP"] = pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="max")
-rec_mean_errors["TSBP"] = pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="mean")
-rec_fro_errors["TSBP"] = pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="fro")
+def ordered_dict_prepend(dct, key, value, dict_setitem=dict.__setitem__):
+	root = dct._OrderedDict__root
+	first = root[1]
+	if key in dct:
+		link = dct._OrderedDict__map[key]
+		link_prev, link_next, _ = link
+		link_prev[1] = link_next
+		link_next[0] = link_prev
+		link[0] = root
+		link[1] = first
+		root[1] = first[0] = link
+	else:
+		root[1] = first[0] = dct._OrderedDict__map[key] = [root, first, key]
+		dict_setitem(dct, key, value)
+
+ordered_dict_prepend(rec_max_errors, "TSBP", pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="max"))
+ordered_dict_prepend(rec_mean_errors, "TSBP", pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="mean"))
+ordered_dict_prepend(rec_fro_errors, "TSBP", pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="fro"))
 
 embeddings_list.insert(0, feature_coords)
 embeddings_name_list.insert(0, "TSBP")
