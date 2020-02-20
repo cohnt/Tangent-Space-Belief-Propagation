@@ -28,11 +28,19 @@ embedding_point_radius = 7.0
 # ]
 # num_landmarks = len(landmark_coords)
 
+# landmark_coords = [
+# 	np.array([6.98200123, 6.30701217]),
+# 	np.array([6.72636139, 6.84291166]),
+# 	np.array([3.45049685, 6.74195935]),
+# 	np.array([9.48523194, 5.73978978])
+# ]
+# num_landmarks = len(landmark_coords)
+
 landmark_coords = [
-	np.array([6.98200123, 6.30701217]),
-	np.array([6.72636139, 6.84291166]),
-	np.array([3.45049685, 6.74195935]),
-	np.array([9.48523194, 5.73978978])
+	np.array([0.44181691, 2.47556252]),
+	np.array([9.74855701, 8.67657555]),
+	np.array([0.94111181, 3.8372051 ]),
+	np.array([4.20762079, 5.0563642 ])
 ]
 num_landmarks = len(landmark_coords)
 
@@ -46,7 +54,7 @@ y_vals = np.linspace(0, 10, num=21)
 xx, yy = np.meshgrid(x_vals, y_vals)
 points = np.stack((np.ravel(xx), np.ravel(yy)), axis=-1)
 # points = points[np.random.choice(range(len(points)), 400, replace=False)]
-mask = np.logical_or(np.logical_or(points[:,1] > 8.5, points[:,1] < 3.5), np.logical_or(points[:,0] > 8, points[:,0] < 2))
+mask = np.logical_or(np.logical_or(points[:,1] > 7, points[:,1] < 3), np.logical_or(points[:,0] > 8, points[:,0] < 2))
 points = points[mask]
 num_points = len(points)
 
