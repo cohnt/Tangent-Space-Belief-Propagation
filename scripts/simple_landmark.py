@@ -147,9 +147,9 @@ method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding"]
 embeddings_list = []
 embeddings_name_list = []
 
-max_errors = OrderedDict()
-mean_errors = OrderedDict()
-fro_errors = OrderedDict()
+rec_max_errors = OrderedDict()
+rec_mean_errors = OrderedDict()
+rec_fro_errors = OrderedDict()
 
 for i in range(num_methods):
 	solver = methods[i]
@@ -194,12 +194,11 @@ for i in range(num_methods):
 	print "%s med error: %f" % (name, pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="median"))
 	print "%s fro error: %f" % (name, pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="fro"))
 
-	max_errors[name] = pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="max")
-	mean_errors[name] = pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="mean")
-	fro_errors[name] = pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="fro")
+	rec_max_errors[name] = pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="max")
+	rec_mean_errors[name] = pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="mean")
+	rec_fro_errors[name] = pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="fro")
 
 ############
-
 
 #######################
 # k-Nearest-Neighbors #
@@ -767,9 +766,9 @@ print "TSBP avg error: %f" % pairwiseDistErr(feature_coords, true_vals, dist_met
 print "TSBP med error: %f" % pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="median")
 print "TSBP fro error: %f" % pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="fro")
 
-max_errors["TSBP"] = pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="max")
-mean_errors["TSBP"] = pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="mean")
-fro_errors["TSBP"] = pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="fro")
+rec_max_errors["TSBP"] = pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="max")
+rec_mean_errors["TSBP"] = pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="mean")
+rec_fro_errors["TSBP"] = pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="fro")
 
 embeddings_list.insert(0, feature_coords)
 embeddings_name_list.insert(0, "TSBP")
@@ -786,17 +785,17 @@ plt.close(fig)
 from visualization.error_plots import relativeErrorBarChart
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-relativeErrorBarChart(ax, max_errors)
+relativeErrorBarChart(ax, rec_max_errors)
 plt.savefig(output_dir + "reconstruction_error_max.svg")
 plt.close(fig)
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-relativeErrorBarChart(ax, mean_errors)
+relativeErrorBarChart(ax, rec_mean_errors)
 plt.savefig(output_dir + "reconstruction_error_mean.svg")
 plt.close(fig)
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-relativeErrorBarChart(ax, fro_errors)
+relativeErrorBarChart(ax, rec_fro_errors)
 plt.savefig(output_dir + "reconstruction_error_fro.svg")
 plt.close(fig)
 
