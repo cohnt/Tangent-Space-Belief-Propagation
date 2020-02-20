@@ -162,33 +162,33 @@ for i in range(num_methods):
 	embeddings_name_list.append(name)
 
 	fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
-	axes[0].scatter(feature_coords[:,0], feature_coords[:,1], c=points[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-	axes[1].scatter(feature_coords[:,0], feature_coords[:,1], c=points[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	axes[0].scatter(feature_coords[:,0], feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	axes[1].scatter(feature_coords[:,0], feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
 	plt.savefig(output_dir + "embedding_%s_1.svg" % name)
 	plt.close(fig)
 
 	fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
-	axes[0].scatter(feature_coords[:,0], -feature_coords[:,1], c=points[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-	axes[1].scatter(feature_coords[:,0], -feature_coords[:,1], c=points[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	axes[0].scatter(feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	axes[1].scatter(feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
 	plt.savefig(output_dir + "embedding_%s_2.svg" % name)
 	plt.close(fig)
 
 	fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
-	axes[0].scatter(-feature_coords[:,0], feature_coords[:,1], c=points[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-	axes[1].scatter(-feature_coords[:,0], feature_coords[:,1], c=points[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	axes[0].scatter(-feature_coords[:,0], feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	axes[1].scatter(-feature_coords[:,0], feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
 	plt.savefig(output_dir + "embedding_%s_3.svg" % name)
 	plt.close(fig)
 
 	fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
-	axes[0].scatter(-feature_coords[:,0], -feature_coords[:,1], c=points[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-	axes[1].scatter(-feature_coords[:,0], -feature_coords[:,1], c=points[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	axes[0].scatter(-feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	axes[1].scatter(-feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
 	plt.savefig(output_dir + "embedding_%s_4.svg" % name)
 	plt.close(fig)
 
-	print "%s max error: %f" % (name, pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="max"))
-	print "%s avg error: %f" % (name, pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="mean"))
-	print "%s med error: %f" % (name, pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="median"))
-	print "%s fro error: %f" % (name, pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="fro"))
+	print "%s max error: %f" % (name, pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="max"))
+	print "%s avg error: %f" % (name, pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="mean"))
+	print "%s med error: %f" % (name, pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="median"))
+	print "%s fro error: %f" % (name, pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="fro"))
 
 ############
 
