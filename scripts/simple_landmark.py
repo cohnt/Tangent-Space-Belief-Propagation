@@ -200,6 +200,20 @@ for i in range(num_methods):
 
 ############
 
+############################
+# Write Current Code State #
+############################
+import inspect
+import sys
+
+lines = inspect.getsourcelines(sys.modules[__name__])[0]
+
+f = open(output_dir + "code.py", "w")
+for index, line in enumerate(lines):
+	f.write("{:4d} {}".format(index + 1, line))
+
+f.close()
+
 #######################
 # k-Nearest-Neighbors #
 #######################
