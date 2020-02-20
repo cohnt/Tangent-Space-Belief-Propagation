@@ -89,6 +89,7 @@
 
 * http://blog.davidecoppola.com/2015/02/how-to-create-git-submodule-from-repository-subdirectory/
 * https://scikit-learn.org/stable/modules/generated/sklearn.metrics.pairwise_distances.html
+* https://stackoverflow.com/questions/16664874/how-to-add-an-element-to-the-beginning-of-an-ordereddict
 
 ### Numpy
 
