@@ -1,9 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def relativeErrorBarChart(ax, dict, title="Reconstruction Error by Manifold Learning Algorithm"):
+def relativeErrorBarChart(ax, dict, title="Reconstruction Error by Manifold Learning Algorithm", titlefontsize=40):
 	rect = ax.bar(range(len(dict)), list(dict.values()), align='center')
-	ax.set_title(title)
+	ax.set_title(title, fontsize=titlefontsize)
 	ax.set_ylabel("Error")
 	ax.set_xticks(range(len(dict)))
 	ax.set_xticklabels(list(dict.keys()))
