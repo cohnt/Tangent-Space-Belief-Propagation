@@ -61,4 +61,4 @@ def listRegressionErrorCharacteristic(ax, embedded_points_list, true_parameters,
 	ax.set_xlabel("Distance Error Threshold")
 	ax.set_ylabel("Proportion of Pairwise Distances")
 
-	ax.legend()
+	ax.legend(loc="lower right")
