@@ -222,6 +222,18 @@ ax.scatter(true_vals[:,0], true_vals[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Sp
 plt.savefig(output_dir + "ideal_embedding_y.svg")
 plt.close(fig)
 
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(true_vals[:,0], true_vals[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+ax.scatter(np.asarray(landmark_coords)[:,0], np.asarray(landmark_coords)[:,1], c="black", s=(embedding_point_radius*3)**2, marker="*")
+plt.savefig(output_dir + "layout_x.svg")
+plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(true_vals[:,0], true_vals[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+ax.scatter(np.asarray(landmark_coords)[:,0], np.asarray(landmark_coords)[:,1], c="black", s=(embedding_point_radius*3)**2, marker="*")
+plt.savefig(output_dir + "layout_y.svg")
+plt.close(fig)
+
 ############################
 # Write Current Code State #
 ############################
