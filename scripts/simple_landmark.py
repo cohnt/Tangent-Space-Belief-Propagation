@@ -112,7 +112,7 @@ num_iters = 25
 explore_perc = 0
 
 message_resample_cov = np.eye(target_dim) * 0.01 # TODO: Change
-pruning_angle_thresh = 0.9
+pruning_angle_thresh = 0.95
 ts_noise_variance = 0.01 # In degrees
 
 embedding_name = "KernelPCA" # Could also be MDS
@@ -165,28 +165,40 @@ for i in range(num_methods):
 	embeddings_list.append(feature_coords)
 	embeddings_name_list.append(name)
 
-	fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
-	axes[0].scatter(feature_coords[:,0], feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-	axes[1].scatter(feature_coords[:,0], feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-	plt.savefig(output_dir + "embedding_%s_1.svg" % name)
+	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+	ax.scatter(feature_coords[:,0], feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	plt.savefig(output_dir + "embedding_%s_1_x.svg" % name)
+	plt.close(fig)
+	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+	ax.scatter(feature_coords[:,0], feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	plt.savefig(output_dir + "embedding_%s_1_y.svg" % name)
 	plt.close(fig)
 
-	fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
-	axes[0].scatter(feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-	axes[1].scatter(feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-	plt.savefig(output_dir + "embedding_%s_2.svg" % name)
+	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+	ax.scatter(feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	plt.savefig(output_dir + "embedding_%s_2_x.svg" % name)
+	plt.close(fig)
+	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+	ax.scatter(feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	plt.savefig(output_dir + "embedding_%s_2_y.svg" % name)
 	plt.close(fig)
 
-	fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
-	axes[0].scatter(-feature_coords[:,0], feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-	axes[1].scatter(-feature_coords[:,0], feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-	plt.savefig(output_dir + "embedding_%s_3.svg" % name)
+	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+	ax.scatter(-feature_coords[:,0], feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	plt.savefig(output_dir + "embedding_%s_3_x.svg" % name)
+	plt.close(fig)
+	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+	ax.scatter(-feature_coords[:,0], feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	plt.savefig(output_dir + "embedding_%s_3_y.svg" % name)
 	plt.close(fig)
 
-	fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
-	axes[0].scatter(-feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-	axes[1].scatter(-feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-	plt.savefig(output_dir + "embedding_%s_4.svg" % name)
+	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+	ax.scatter(-feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	plt.savefig(output_dir + "embedding_%s_4_x.svg" % name)
+	plt.close(fig)
+	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+	ax.scatter(-feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	plt.savefig(output_dir + "embedding_%s_4_y.svg" % name)
 	plt.close(fig)
 
 	print "%s max error: %f" % (name, pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="max"))
@@ -200,10 +212,26 @@ for i in range(num_methods):
 
 ############
 
-fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
-axes[0].scatter(true_vals[:,0], true_vals[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-axes[1].scatter(true_vals[:,0], true_vals[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-plt.savefig(output_dir + "ideal_embedding.svg")
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(true_vals[:,0], true_vals[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+plt.savefig(output_dir + "ideal_embedding_x.svg")
+plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(true_vals[:,0], true_vals[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+plt.savefig(output_dir + "ideal_embedding_y.svg")
+plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(true_vals[:,0], true_vals[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+ax.scatter(np.asarray(landmark_coords)[:,0], np.asarray(landmark_coords)[:,1], c="black", s=(embedding_point_radius*3)**2, marker="*")
+plt.savefig(output_dir + "layout_x.svg")
+plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(true_vals[:,0], true_vals[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+ax.scatter(np.asarray(landmark_coords)[:,0], np.asarray(landmark_coords)[:,1], c="black", s=(embedding_point_radius*3)**2, marker="*")
+plt.savefig(output_dir + "layout_y.svg")
 plt.close(fig)
 
 ############################
@@ -759,25 +787,45 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
-fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
-axes[0].scatter(feature_coords[:,0], feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-axes[1].scatter(feature_coords[:,0], feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-plt.savefig(output_dir + "embedding_tsbp_1.svg")
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(feature_coords[:,0], feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+plt.savefig(output_dir + "embedding_tsbp_1_x.svg")
+plt.close(fig)
 
-fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
-axes[0].scatter(feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-axes[1].scatter(feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-plt.savefig(output_dir + "embedding_tsbp_2.svg")
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(feature_coords[:,0], feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+plt.savefig(output_dir + "embedding_tsbp_1_y.svg")
+plt.close(fig)
 
-fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
-axes[0].scatter(-feature_coords[:,0], feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-axes[1].scatter(-feature_coords[:,0], feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-plt.savefig(output_dir + "embedding_tsbp_3.svg")
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+plt.savefig(output_dir + "embedding_tsbp_2_x.svg")
+plt.close(fig)
 
-fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(19.2, 10.8), dpi=100)
-axes[0].scatter(-feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-axes[1].scatter(-feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-plt.savefig(output_dir + "embedding_tsbp_4.svg")
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+plt.savefig(output_dir + "embedding_tsbp_2_y.svg")
+plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(-feature_coords[:,0], feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+plt.savefig(output_dir + "embedding_tsbp_3_x.svg")
+plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(-feature_coords[:,0], feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+plt.savefig(output_dir + "embedding_tsbp_3_y.svg")
+plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(-feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+plt.savefig(output_dir + "embedding_tsbp_4_x.svg")
+plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(-feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+plt.savefig(output_dir + "embedding_tsbp_4_y.svg")
+plt.close(fig)
 
 # tsbp_error = pairwiseDistErr(feature_coords, points, dist_metric="l2", mat_norm="max")
 # print "TSBP error: %f" % tsbp_error
