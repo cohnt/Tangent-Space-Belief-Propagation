@@ -10,7 +10,7 @@ import sys
 import copy
 from joblib import Parallel, delayed
 from tqdm import tqdm
-from utils import write, flush, pairwiseDistErr
+from utils import write, flush, pairwiseDistErr, setAxisTickSize, setAxisTickSize3D
 from collections import OrderedDict
 
 global_t0 = time.time()
@@ -46,12 +46,15 @@ data_sp_rad = 5.0
 data_sp_lw = 1.0
 nn_lw = 0.5
 pca_ll = 0.1
-embedding_sp_rad = 7.0
+embedding_sp_rad = 13.0
 embedding_sp_lw = 1.0
 combined_sp_rad = 4.0
 combined_sp_lw = 0.5
 disp_elev = 5.0
 disp_azim = -85.0
+embedding_axis_tick_size = 30
+neighbors_axis_tick_size = 20
+title_font_size = 30
 
 write("\n")
 
@@ -190,6 +193,7 @@ fig, ax = make3DFigure()
 # Not squared because it's squared inside plot_neighbors_3d
 plot_neighbors_3d(points, color, neighbor_graph, ax, point_size=data_sp_rad, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False, line_color="grey")
 ax.set_title("Nearest Neighbors (k=%d)" % neighbors_k)
+setAxisTickSize3D(ax, neighbors_axis_tick_size)
 plt.savefig(output_dir + "nearest_neighbors.svg")
 angles = np.linspace(0, 360, 40+1)[:-1]
 rotanimate(ax, angles, output_dir + "nearest_neighbors.gif", delay=30, width=14.4, height=10.8, folder=output_dir, elevation=disp_elev)
@@ -205,6 +209,7 @@ fig, ax = make3DFigure()
 # Not squared because it's squared inside plot_neighbors_3d
 plot_pca_3d(points, color, true_tangents, ax, point_size=data_sp_rad, point_line_width=data_sp_lw, line_width=nn_lw, line_length=pca_ll)
 ax.set_title("Exact Tangents")
+setAxisTickSize3D(ax, neighbors_axis_tick_size)
 plt.savefig(output_dir + "true_tangents.svg")
 plt.close(fig)
 t1 = time.time()
@@ -738,6 +743,7 @@ flush()
 fig, ax = make3DFigure()
 plot_neighbors_3d(points, color, pruned_neighbors, ax, point_size=data_sp_rad, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False, line_color="grey")
 ax.set_title("Pruned Nearest Neighbors (k=%d, thresh=%f)" % (neighbors_k, pruning_angle_thresh))
+setAxisTickSize3D(ax, neighbors_axis_tick_size)
 plt.savefig(output_dir + "pruned_nearest_neighbors.svg")
 angles = np.linspace(0, 360, 40+1)[:-1]
 rotanimate(ax, angles, output_dir + "pruned_nearest_neighbors.gif", delay=30, width=14.4, height=10.8, folder=output_dir, elevation=disp_elev)
@@ -803,6 +809,7 @@ flush()
 fig, ax = make3DFigure()
 plot_neighbors_3d(points, color, pruned_neighbors, ax, point_size=data_sp_rad, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False, line_color="grey")
 ax.set_title("Added Edges after Pruning")
+setAxisTickSize3D(ax, neighbors_axis_tick_size)
 plt.savefig(output_dir + "added_edges.svg")
 angles = np.linspace(0, 360, 40+1)[:-1]
 rotanimate(ax, angles, output_dir + "added_edges.gif", delay=30, width=14.4, height=10.8, folder=output_dir, elevation=disp_elev)
@@ -839,6 +846,7 @@ print "TSBP Error: %f" % tsbp_err
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 ax.set_title("2D Embedding from BP Tangent Correction")
+setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + "coord_bp.svg")
 plt.close(fig)
 
@@ -897,7 +905,7 @@ for i in range(num_methods):
 	
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 	ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
-	ax.set_title("\n".join(wrap("2D Embedding from %s" % name, 60)))
+	setAxisTickSize(ax, embedding_axis_tick_size)
 	plt.savefig(output_dir + ("comparison_%s.svg" % name))
 	plt.close(fig)
 
@@ -923,7 +931,7 @@ embeddings_name_list.append("LTSA")
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
-ax.set_title("\n".join(wrap("2D Embedding from Classical LTSA", 60)))
+setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + "comparison_orig_LTSA.svg")
 plt.close(fig)
 
@@ -946,7 +954,7 @@ print "LTSA BPT Error: %f" % method_errs["LTSA BPT"]
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
-ax.set_title("\n".join(wrap("2D Embedding from LTSA with Tangent Space Correction", 60)))
+setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + "comparison_corrected_LTSA.svg")
 plt.close(fig)
 
@@ -970,7 +978,7 @@ print "LTSA Pruning Error: %f" % method_errs["LTSA Pruning"]
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
-ax.set_title("\n".join(wrap("2D Embedding from LTSA with Tangent Space Correction and Edge Pruning", 60)))
+setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + "comparison_pruned_LTSA.svg")
 plt.close(fig)
 
@@ -996,9 +1004,7 @@ embeddings_name_list.append("HLLE")
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
-ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from HLLE\n Reconstruction Error: %f" % method_errs["HLLE"], 50)))
-plt.xlabel("Actual Parameter Value")
-plt.ylabel("Embedded Coordinate")
+setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + "comparison_HLLE.svg")
 plt.close(fig)
 
