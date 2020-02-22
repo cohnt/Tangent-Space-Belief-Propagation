@@ -114,3 +114,11 @@ def setAxisTickSize(ax, size):
 		tick.label.set_fontsize(size)
 	for tick in ax.yaxis.get_major_ticks():
 		tick.label.set_fontsize(size)
+
+def setAxisTickSize3D(ax, size):
+	for tick in ax.xaxis.get_major_ticks():
+		tick.label.set_fontsize(size)
+	for tick in ax.yaxis.get_major_ticks():
+		tick.label.set_fontsize(size)
+	for tick in ax.zaxis.get_major_ticks():
+		tick.label.set_fontsize(size)	
