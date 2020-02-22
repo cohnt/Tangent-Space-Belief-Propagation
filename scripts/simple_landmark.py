@@ -8,7 +8,7 @@ neighbors_k = 5
 
 output_dir = "results_landmark/"
 
-embedding_point_radius = 7.0
+embedding_point_radius = 11.0
 title_font_size = 30
 
 # landmark_coords = [
@@ -88,7 +88,7 @@ neighbor_dict = sparseMatrixToDict(neighbor_graph)
 neighbor_pair_list = [(key, value) for key, arr in neighbor_dict.items() for value in arr]
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-plot_neighbors_2d(points, points[:,0]/10.0, neighbor_graph, ax, show_labels=False)
+plot_neighbors_2d(points, points[:,0]/10.0, neighbor_graph, ax, show_labels=False, point_size=embedding_point_radius)
 ax.set_title("Nearest Neighbors (k=%d)\n" % neighbors_k, fontsize=title_font_size)
 setAxisTickSize(ax, 20)
 plt.savefig(output_dir + "nearest_neighbors.svg")
@@ -710,7 +710,7 @@ flush()
 print "Pruned %d edges!" % num_pruned
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-plot_neighbors_2d(true_vals, points[:,0]/10.0, pruned_neighbors, ax, show_labels=False)
+plot_neighbors_2d(true_vals, points[:,0]/10.0, pruned_neighbors, ax, show_labels=False, point_size=embedding_point_radius)
 ax.set_title("Pruned Nearest Neighbors\n", fontsize=title_font_size)
 setAxisTickSize(ax, 20)
 plt.savefig(output_dir + "pruned_neighbors.svg")
@@ -778,7 +778,7 @@ write("Done! dt=%f\n" % (t1-t0))
 flush()
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-plot_neighbors_2d(true_vals, points[:,0]/10.0, pruned_neighbors, ax, show_labels=False)
+plot_neighbors_2d(true_vals, points[:,0]/10.0, pruned_neighbors, ax, show_labels=False, point_size=embedding_point_radius)
 ax.set_title("Reconnected Nearest Neighbors\n", fontsize=title_font_size)
 setAxisTickSize(ax, 20)
 plt.savefig(output_dir + "added_edges.svg")
