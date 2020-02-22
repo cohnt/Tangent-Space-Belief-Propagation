@@ -116,7 +116,7 @@ num_iters = 25
 explore_perc = 0
 
 message_resample_cov = np.eye(target_dim) * 0.01 # TODO: Change
-pruning_angle_thresh = 0.95
+pruning_angle_thresh = 0.9
 ts_noise_variance = 0.01 # In degrees
 
 embedding_name = "KernelPCA" # Could also be MDS
@@ -706,7 +706,7 @@ flush()
 print "Pruned %d edges!" % num_pruned
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-plot_neighbors_2d(true_vals, points[:,0]/10.0, pruned_neighbors, ax, show_labels=False, point_size=embedding_point_radius)
+plot_neighbors_2d(true_vals, true_vals[:,0]/10.0, pruned_neighbors, ax, show_labels=False, point_size=embedding_point_radius)
 ax.set_title("Pruned Nearest Neighbors\n", fontsize=title_font_size)
 setAxisTickSize(ax, 20)
 plt.savefig(output_dir + "pruned_neighbors.svg")
