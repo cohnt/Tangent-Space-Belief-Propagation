@@ -9,6 +9,7 @@ neighbors_k = 5
 output_dir = "results_landmark/"
 
 embedding_point_radius = 7.0
+title_font_size = 20
 
 # landmark_coords = [
 # 	np.array([0., 0.]),
@@ -82,7 +83,7 @@ neighbor_pair_list = [(key, value) for key, arr in neighbor_dict.items() for val
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 plot_neighbors_2d(points, points[:,0]/10.0, neighbor_graph, ax, show_labels=False)
-ax.set_title("Nearest Neighbors (k=%d)\n" % neighbors_k)
+ax.set_title("Nearest Neighbors (k=%d)\n" % neighbors_k, fontsize=title_font_size)
 plt.savefig(output_dir + "nearest_neighbors.svg")
 plt.close(fig)
 
@@ -691,7 +692,7 @@ print "Pruned %d edges!" % num_pruned
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 plot_neighbors_2d(true_vals, points[:,0]/10.0, pruned_neighbors, ax, show_labels=False)
-ax.set_title("Pruned Nearest Neighbors")
+ax.set_title("Pruned Nearest Neighbors\n", fonsize=title_font_size)
 plt.savefig(output_dir + "pruned_neighbors.svg")
 plt.close(fig)
 
