@@ -10,7 +10,9 @@ neighbors_k = 5
 
 output_dir = "results_landmark/"
 
-embedding_point_radius = 11.0
+embedding_point_radius = 13.0
+embedding_axis_tick_size = 30
+neighbors_axis_tick_size = 20
 title_font_size = 30
 
 # landmark_coords = [
@@ -86,7 +88,7 @@ neighbor_pair_list = [(key, value) for key, arr in neighbor_dict.items() for val
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 plot_neighbors_2d(points, points[:,0]/10.0, neighbor_graph, ax, show_labels=False, point_size=embedding_point_radius)
 ax.set_title("Nearest Neighbors (k=%d)\n" % neighbors_k, fontsize=title_font_size)
-setAxisTickSize(ax, 20)
+setAxisTickSize(ax, neighbors_axis_tick_size)
 plt.savefig(output_dir + "nearest_neighbors.svg")
 plt.close(fig)
 
@@ -110,7 +112,7 @@ from tqdm import tqdm
 target_dim = 2
 source_dim = num_landmarks
 
-num_samples = 10
+num_samples = 5
 num_iters = 25
 
 explore_perc = 0
@@ -173,45 +175,45 @@ for i in range(num_methods):
 
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 	ax.scatter(feature_coords[:,0], feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-	setAxisTickSize(ax, 20)
+	setAxisTickSize(ax, embedding_axis_tick_size)
 	plt.savefig(output_dir + "embedding_%s_1_x.svg" % name)
 	plt.close(fig)
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 	ax.scatter(feature_coords[:,0], feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-	setAxisTickSize(ax, 20)
+	setAxisTickSize(ax, embedding_axis_tick_size)
 	plt.savefig(output_dir + "embedding_%s_1_y.svg" % name)
 	plt.close(fig)
 
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 	ax.scatter(feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-	setAxisTickSize(ax, 20)
+	setAxisTickSize(ax, embedding_axis_tick_size)
 	plt.savefig(output_dir + "embedding_%s_2_x.svg" % name)
 	plt.close(fig)
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 	ax.scatter(feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-	setAxisTickSize(ax, 20)
+	setAxisTickSize(ax, embedding_axis_tick_size)
 	plt.savefig(output_dir + "embedding_%s_2_y.svg" % name)
 	plt.close(fig)
 
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 	ax.scatter(-feature_coords[:,0], feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-	setAxisTickSize(ax, 20)
+	setAxisTickSize(ax, embedding_axis_tick_size)
 	plt.savefig(output_dir + "embedding_%s_3_x.svg" % name)
 	plt.close(fig)
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 	ax.scatter(-feature_coords[:,0], feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-	setAxisTickSize(ax, 20)
+	setAxisTickSize(ax, embedding_axis_tick_size)
 	plt.savefig(output_dir + "embedding_%s_3_y.svg" % name)
 	plt.close(fig)
 
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 	ax.scatter(-feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-	setAxisTickSize(ax, 20)
+	setAxisTickSize(ax, embedding_axis_tick_size)
 	plt.savefig(output_dir + "embedding_%s_4_x.svg" % name)
 	plt.close(fig)
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 	ax.scatter(-feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-	setAxisTickSize(ax, 20)
+	setAxisTickSize(ax, embedding_axis_tick_size)
 	plt.savefig(output_dir + "embedding_%s_4_y.svg" % name)
 	plt.close(fig)
 
@@ -228,27 +230,27 @@ for i in range(num_methods):
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(true_vals[:,0], true_vals[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-setAxisTickSize(ax, 20)
+setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + "ideal_embedding_x.svg")
 plt.close(fig)
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(true_vals[:,0], true_vals[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-setAxisTickSize(ax, 20)
+setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + "ideal_embedding_y.svg")
 plt.close(fig)
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(true_vals[:,0], true_vals[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
 ax.scatter(np.asarray(landmark_coords)[:,0], np.asarray(landmark_coords)[:,1], c="black", s=(embedding_point_radius*3)**2, marker="*")
-setAxisTickSize(ax, 20)
+setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + "layout_x.svg")
 plt.close(fig)
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(true_vals[:,0], true_vals[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
 ax.scatter(np.asarray(landmark_coords)[:,0], np.asarray(landmark_coords)[:,1], c="black", s=(embedding_point_radius*3)**2, marker="*")
-setAxisTickSize(ax, 20)
+setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + "layout_y.svg")
 plt.close(fig)
 
@@ -710,7 +712,7 @@ print "Pruned %d edges!" % num_pruned
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 plot_neighbors_2d(true_vals, true_vals[:,0]/10.0, pruned_neighbors, ax, show_labels=False, point_size=embedding_point_radius)
 ax.set_title("Pruned Nearest Neighbors\n", fontsize=title_font_size)
-setAxisTickSize(ax, 20)
+setAxisTickSize(ax, neighbors_axis_tick_size)
 plt.savefig(output_dir + "pruned_neighbors.svg")
 plt.close(fig)
 
@@ -778,7 +780,7 @@ flush()
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 plot_neighbors_2d(true_vals, points[:,0]/10.0, pruned_neighbors, ax, show_labels=False, point_size=embedding_point_radius)
 ax.set_title("Reconnected Nearest Neighbors\n", fontsize=title_font_size)
-setAxisTickSize(ax, 20)
+setAxisTickSize(ax, neighbors_axis_tick_size)
 plt.savefig(output_dir + "added_edges.svg")
 plt.close(fig)
 
@@ -809,45 +811,45 @@ flush()
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(feature_coords[:,0], feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-setAxisTickSize(ax, 20)
+setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + "embedding_tsbp_1_x.svg")
 plt.close(fig)
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(feature_coords[:,0], feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-setAxisTickSize(ax, 20)
+setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + "embedding_tsbp_1_y.svg")
 plt.close(fig)
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-setAxisTickSize(ax, 20)
+setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + "embedding_tsbp_2_x.svg")
 plt.close(fig)
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-setAxisTickSize(ax, 20)
+setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + "embedding_tsbp_2_y.svg")
 plt.close(fig)
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(-feature_coords[:,0], feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-setAxisTickSize(ax, 20)
+setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + "embedding_tsbp_3_x.svg")
 plt.close(fig)
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(-feature_coords[:,0], feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-setAxisTickSize(ax, 20)
+setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + "embedding_tsbp_3_y.svg")
 plt.close(fig)
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(-feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-setAxisTickSize(ax, 20)
+setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + "embedding_tsbp_4_x.svg")
 plt.close(fig)
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(-feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
-setAxisTickSize(ax, 20)
+setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + "embedding_tsbp_4_y.svg")
 plt.close(fig)
 
