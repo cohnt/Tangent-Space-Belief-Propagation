@@ -778,7 +778,7 @@ write("Done! dt=%f\n" % (t1-t0))
 flush()
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-plot_neighbors_2d(true_vals, points[:,0]/10.0, pruned_neighbors, ax, show_labels=False, point_size=embedding_point_radius)
+plot_neighbors_2d(true_vals, true_vals[:,0]/10.0, pruned_neighbors, ax, show_labels=False, point_size=embedding_point_radius)
 ax.set_title("Reconnected Nearest Neighbors\n", fontsize=title_font_size)
 setAxisTickSize(ax, neighbors_axis_tick_size)
 plt.savefig(output_dir + "added_edges.svg")
