@@ -4,6 +4,8 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from collections import OrderedDict
 
+from utils import setAxisTickSize
+
 neighbors_k = 5
 
 output_dir = "results_landmark/"
@@ -65,12 +67,6 @@ range_data = np.zeros((num_points, num_landmarks))
 def noise():
 	# return np.random.uniform(low=-0.5, high=0.5)
 	return np.random.normal(loc=0.0, scale=0.0)
-
-def setAxisTickSize(ax, size):
-	for tick in ax.xaxis.get_major_ticks():
-		tick.label.set_fontsize(size)
-	for tick in ax.yaxis.get_major_ticks():
-		tick.label.set_fontsize(size)
 
 for i in range(num_points):
 	for j in range(num_landmarks):

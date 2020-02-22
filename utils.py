@@ -108,3 +108,9 @@ def pairwiseDistErr(embedded_points, true_parameters, normalize_data=True, norma
 		else:
 			err = np.linalg.norm(embedded_dists - true_dists, ord=mat_norm, axis=None)
 		return err
+
+def setAxisTickSize(ax, size):
+	for tick in ax.xaxis.get_major_ticks():
+		tick.label.set_fontsize(size)
+	for tick in ax.yaxis.get_major_ticks():
+		tick.label.set_fontsize(size)
