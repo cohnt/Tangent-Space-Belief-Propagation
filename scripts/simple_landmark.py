@@ -11,7 +11,7 @@ neighbors_k = 5
 output_dir = "results_landmark/"
 
 embedding_point_radius = 13.0
-embedding_axis_tick_size = 30
+embedding_axis_tick_size = 40
 neighbors_axis_tick_size = 20
 title_font_size = 30
 
