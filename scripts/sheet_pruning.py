@@ -883,9 +883,10 @@ methods.append(MDS(n_components=target_dim, n_jobs=-1))
 methods.append(Isomap(n_neighbors=neighbors_k, n_components=target_dim, n_jobs=-1))
 methods.append(SpectralEmbedding(n_components=target_dim, n_neighbors=neighbors_k, n_jobs=-1))
 methods.append(TSNE(n_components=target_dim))
+methods.append(Autoencoder(source_dim, target_dim, [64, 32, 32], ["relu", "relu", "relu"]))
 num_methods = len(methods)
 
-method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding", "t-SNE"]
+method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding", "t-SNE", "Autoencoder"]
 
 for i in range(num_methods):
 	solver = methods[i]
@@ -1042,6 +1043,8 @@ axes_list = np.concatenate(axes)
 for i in range(num_methods):
 	solver = methods[i]
 	name = method_names[i]
+	if name == "MDS":
+		continue
 	feature_coords = solver.fit_transform(points)
 
 	axes_list[i].scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
