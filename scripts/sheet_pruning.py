@@ -1044,6 +1044,7 @@ axes_list = np.concatenate(axes)
 
 methods.pop(1)
 method_names.pop(1)
+num_methods = len(methods)
 
 for i in range(num_methods):
 	solver = methods[i]
