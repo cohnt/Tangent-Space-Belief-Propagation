@@ -56,3 +56,7 @@ class Autoencoder():
 
 	def reconstruct(self, data):
 		return self.autoencoder.predict(data)
+
+	def fit_transform(self, data):
+		self.train(data)
+		return self.embed(data)
