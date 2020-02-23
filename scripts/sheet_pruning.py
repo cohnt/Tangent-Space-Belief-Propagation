@@ -1018,8 +1018,37 @@ ax.set_title("\n".join(wrap("Regression Error Characteristic from HLLE", 50)))
 plt.savefig(output_dir + "rec_HLLE.svg")
 plt.close(fig)
 
+write("Computing Corrected t-SNE...")
+flush()
+t0 = time.time()
+feature_coords = TSNE(n_components=target_dim, metric="precomputed").fit_transform(shortest_distances)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+method_errs["Corrected t-SNE"] = pairwiseDistErr(feature_coords, true_parameters, dist_metric=err_dist_metric, mat_norm=err_mat_norm)
+print "Corrected t-SNE Error: %f" % method_errs["Corrected t-SNE"]
+
+embeddings_list.append(feature_coords)
+embeddings_name_list.append("Corrected t-SNE")
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
+ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Corrected t-SNE\n Reconstruction Error: %f" % method_errs["Corrected t-SNE"], 50)))
+plt.xlabel("Actual Parameter Value")
+plt.ylabel("Embedded Coordinate")
+plt.savefig(output_dir + "comparison_Corrected t-SNE.svg")
+plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+regressionErrorCharacteristic(ax, feature_coords, true_parameters, dist_metric=err_dist_metric)
+ax.set_title("\n".join(wrap("Regression Error Characteristic from Corrected t-SNE", 50)))
+plt.savefig(output_dir + "rec_Corrected t-SNE.svg")
+plt.close(fig)
+
 method_errs.pop("LTSA BPT")
 method_errs.pop("LTSA Pruning")
+method_errs.pop("Corrected t-SNE")
 from visualization.error_plots import relativeErrorBarChart
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 relativeErrorBarChart(ax, method_errs)
