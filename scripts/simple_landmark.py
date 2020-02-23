@@ -6,7 +6,7 @@ from collections import OrderedDict
 
 from utils import setAxisTickSize
 
-neighbors_k = 5
+neighbors_k = 6
 
 output_dir = "results_landmark/"
 
@@ -42,11 +42,19 @@ title_font_size = 30
 # ]
 # num_landmarks = len(landmark_coords)
 
+# landmark_coords = [
+# 	np.array([0.44181691, 2.47556252]),
+# 	np.array([9.74855701, 8.67657555]),
+# 	np.array([0.94111181, 3.8372051 ]),
+# 	np.array([4.20762079, 5.0563642 ])
+# ]
+# num_landmarks = len(landmark_coords)
+
 landmark_coords = [
-	np.array([0.44181691, 2.47556252]),
-	np.array([9.74855701, 8.67657555]),
-	np.array([0.94111181, 3.8372051 ]),
-	np.array([4.20762079, 5.0563642 ])
+	np.array([5.27770294, 4.54453647]),
+	np.array([6.16563489, 5.39577828]),
+	np.array([7.16979217, 9.11084062]),
+	np.array([7.29313071, 9.15263291])
 ]
 num_landmarks = len(landmark_coords)
 
@@ -118,7 +126,7 @@ num_iters = 25
 explore_perc = 0
 
 message_resample_cov = np.eye(target_dim) * 0.01 # TODO: Change
-pruning_angle_thresh = 0.9
+pruning_angle_thresh = 0.95
 ts_noise_variance = 0.01 # In degrees
 
 embedding_name = "KernelPCA" # Could also be MDS
