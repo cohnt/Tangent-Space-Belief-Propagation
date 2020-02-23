@@ -876,6 +876,7 @@ flush()
 
 from sklearn.manifold import LocallyLinearEmbedding, MDS, Isomap, SpectralEmbedding, TSNE
 from ltsa import compute_ltsa
+from autoencoder import Autoencoder
 
 methods = []
 methods.append(LocallyLinearEmbedding(n_neighbors=neighbors_k, n_components=target_dim, n_jobs=-1))
