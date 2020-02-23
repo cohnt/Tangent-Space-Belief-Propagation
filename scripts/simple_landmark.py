@@ -6,7 +6,7 @@ from collections import OrderedDict
 
 from utils import setAxisTickSize
 
-neighbors_k = 10
+neighbors_k = 12
 
 output_dir = "results_landmark/"
 
