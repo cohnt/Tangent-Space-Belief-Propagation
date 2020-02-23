@@ -1035,8 +1035,6 @@ embeddings_name_list.append("Corrected t-SNE")
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Corrected t-SNE\n Reconstruction Error: %f" % method_errs["Corrected t-SNE"], 50)))
-plt.xlabel("Actual Parameter Value")
-plt.ylabel("Embedded Coordinate")
 plt.savefig(output_dir + "comparison_corrected_t-SNE.svg")
 plt.close(fig)
 
