@@ -63,8 +63,8 @@ for landmark in landmark_coords:
 	print landmark
 
 # Build up a list of points to measure at
-x_vals = np.linspace(0, 10, num=23)
-y_vals = np.linspace(0, 10, num=23)
+x_vals = np.linspace(-1, 11, num=27)
+y_vals = np.linspace(-1, 11, num=27)
 xx, yy = np.meshgrid(x_vals, y_vals)
 points = np.stack((np.ravel(xx), np.ravel(yy)), axis=-1)
 # points = points[np.random.choice(range(len(points)), 400, replace=False)]
