@@ -27,10 +27,17 @@ title_font_size = 30
 # for _ in range(num_landmarks):
 # 	landmark_coords.append(np.random.uniform(low=0.0, high=10.0, size=(2)))
 
+# landmark_coords = [
+# 	np.array([6.93128243, 2.88532531]),
+# 	np.array([3.54094086, 5.58023536]),
+# 	np.array([1.46209511, 9.62733474])
+# ]
+# num_landmarks = len(landmark_coords)
+
 landmark_coords = [
 	np.array([6.93128243, 2.88532531]),
 	np.array([3.54094086, 5.58023536]),
-	np.array([1.46209511, 9.62733474])
+	np.array([1.46209511, 10.62733474])
 ]
 num_landmarks = len(landmark_coords)
 
