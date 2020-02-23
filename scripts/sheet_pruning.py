@@ -1041,6 +1041,9 @@ fig, axes = plt.subplots(nrows=3, ncols=3, figsize=(10.8, 10.8), dpi=100)
 plt.tight_layout(pad=5, h_pad=10, w_pad=5)
 axes_list = np.concatenate(axes)
 
+methods.pop()
+methods.append(Autoencoder(source_dim, target_dim, [64, 32, 32], ["relu", "relu", "relu"]))
+
 for i in range(num_methods):
 	solver = methods[i]
 	name = method_names[i]
