@@ -16,8 +16,9 @@ from collections import OrderedDict
 global_t0 = time.time()
 
 dataset_name = "swiss_roll"
-dataset_seed = np.random.randint(0, 2**32)
+# dataset_seed = np.random.randint(0, 2**32)
 # dataset_seed = 2007610755
+dataset_seed = 3525166035
 num_points = 700    # Number of data points
 data_noise = 0.001     # How much noise is added to the data
 source_dim = 3      # The dimensionality of the incoming dataset (see "Load Dataset" below)
