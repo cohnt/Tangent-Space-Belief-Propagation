@@ -6,7 +6,7 @@ from collections import OrderedDict
 
 from utils import setAxisTickSize
 
-neighbors_k = 8
+neighbors_k = 7
 
 output_dir = "results_landmark/"
 
@@ -63,8 +63,8 @@ for landmark in landmark_coords:
 	print landmark
 
 # Build up a list of points to measure at
-x_vals = np.linspace(0, 10, num=25)
-y_vals = np.linspace(0, 10, num=25)
+x_vals = np.linspace(0, 10, num=23)
+y_vals = np.linspace(0, 10, num=23)
 xx, yy = np.meshgrid(x_vals, y_vals)
 points = np.stack((np.ravel(xx), np.ravel(yy)), axis=-1)
 # points = points[np.random.choice(range(len(points)), 400, replace=False)]
@@ -126,7 +126,7 @@ num_iters = 25
 explore_perc = 0
 
 message_resample_cov = np.eye(target_dim) * 0.01 # TODO: Change
-pruning_angle_thresh = 0.97
+pruning_angle_thresh = 0.95
 ts_noise_variance = 0.01 # In degrees
 
 embedding_name = "KernelPCA" # Could also be MDS
