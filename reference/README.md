@@ -84,6 +84,10 @@
 * https://matplotlib.org/tutorials/intermediate/legend_guide.html
 * https://stackoverflow.com/questions/4971269/how-to-pick-a-new-color-for-each-plotted-line-within-a-figure-in-matplotlib
 * https://stackoverflow.com/questions/12236566/setting-different-color-for-each-series-in-scatter-plot-on-matplotlib
+* https://matplotlib.org/3.1.1/api/text_api.html#matplotlib.text.Text
+* https://stackoverflow.com/questions/10404759/matplotlib-set-yaxis-label-size
+* https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.legend.html
+* https://stackoverflow.com/questions/6390393/matplotlib-make-tick-labels-font-size-smaller
 
 ### Other
 

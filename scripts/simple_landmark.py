@@ -4,11 +4,16 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from collections import OrderedDict
 
-neighbors_k = 5
+from utils import setAxisTickSize
+
+neighbors_k = 15
 
 output_dir = "results_landmark/"
 
-embedding_point_radius = 7.0
+embedding_point_radius = 13.0
+embedding_axis_tick_size = 40
+neighbors_axis_tick_size = 20
+title_font_size = 30
 
 # landmark_coords = [
 # 	np.array([0., 0.]),
@@ -29,6 +34,13 @@ embedding_point_radius = 7.0
 # ]
 # num_landmarks = len(landmark_coords)
 
+landmark_coords = [
+	np.array([6.93128243, 2.88532531]),
+	np.array([3.54094086, 5.58023536]),
+	np.array([1.46209511, 10.62733474])
+]
+num_landmarks = len(landmark_coords)
+
 # landmark_coords = [
 # 	np.array([6.98200123, 6.30701217]),
 # 	np.array([6.72636139, 6.84291166]),
@@ -37,21 +49,29 @@ embedding_point_radius = 7.0
 # ]
 # num_landmarks = len(landmark_coords)
 
-landmark_coords = [
-	np.array([0.44181691, 2.47556252]),
-	np.array([9.74855701, 8.67657555]),
-	np.array([0.94111181, 3.8372051 ]),
-	np.array([4.20762079, 5.0563642 ])
-]
-num_landmarks = len(landmark_coords)
+# landmark_coords = [
+# 	np.array([0.44181691, 2.47556252]),
+# 	np.array([9.74855701, 8.67657555]),
+# 	np.array([0.94111181, 3.8372051 ]),
+# 	np.array([4.20762079, 5.0563642 ])
+# ]
+# num_landmarks = len(landmark_coords)
+
+# landmark_coords = [
+# 	np.array([5.27770294, 4.54453647]),
+# 	np.array([6.16563489, 5.39577828]),
+# 	np.array([7.16979217, 9.11084062]),
+# 	np.array([7.29313071, 9.15263291])
+# ]
+# num_landmarks = len(landmark_coords)
 
 print "Landmarks:"
 for landmark in landmark_coords:
 	print landmark
 
 # Build up a list of points to measure at
-x_vals = np.linspace(0, 10, num=21)
-y_vals = np.linspace(0, 10, num=21)
+x_vals = np.linspace(-1.5, 11.5, num=31)
+y_vals = np.linspace(-1.5, 11.5, num=31)
 xx, yy = np.meshgrid(x_vals, y_vals)
 points = np.stack((np.ravel(xx), np.ravel(yy)), axis=-1)
 # points = points[np.random.choice(range(len(points)), 400, replace=False)]
@@ -81,8 +101,9 @@ neighbor_dict = sparseMatrixToDict(neighbor_graph)
 neighbor_pair_list = [(key, value) for key, arr in neighbor_dict.items() for value in arr]
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-plot_neighbors_2d(points, points[:,0]/10.0, neighbor_graph, ax, show_labels=False)
-ax.set_title("Nearest Neighbors (k=%d)\n" % neighbors_k)
+plot_neighbors_2d(points, points[:,0]/10.0, neighbor_graph, ax, show_labels=False, point_size=embedding_point_radius)
+ax.set_title("Nearest Neighbors (k=%d)\n" % neighbors_k, fontsize=title_font_size)
+setAxisTickSize(ax, neighbors_axis_tick_size)
 plt.savefig(output_dir + "nearest_neighbors.svg")
 plt.close(fig)
 
@@ -106,13 +127,13 @@ from tqdm import tqdm
 target_dim = 2
 source_dim = num_landmarks
 
-num_samples = 10
+num_samples = 5
 num_iters = 25
 
 explore_perc = 0
 
 message_resample_cov = np.eye(target_dim) * 0.01 # TODO: Change
-pruning_angle_thresh = 0.95
+pruning_angle_thresh = 0.98
 ts_noise_variance = 0.01 # In degrees
 
 embedding_name = "KernelPCA" # Could also be MDS
@@ -140,9 +161,11 @@ methods.append(LocallyLinearEmbedding(n_neighbors=neighbors_k, n_components=targ
 methods.append(MDS(n_components=target_dim, n_jobs=-1))
 methods.append(Isomap(n_neighbors=neighbors_k, n_components=target_dim, n_jobs=-1))
 methods.append(SpectralEmbedding(n_components=target_dim, n_neighbors=neighbors_k, n_jobs=-1))
+methods.append(TSNE(n_components=target_dim))
+methods.append(LocallyLinearEmbedding(n_neighbors=neighbors_k, n_components=target_dim, n_jobs=-1, method="ltsa"))
 num_methods = len(methods)
 
-method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding"]
+method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding", "t-SNE", "LTSA"]
 
 embeddings_list = []
 embeddings_name_list = []
@@ -167,37 +190,45 @@ for i in range(num_methods):
 
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 	ax.scatter(feature_coords[:,0], feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	setAxisTickSize(ax, embedding_axis_tick_size)
 	plt.savefig(output_dir + "embedding_%s_1_x.svg" % name)
 	plt.close(fig)
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 	ax.scatter(feature_coords[:,0], feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	setAxisTickSize(ax, embedding_axis_tick_size)
 	plt.savefig(output_dir + "embedding_%s_1_y.svg" % name)
 	plt.close(fig)
 
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 	ax.scatter(feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	setAxisTickSize(ax, embedding_axis_tick_size)
 	plt.savefig(output_dir + "embedding_%s_2_x.svg" % name)
 	plt.close(fig)
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 	ax.scatter(feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	setAxisTickSize(ax, embedding_axis_tick_size)
 	plt.savefig(output_dir + "embedding_%s_2_y.svg" % name)
 	plt.close(fig)
 
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 	ax.scatter(-feature_coords[:,0], feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	setAxisTickSize(ax, embedding_axis_tick_size)
 	plt.savefig(output_dir + "embedding_%s_3_x.svg" % name)
 	plt.close(fig)
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 	ax.scatter(-feature_coords[:,0], feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	setAxisTickSize(ax, embedding_axis_tick_size)
 	plt.savefig(output_dir + "embedding_%s_3_y.svg" % name)
 	plt.close(fig)
 
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 	ax.scatter(-feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	setAxisTickSize(ax, embedding_axis_tick_size)
 	plt.savefig(output_dir + "embedding_%s_4_x.svg" % name)
 	plt.close(fig)
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 	ax.scatter(-feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+	setAxisTickSize(ax, embedding_axis_tick_size)
 	plt.savefig(output_dir + "embedding_%s_4_y.svg" % name)
 	plt.close(fig)
 
@@ -214,23 +245,27 @@ for i in range(num_methods):
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(true_vals[:,0], true_vals[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + "ideal_embedding_x.svg")
 plt.close(fig)
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(true_vals[:,0], true_vals[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + "ideal_embedding_y.svg")
 plt.close(fig)
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(true_vals[:,0], true_vals[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
 ax.scatter(np.asarray(landmark_coords)[:,0], np.asarray(landmark_coords)[:,1], c="black", s=(embedding_point_radius*3)**2, marker="*")
+setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + "layout_x.svg")
 plt.close(fig)
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(true_vals[:,0], true_vals[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
 ax.scatter(np.asarray(landmark_coords)[:,0], np.asarray(landmark_coords)[:,1], c="black", s=(embedding_point_radius*3)**2, marker="*")
+setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + "layout_y.svg")
 plt.close(fig)
 
@@ -690,8 +725,9 @@ flush()
 print "Pruned %d edges!" % num_pruned
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-plot_neighbors_2d(true_vals, points[:,0]/10.0, pruned_neighbors, ax, show_labels=False)
-ax.set_title("Pruned Nearest Neighbors")
+plot_neighbors_2d(true_vals, true_vals[:,0]/10.0, pruned_neighbors, ax, show_labels=False, point_size=embedding_point_radius)
+ax.set_title("Pruned Nearest Neighbors\n", fontsize=title_font_size)
+setAxisTickSize(ax, neighbors_axis_tick_size)
 plt.savefig(output_dir + "pruned_neighbors.svg")
 plt.close(fig)
 
@@ -757,8 +793,9 @@ write("Done! dt=%f\n" % (t1-t0))
 flush()
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-plot_neighbors_2d(true_vals, points[:,0]/10.0, pruned_neighbors, ax, show_labels=False)
-ax.set_title("Reconnected Nearest Neighbors")
+plot_neighbors_2d(true_vals, true_vals[:,0]/10.0, pruned_neighbors, ax, show_labels=False, point_size=embedding_point_radius)
+ax.set_title("Reconnected Nearest Neighbors\n", fontsize=title_font_size)
+setAxisTickSize(ax, neighbors_axis_tick_size)
 plt.savefig(output_dir + "added_edges.svg")
 plt.close(fig)
 
@@ -789,41 +826,45 @@ flush()
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(feature_coords[:,0], feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + "embedding_tsbp_1_x.svg")
 plt.close(fig)
-
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(feature_coords[:,0], feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + "embedding_tsbp_1_y.svg")
 plt.close(fig)
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + "embedding_tsbp_2_x.svg")
 plt.close(fig)
-
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + "embedding_tsbp_2_y.svg")
 plt.close(fig)
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(-feature_coords[:,0], feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + "embedding_tsbp_3_x.svg")
 plt.close(fig)
-
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(-feature_coords[:,0], feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + "embedding_tsbp_3_y.svg")
 plt.close(fig)
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(-feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + "embedding_tsbp_4_x.svg")
 plt.close(fig)
-
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(-feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + "embedding_tsbp_4_y.svg")
 plt.close(fig)
 
@@ -860,6 +901,9 @@ embeddings_name_list.insert(0, "TSBP")
 
 fig, ax = plt.subplots()
 listRegressionErrorCharacteristic(ax, embeddings_list, true_vals, embeddings_name_list, dist_metric="l2")
+setAxisTickSize(ax, 15)
+ax.xaxis.label.set_size(20)
+ax.yaxis.label.set_size(20)
 plt.savefig(output_dir + "rec.svg")
 plt.close(fig)
 
@@ -868,16 +912,22 @@ plt.close(fig)
 from visualization.error_plots import relativeErrorBarChart
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-relativeErrorBarChart(ax, rec_max_errors, title="Maximum Pairwise Error by Manifold Learning Algorithm")
+relativeErrorBarChart(ax, rec_max_errors, title="Maximum Pairwise Error by Manifold Learning Algorithm\n", titlefontsize=title_font_size)
+setAxisTickSize(ax, 20)
+ax.yaxis.label.set_size(20)
 plt.savefig(output_dir + "reconstruction_error_max.svg")
 plt.close(fig)
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-relativeErrorBarChart(ax, rec_mean_errors, title="Mean Pairwise Error by Manifold Learning Algorithm")
+relativeErrorBarChart(ax, rec_mean_errors, title="Mean Pairwise Error by Manifold Learning Algorithm\n", titlefontsize=title_font_size)
+setAxisTickSize(ax, 20)
+ax.yaxis.label.set_size(20)
 plt.savefig(output_dir + "reconstruction_error_mean.svg")
 plt.close(fig)
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-relativeErrorBarChart(ax, rec_fro_errors, title="Frobenius Reconstruction Error by Manifold Learning Algorithm")
+relativeErrorBarChart(ax, rec_fro_errors, title="Frobenius Reconstruction Error by Manifold Learning Algorithm\n", titlefontsize=title_font_size)
+setAxisTickSize(ax, 20)
+ax.yaxis.label.set_size(20)
 plt.savefig(output_dir + "reconstruction_error_fro.svg")
 plt.close(fig)

@@ -1,9 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def relativeErrorBarChart(ax, dict, title="Reconstruction Error by Manifold Learning Algorithm"):
+def relativeErrorBarChart(ax, dict, title="Reconstruction Error by Manifold Learning Algorithm", titlefontsize=40):
 	rect = ax.bar(range(len(dict)), list(dict.values()), align='center')
-	ax.set_title(title)
+	ax.set_title(title, fontsize=titlefontsize)
 	ax.set_ylabel("Error")
 	ax.set_xticks(range(len(dict)))
 	ax.set_xticklabels(list(dict.keys()))
@@ -39,7 +39,7 @@ def regressionErrorCharacteristic(ax, embedded_points, true_parameters, dist_met
 	ax.set_ylabel("Proportion of Pairwise Distances")
 
 import matplotlib.cm as cm
-def listRegressionErrorCharacteristic(ax, embedded_points_list, true_parameters, name_list, dist_metric="l2", density=0.01):
+def listRegressionErrorCharacteristic(ax, embedded_points_list, true_parameters, name_list, dist_metric="l2", density=0.01, lw=3.0):
 	max_err = 0
 	colors = cm.rainbow(np.linspace(0, 1, len(embedded_points_list)))
 	for i in range(len(embedded_points_list)):
@@ -54,11 +54,11 @@ def listRegressionErrorCharacteristic(ax, embedded_points_list, true_parameters,
 		x_vals = np.sort(err_mat[np.triu_indices(num_points)])
 		x_vals = x_vals[np.asarray(np.linspace(0, len(x_vals)-1, num=density*len(x_vals)), dtype=int)]
 		y_vals = np.arange(1, len(x_vals)+1) / float(len(x_vals))
-		ax.plot(x_vals, y_vals, label=name_list[i], color=colors[i])
+		ax.plot(x_vals, y_vals, label=name_list[i], color=colors[i], lw=lw)
 
 	ax.set_xlim(left=0, right=max_err)
 	ax.set_ylim(bottom=0, top=1)
 	ax.set_xlabel("Distance Error Threshold")
 	ax.set_ylabel("Proportion of Pairwise Distances")
 
-	ax.legend()
+	ax.legend(loc="lower right")
