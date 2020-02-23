@@ -6,7 +6,7 @@ from collections import OrderedDict
 
 from utils import setAxisTickSize
 
-neighbors_k = 14
+neighbors_k = 15
 
 output_dir = "results_landmark/"
 
@@ -133,7 +133,7 @@ num_iters = 25
 explore_perc = 0
 
 message_resample_cov = np.eye(target_dim) * 0.01 # TODO: Change
-pruning_angle_thresh = 0.975
+pruning_angle_thresh = 0.98
 ts_noise_variance = 0.01 # In degrees
 
 embedding_name = "KernelPCA" # Could also be MDS
