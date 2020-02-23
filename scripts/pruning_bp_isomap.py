@@ -1057,14 +1057,12 @@ fig, axes = plt.subplots(nrows=3, ncols=3, figsize=(10.8, 10.8), dpi=100)
 plt.tight_layout(pad=5, h_pad=10, w_pad=5)
 axes_list = np.concatenate(axes)
 
-methods.pop()
-methods.append(Autoencoder(source_dim, target_dim, [64, 32, 32], ["relu", "relu", "relu"]))
+methods.pop(1)
+method_names.pop(1)
 
 for i in range(num_methods):
 	solver = methods[i]
 	name = method_names[i]
-	if name == "MDS":
-		continue
 	feature_coords = solver.fit_transform(points)
 
 	axes_list[i].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
