@@ -155,6 +155,7 @@ from visualization.error_plots import regressionErrorCharacteristic, listRegress
 
 from sklearn.manifold import LocallyLinearEmbedding, MDS, Isomap, SpectralEmbedding, TSNE
 from ltsa import compute_ltsa
+from autoencoder import Autoencoder
 
 methods = []
 methods.append(LocallyLinearEmbedding(n_neighbors=neighbors_k, n_components=target_dim, n_jobs=-1))
@@ -163,9 +164,10 @@ methods.append(Isomap(n_neighbors=neighbors_k, n_components=target_dim, n_jobs=-
 methods.append(SpectralEmbedding(n_components=target_dim, n_neighbors=neighbors_k, n_jobs=-1))
 methods.append(TSNE(n_components=target_dim))
 methods.append(LocallyLinearEmbedding(n_neighbors=neighbors_k, n_components=target_dim, n_jobs=-1, method="ltsa"))
+methods.append(Autoencoder(source_dim, target_dim, [64, 32, 32], ["relu", "relu", "relu"]))
 num_methods = len(methods)
 
-method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding", "t-SNE", "LTSA"]
+method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding", "t-SNE", "LTSA", "Autoencoder"]
 
 embeddings_list = []
 embeddings_name_list = []
