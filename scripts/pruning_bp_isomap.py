@@ -50,9 +50,9 @@ embedding_sp_rad = 13.0
 embedding_sp_lw = 1.0
 combined_sp_rad = 4.0
 combined_sp_lw = 0.5
-embedding_axis_tick_size = 40
+embedding_axis_tick_size = 30
 neighbors_axis_tick_size = 20
-embedding_axis_label_size = 50
+embedding_axis_label_size = 30
 
 write("\n")
 
