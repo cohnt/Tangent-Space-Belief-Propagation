@@ -155,6 +155,7 @@ from visualization.error_plots import regressionErrorCharacteristic, listRegress
 
 from sklearn.manifold import LocallyLinearEmbedding, MDS, Isomap, SpectralEmbedding, TSNE
 from ltsa import compute_ltsa
+from autoencoder import Autoencoder
 
 methods = []
 methods.append(LocallyLinearEmbedding(n_neighbors=neighbors_k, n_components=target_dim, n_jobs=-1))
@@ -163,9 +164,10 @@ methods.append(Isomap(n_neighbors=neighbors_k, n_components=target_dim, n_jobs=-
 methods.append(SpectralEmbedding(n_components=target_dim, n_neighbors=neighbors_k, n_jobs=-1))
 methods.append(TSNE(n_components=target_dim))
 methods.append(LocallyLinearEmbedding(n_neighbors=neighbors_k, n_components=target_dim, n_jobs=-1, method="ltsa"))
+methods.append(Autoencoder(source_dim, target_dim, [64, 32, 32], ["relu", "relu", "relu"]))
 num_methods = len(methods)
 
-method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding", "t-SNE", "LTSA"]
+method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding", "t-SNE", "LTSA", "Autoencoder"]
 
 embeddings_list = []
 embeddings_name_list = []
@@ -807,6 +809,116 @@ shortest_distances = graph_shortest_path(pruned_neighbors, directed=False)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
+
+###################################
+
+solver = TSNE(n_components=target_dim, metric="precomputed")
+feature_coords = solver.fit_transform(graph_shortest_path(neighbor_graph, directed=False))
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(feature_coords[:,0], feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+setAxisTickSize(ax, embedding_axis_tick_size)
+plt.savefig(output_dir + "embedding_NN_t-SNE_1_x.svg")
+plt.close(fig)
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(feature_coords[:,0], feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+setAxisTickSize(ax, embedding_axis_tick_size)
+plt.savefig(output_dir + "embedding_NN_t-SNE_1_y.svg")
+plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+setAxisTickSize(ax, embedding_axis_tick_size)
+plt.savefig(output_dir + "embedding_NN_t-SNE_2_x.svg")
+plt.close(fig)
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+setAxisTickSize(ax, embedding_axis_tick_size)
+plt.savefig(output_dir + "embedding_NN_t-SNE_2_y.svg")
+plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(-feature_coords[:,0], feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+setAxisTickSize(ax, embedding_axis_tick_size)
+plt.savefig(output_dir + "embedding_NN_t-SNE_3_x.svg")
+plt.close(fig)
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(-feature_coords[:,0], feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+setAxisTickSize(ax, embedding_axis_tick_size)
+plt.savefig(output_dir + "embedding_NN_t-SNE_3_y.svg")
+plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(-feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+setAxisTickSize(ax, embedding_axis_tick_size)
+plt.savefig(output_dir + "embedding_NN_t-SNE_4_x.svg")
+plt.close(fig)
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(-feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+setAxisTickSize(ax, embedding_axis_tick_size)
+plt.savefig(output_dir + "embedding_NN_t-SNE_4_y.svg")
+plt.close(fig)
+
+print "NN t-SNE max error: %f" % pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="max")
+print "NN t-SNE avg error: %f" % pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="mean")
+print "NN t-SNE med error: %f" % pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="median")
+print "NN t-SNE fro error: %f" % pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="fro")
+
+###################################
+
+solver = TSNE(n_components=target_dim, metric="precomputed")
+feature_coords = solver.fit_transform(shortest_distances)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(feature_coords[:,0], feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+setAxisTickSize(ax, embedding_axis_tick_size)
+plt.savefig(output_dir + "embedding_Corrected_t-SNE_1_x.svg")
+plt.close(fig)
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(feature_coords[:,0], feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+setAxisTickSize(ax, embedding_axis_tick_size)
+plt.savefig(output_dir + "embedding_Corrected_t-SNE_1_y.svg")
+plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+setAxisTickSize(ax, embedding_axis_tick_size)
+plt.savefig(output_dir + "embedding_Corrected_t-SNE_2_x.svg")
+plt.close(fig)
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+setAxisTickSize(ax, embedding_axis_tick_size)
+plt.savefig(output_dir + "embedding_Corrected_t-SNE_2_y.svg")
+plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(-feature_coords[:,0], feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+setAxisTickSize(ax, embedding_axis_tick_size)
+plt.savefig(output_dir + "embedding_Corrected_t-SNE_3_x.svg")
+plt.close(fig)
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(-feature_coords[:,0], feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+setAxisTickSize(ax, embedding_axis_tick_size)
+plt.savefig(output_dir + "embedding_Corrected_t-SNE_3_y.svg")
+plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(-feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,0]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+setAxisTickSize(ax, embedding_axis_tick_size)
+plt.savefig(output_dir + "embedding_Corrected_t-SNE_4_x.svg")
+plt.close(fig)
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(-feature_coords[:,0], -feature_coords[:,1], c=true_vals[:,1]/10.0, cmap=plt.cm.Spectral, s=embedding_point_radius**2)
+setAxisTickSize(ax, embedding_axis_tick_size)
+plt.savefig(output_dir + "embedding_Corrected_t-SNE_4_y.svg")
+plt.close(fig)
+
+print "Corrected t-SNE max error: %f" % pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="max")
+print "Corrected t-SNE avg error: %f" % pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="mean")
+print "Corrected t-SNE med error: %f" % pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="median")
+print "Corrected t-SNE fro error: %f" % pairwiseDistErr(feature_coords, true_vals, dist_metric="l2", mat_norm="fro")
+
+###################################
 
 write("Fitting KernelPCA...")
 flush()

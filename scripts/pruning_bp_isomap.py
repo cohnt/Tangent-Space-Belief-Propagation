@@ -16,9 +16,9 @@ from collections import OrderedDict
 global_t0 = time.time()
 
 dataset_name = "long_spiral_curve"
-# dataset_seed = 4045775215
+dataset_seed = 4045775215
 # dataset_seed = 4015005259
-dataset_seed = np.random.randint(0, 2**32)
+# dataset_seed = np.random.randint(0, 2**32)
 num_points = 500    # Number of data points
 data_noise = 0.001 # How much noise is added to the data
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
@@ -42,11 +42,11 @@ kpca_eigen_solver = "auto"
 kpca_tol = 1e-9
 kpca_max_iter = 3000
 
-data_sp_rad = 7.0
+data_sp_rad = 10.0
 data_sp_lw = 1.0
 nn_lw = 1.0
 pca_ll = 0.1
-embedding_sp_rad = 7.0
+embedding_sp_rad = 13.0
 embedding_sp_lw = 1.0
 combined_sp_rad = 4.0
 combined_sp_lw = 0.5
@@ -882,6 +882,7 @@ flush()
 
 from sklearn.manifold import LocallyLinearEmbedding, MDS, Isomap, SpectralEmbedding, TSNE
 from ltsa import compute_ltsa
+from autoencoder import Autoencoder
 
 methods = []
 methods.append(LocallyLinearEmbedding(n_neighbors=neighbors_k, n_components=target_dim, n_jobs=-1))
@@ -889,9 +890,10 @@ methods.append(MDS(n_components=target_dim, n_jobs=-1))
 methods.append(Isomap(n_neighbors=neighbors_k, n_components=target_dim, n_jobs=-1))
 methods.append(SpectralEmbedding(n_components=target_dim, n_neighbors=neighbors_k, n_jobs=-1))
 methods.append(TSNE(n_components=target_dim))
+methods.append(Autoencoder(source_dim, target_dim, [64, 32, 32], ["relu", "relu", "relu"]))
 num_methods = len(methods)
 
-method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding", "t-SNE"]
+method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding", "t-SNE", "Autoencoder"]
 
 for i in range(num_methods):
 	solver = methods[i]
@@ -1031,8 +1033,37 @@ ax.set_title("\n".join(wrap("Regression Error Characteristic from HLLE", 50)))
 plt.savefig(output_dir + "rec_HLLE.svg")
 plt.close(fig)
 
+write("Computing Corrected t-SNE...")
+flush()
+t0 = time.time()
+feature_coords = TSNE(n_components=target_dim, metric="precomputed").fit_transform(shortest_distances)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+method_errs["Corrected t-SNE"] = pairwiseDistErr(feature_coords, true_parameters, dist_metric=err_dist_metric, mat_norm=err_mat_norm)
+print "Corrected t-SNE Error: %f" % method_errs["Corrected t-SNE"]
+
+embeddings_list.append(feature_coords)
+embeddings_name_list.append("Corrected t-SNE")
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
+ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Corrected t-SNE\n Reconstruction Error: %f" % method_errs["Corrected t-SNE"], 50)))
+plt.xlabel("Actual Parameter Value")
+plt.ylabel("Embedded Coordinate")
+plt.savefig(output_dir + "comparison_Corrected t-SNE.svg")
+plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+regressionErrorCharacteristic(ax, feature_coords, true_parameters, dist_metric=err_dist_metric)
+ax.set_title("\n".join(wrap("Regression Error Characteristic from Corrected t-SNE", 50)))
+plt.savefig(output_dir + "rec_Corrected t-SNE.svg")
+plt.close(fig)
+
 method_errs.pop("LTSA BPT")
 method_errs.pop("LTSA Pruning")
+method_errs.pop("Corrected t-SNE")
 from visualization.error_plots import relativeErrorBarChart
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 relativeErrorBarChart(ax, method_errs)
@@ -1054,6 +1085,10 @@ matplotlib.rcParams.update({'font.size': 6})
 fig, axes = plt.subplots(nrows=3, ncols=3, figsize=(10.8, 10.8), dpi=100)
 plt.tight_layout(pad=5, h_pad=10, w_pad=5)
 axes_list = np.concatenate(axes)
+
+methods.pop(1)
+method_names.pop(1)
+num_methods = len(methods)
 
 for i in range(num_methods):
 	solver = methods[i]
