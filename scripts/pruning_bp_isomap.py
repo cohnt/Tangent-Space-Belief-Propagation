@@ -1052,13 +1052,13 @@ ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_
 ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Corrected t-SNE\n Reconstruction Error: %f" % method_errs["Corrected t-SNE"], 50)))
 plt.xlabel("Actual Parameter Value")
 plt.ylabel("Embedded Coordinate")
-plt.savefig(output_dir + "comparison_Corrected t-SNE.svg")
+plt.savefig(output_dir + "comparison_corrected_t-SNE.svg")
 plt.close(fig)
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 regressionErrorCharacteristic(ax, feature_coords, true_parameters, dist_metric=err_dist_metric)
 ax.set_title("\n".join(wrap("Regression Error Characteristic from Corrected t-SNE", 50)))
-plt.savefig(output_dir + "rec_Corrected t-SNE.svg")
+plt.savefig(output_dir + "rec_corrected_t-SNE.svg")
 plt.close(fig)
 
 method_errs.pop("LTSA BPT")
