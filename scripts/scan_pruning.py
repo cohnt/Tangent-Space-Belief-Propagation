@@ -69,7 +69,8 @@ title_font_size = 30
 
 min_k = 1
 max_k = 15
-method_errs_list = [OrderedDict() for _ in range(min_k, max_k+1)]
+method_max_errs_list = [OrderedDict() for _ in range(min_k, max_k+1)]
+method_mean_errs_list= [OrderedDict() for _ in range(min_k, max_k+1)]
 
 write("\n")
 
@@ -117,9 +118,12 @@ f.close()
 #################
 
 from utils import pairwiseDistErr
-def error_func(embedded_points, true_vals):
+def error_func_max(embedded_points, true_vals):
 	ordered_points = np.argsort(embedded_points[:,0])
 	return pairwiseDistErr(np.asmatrix(ordered_points, dtype=float).T, np.asmatrix(true_vals, dtype=float).T, dist_metric="l1", mat_norm="max", normalize_data=False)
+def error_func_mean(embedded_points, true_vals):
+	ordered_points = np.argsort(embedded_points[:,0])
+	return pairwiseDistErr(np.asmatrix(ordered_points, dtype=float).T, np.asmatrix(true_vals, dtype=float).T, dist_metric="l1", mat_norm="mean", normalize_data=False)
 
 #################
 
@@ -655,7 +659,8 @@ for neighbors_k in range(min_k, max_k+1):
 	plt.savefig(output_dir + ("coord_bp_%d_iters_k_%s.svg" % (iter_num-1, str(neighbors_k).zfill(2))))
 
 	print "Maximum error: %f" % error_func(feature_coords, true_vals)
-	method_errs_list[neighbors_k-min_k]["TSBP"] = error_func(feature_coords, true_vals)
+	method_max_errs_list[neighbors_k-min_k]["TSBP"] = error_func_max(feature_coords, true_vals)
+	method_mean_errs_list[neighbors_k-min_k]["TSBP"] = error_func_mean(feature_coords, true_vals)
 
 ##############################################################################
 ##############################################################################
@@ -818,7 +823,8 @@ for i in range(num_methods):
 	plt.close(fig)
 	print "Maximum error: %f" % error_func(feature_coords, true_vals)
 	for k in range(min_k, max_k+1):
-		method_errs_list[k-min_k][name] = error_func(feature_coords, true_vals)
+		method_max_errs_list[k-min_k][name] = error_func_max(feature_coords, true_vals)
+		method_mean_errs_list[k-min_k][name] = error_func_mean(feature_coords, true_vals)
 
 from autoencoder import Autoencoder
 
@@ -835,7 +841,8 @@ plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + "autoencoder.svg")
 plt.close(fig)
 print "Maximum error: %f" % error_func(feature_coords, true_vals)
 for k in range(min_k, max_k+1):
-	method_errs_list[k-min_k]["Autoencoder"] = error_func(feature_coords, true_vals)
+	method_max_errs_list[k-min_k]["Autoencoder"] = error_func_max(feature_coords, true_vals)
+	method_mean_errs_list[k-min_k]["Autoencoder"] = error_func_mean(feature_coords, true_vals)
 
 for k in range(min_k, max_k+1):
 	print "\t\t\t\t\tk value: %d" % k
@@ -867,7 +874,8 @@ for k in range(min_k, max_k+1):
 		plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + name + ".svg")
 		plt.close(fig)
 		print "Maximum error: %f" % error_func(feature_coords, true_vals)
-		method_errs_list[k-min_k][name] = error_func(feature_coords, true_vals)
+		method_max_errs_list[k-min_k][name] = error_func_max(feature_coords, true_vals)
+		method_mean_errs_list[k-min_k][name] = error_func_mean(feature_coords, true_vals)
 
 	write("Computing Classical LTSA...")
 
@@ -900,7 +908,8 @@ for k in range(min_k, max_k+1):
 	plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + "LTSA.svg")
 	plt.close(fig)
 	print "Maximum error: %f" % error_func(feature_coords, true_vals)
-	method_errs_list[k-min_k]["LTSA"] = error_func(feature_coords, true_vals)
+	method_max_errs_list[k-min_k]["LTSA"] = error_func_max(feature_coords, true_vals)
+	method_mean_errs_list[k-min_k]["LTSA"] = error_func_mean(feature_coords, true_vals)
 
 
 	# methods = []
@@ -936,6 +945,10 @@ flush()
 from visualization.error_plots import relativeErrorBarChart
 for k in range(min_k, max_k+1):
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-	relativeErrorBarChart(ax, method_errs_list[k-min_k])
-	plt.savefig(output_dir + "reconstruction_error_%d.svg" % k)
+	relativeErrorBarChart(ax, method_max_errs_list[k-min_k])
+	plt.savefig(output_dir + "reconstruction_max_error_%d.svg" % k)
+	plt.close(fig)
+	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+	relativeErrorBarChart(ax, method_mean_errs_list[k-min_k])
+	plt.savefig(output_dir + "reconstruction_mean_error_%d.svg" % k)
 	plt.close(fig)
