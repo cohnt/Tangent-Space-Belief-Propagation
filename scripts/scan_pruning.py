@@ -658,7 +658,7 @@ for neighbors_k in range(min_k, max_k+1):
 	setAxisTickSize(ax, embedding_axis_tick_size)
 	plt.savefig(output_dir + ("coord_bp_%d_iters_k_%s.svg" % (iter_num-1, str(neighbors_k).zfill(2))))
 
-	print "Maximum error: %f" % error_func(feature_coords, true_vals)
+	print "Maximum error: %f" % error_func_max(feature_coords, true_vals)
 	method_max_errs_list[neighbors_k-min_k]["TSBP"] = error_func_max(feature_coords, true_vals)
 	method_mean_errs_list[neighbors_k-min_k]["TSBP"] = error_func_mean(feature_coords, true_vals)
 
@@ -821,7 +821,7 @@ for i in range(num_methods):
 	setAxisTickSize(ax, embedding_axis_tick_size)
 	plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + name + ".svg")
 	plt.close(fig)
-	print "Maximum error: %f" % error_func(feature_coords, true_vals)
+	print "Maximum error: %f" % error_func_max(feature_coords, true_vals)
 	for k in range(min_k, max_k+1):
 		method_max_errs_list[k-min_k][name] = error_func_max(feature_coords, true_vals)
 		method_mean_errs_list[k-min_k][name] = error_func_mean(feature_coords, true_vals)
@@ -839,7 +839,7 @@ plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
 setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + "autoencoder.svg")
 plt.close(fig)
-print "Maximum error: %f" % error_func(feature_coords, true_vals)
+print "Maximum error: %f" % error_func_max(feature_coords, true_vals)
 for k in range(min_k, max_k+1):
 	method_max_errs_list[k-min_k]["Autoencoder"] = error_func_max(feature_coords, true_vals)
 	method_mean_errs_list[k-min_k]["Autoencoder"] = error_func_mean(feature_coords, true_vals)
@@ -873,7 +873,7 @@ for k in range(min_k, max_k+1):
 		setAxisTickSize(ax, embedding_axis_tick_size)
 		plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + name + ".svg")
 		plt.close(fig)
-		print "Maximum error: %f" % error_func(feature_coords, true_vals)
+		print "Maximum error: %f" % error_func_max(feature_coords, true_vals)
 		method_max_errs_list[k-min_k][name] = error_func_max(feature_coords, true_vals)
 		method_mean_errs_list[k-min_k][name] = error_func_mean(feature_coords, true_vals)
 
@@ -907,7 +907,7 @@ for k in range(min_k, max_k+1):
 	setAxisTickSize(ax, embedding_axis_tick_size)
 	plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + "LTSA.svg")
 	plt.close(fig)
-	print "Maximum error: %f" % error_func(feature_coords, true_vals)
+	print "Maximum error: %f" % error_func_max(feature_coords, true_vals)
 	method_max_errs_list[k-min_k]["LTSA"] = error_func_max(feature_coords, true_vals)
 	method_mean_errs_list[k-min_k]["LTSA"] = error_func_mean(feature_coords, true_vals)
 
