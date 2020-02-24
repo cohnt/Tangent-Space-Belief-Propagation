@@ -67,8 +67,8 @@ neighbors_axis_tick_size = 20
 embedding_axis_label_size = 20
 title_font_size = 30
 
-min_k = 1
-max_k = 15
+min_k = 2
+max_k = 8
 method_max_errs_list = [OrderedDict() for _ in range(min_k, max_k+1)]
 method_mean_errs_list= [OrderedDict() for _ in range(min_k, max_k+1)]
 
