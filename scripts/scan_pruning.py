@@ -10,7 +10,8 @@ import sys
 import copy
 from joblib import Parallel, delayed
 from tqdm import tqdm
-from utils import write, flush
+from utils import write, flush, setAxisTickSize
+from collections import OrderedDict
 
 from datasets.other.laser_scan import make_laser_scan_curve
 
@@ -28,6 +29,7 @@ points, true_vals = make_laser_scan_curve()
 ######################################################################
 
 global_t0 = time.time()
+
 
 dataset_name = "laser_scan"
 num_points = None # Get from the data
@@ -59,8 +61,16 @@ embedding_sp_lw = 1.0
 combined_sp_rad = 4.0
 combined_sp_lw = 0.5
 
-min_k = 1
-max_k = 15
+embedding_point_radius = 13.0
+embedding_axis_tick_size = 40
+neighbors_axis_tick_size = 20
+embedding_axis_label_size = 20
+title_font_size = 30
+
+min_k = 2
+max_k = 8
+method_max_errs_list = [OrderedDict() for _ in range(min_k, max_k+1)]
+method_mean_errs_list= [OrderedDict() for _ in range(min_k, max_k+1)]
 
 write("\n")
 
@@ -104,6 +114,18 @@ f.write("embedding_tol=%s\n" % str(kpca_tol))
 f.write("embedding_max_iter=%d\n" % kpca_max_iter)
 
 f.close()
+
+#################
+
+from utils import pairwiseDistErr
+def error_func_max(embedded_points, true_vals):
+	ordered_points = np.argsort(embedded_points[:,0])
+	return pairwiseDistErr(np.asmatrix(ordered_points, dtype=float).T, np.asmatrix(true_vals, dtype=float).T, dist_metric="l1", mat_norm="max", normalize_data=False)
+def error_func_mean(embedded_points, true_vals):
+	ordered_points = np.argsort(embedded_points[:,0])
+	return pairwiseDistErr(np.asmatrix(ordered_points, dtype=float).T, np.asmatrix(true_vals, dtype=float).T, dist_metric="l1", mat_norm="mean", normalize_data=False)
+
+#################
 
 for neighbors_k in range(min_k, max_k+1):
 	#######################
@@ -629,11 +651,16 @@ for neighbors_k in range(min_k, max_k+1):
 	flush()
 
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-	ax.scatter(true_vals, feature_coords, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
-	ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from BP Tangent Correction for Edge Pruning (k=%d)" % neighbors_k, 60)))
-	plt.xlabel("Actual Parameter Value")
-	plt.ylabel("Embedded Coordinate")
+	ax.scatter(true_vals, feature_coords, c=true_vals/float(np.max(true_vals)), cmap=plt.cm.Spectral, s=embedding_point_radius**2, linewidths=embedding_sp_lw)
+	# ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from BP Tangent Correction for Edge Pruning (k=%d)" % neighbors_k, 60)))
+	plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
+	plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
+	setAxisTickSize(ax, embedding_axis_tick_size)
 	plt.savefig(output_dir + ("coord_bp_%d_iters_k_%s.svg" % (iter_num-1, str(neighbors_k).zfill(2))))
+
+	print "Maximum error: %f" % error_func_max(feature_coords, true_vals)
+	method_max_errs_list[neighbors_k-min_k]["TSBP"] = error_func_max(feature_coords, true_vals)
+	method_mean_errs_list[neighbors_k-min_k]["TSBP"] = error_func_mean(feature_coords, true_vals)
 
 ##############################################################################
 ##############################################################################
@@ -765,6 +792,7 @@ plt.savefig(output_dir + "pca_pruning.svg")
 
 k = neighbors_k
 
+
 from sklearn.manifold import LocallyLinearEmbedding, MDS, Isomap, SpectralEmbedding, TSNE
 from ltsa import compute_ltsa
 
@@ -786,12 +814,35 @@ for i in range(num_methods):
 	flush()
 	
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-	ax.scatter(true_vals, feature_coords)
-	ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from %s" % name, 60)))
-	plt.xlabel("Actual Parameter Value")
-	plt.ylabel("Embedded Coordinate")
+	ax.scatter(true_vals, feature_coords, c=true_vals/float(np.max(true_vals)), cmap=plt.cm.Spectral, s=embedding_point_radius**2, linewidths=embedding_sp_lw)
+	# ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from %s" % name, 60)))
+	plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
+	plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
+	setAxisTickSize(ax, embedding_axis_tick_size)
 	plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + name + ".svg")
 	plt.close(fig)
+	print "Maximum error: %f" % error_func_max(feature_coords, true_vals)
+	for k in range(min_k, max_k+1):
+		method_max_errs_list[k-min_k][name] = error_func_max(feature_coords, true_vals)
+		method_mean_errs_list[k-min_k][name] = error_func_mean(feature_coords, true_vals)
+
+from autoencoder import Autoencoder
+
+solver = Autoencoder(source_dim, target_dim, [64, 32, 32], ["relu", "relu", "relu"])
+feature_coords = solver.fit_transform(points)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(true_vals, feature_coords, c=true_vals/float(np.max(true_vals)), cmap=plt.cm.Spectral, s=embedding_point_radius**2, linewidths=embedding_sp_lw)
+# ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Autoencoder", 60)))
+plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
+plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
+setAxisTickSize(ax, embedding_axis_tick_size)
+plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + "autoencoder.svg")
+plt.close(fig)
+print "Maximum error: %f" % error_func_max(feature_coords, true_vals)
+for k in range(min_k, max_k+1):
+	method_max_errs_list[k-min_k]["Autoencoder"] = error_func_max(feature_coords, true_vals)
+	method_mean_errs_list[k-min_k]["Autoencoder"] = error_func_mean(feature_coords, true_vals)
 
 for k in range(min_k, max_k+1):
 	print "\t\t\t\t\tk value: %d" % k
@@ -815,12 +866,16 @@ for k in range(min_k, max_k+1):
 		flush()
 		
 		fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-		ax.scatter(true_vals, feature_coords)
-		ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from %s" % name, 60)))
-		plt.xlabel("Actual Parameter Value")
-		plt.ylabel("Embedded Coordinate")
+		ax.scatter(true_vals, feature_coords, c=true_vals/float(np.max(true_vals)), cmap=plt.cm.Spectral, s=embedding_point_radius**2, linewidths=embedding_sp_lw)
+		# ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from %s" % name, 60)))
+		plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
+		plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
+		setAxisTickSize(ax, embedding_axis_tick_size)
 		plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + name + ".svg")
 		plt.close(fig)
+		print "Maximum error: %f" % error_func_max(feature_coords, true_vals)
+		method_max_errs_list[k-min_k][name] = error_func_max(feature_coords, true_vals)
+		method_mean_errs_list[k-min_k][name] = error_func_mean(feature_coords, true_vals)
 
 	write("Computing Classical LTSA...")
 
@@ -845,12 +900,16 @@ for k in range(min_k, max_k+1):
 	flush()
 
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-	ax.scatter(true_vals, feature_coords)
-	ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Classical LTSA", 60)))
-	plt.xlabel("Actual Parameter Value")
-	plt.ylabel("Embedded Coordinate")
+	ax.scatter(true_vals, feature_coords, c=true_vals/float(np.max(true_vals)), cmap=plt.cm.Spectral, s=embedding_point_radius**2, linewidths=embedding_sp_lw)
+	# ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Classical LTSA", 60)))
+	plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
+	plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
+	setAxisTickSize(ax, embedding_axis_tick_size)
 	plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + "LTSA.svg")
 	plt.close(fig)
+	print "Maximum error: %f" % error_func_max(feature_coords, true_vals)
+	method_max_errs_list[k-min_k]["LTSA"] = error_func_max(feature_coords, true_vals)
+	method_mean_errs_list[k-min_k]["LTSA"] = error_func_mean(feature_coords, true_vals)
 
 
 	# methods = []
@@ -882,3 +941,14 @@ for k in range(min_k, max_k+1):
 global_t1 = time.time()
 write("\nTotal program runtime: %d seconds.\n\n" % (global_t1-global_t0))
 flush()
+
+from visualization.error_plots import relativeErrorBarChart
+for k in range(min_k, max_k+1):
+	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+	relativeErrorBarChart(ax, method_max_errs_list[k-min_k])
+	plt.savefig(output_dir + "reconstruction_max_error_%d.svg" % k)
+	plt.close(fig)
+	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+	relativeErrorBarChart(ax, method_mean_errs_list[k-min_k])
+	plt.savefig(output_dir + "reconstruction_mean_error_%d.svg" % k)
+	plt.close(fig)

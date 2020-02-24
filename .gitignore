@@ -13,6 +13,7 @@ datasets/other/data.csv
 *.svg
 *.png
 *.gif
+*.mp4
 
 # LaTeX
 *.aux
