@@ -10,7 +10,7 @@ import sys
 import copy
 from joblib import Parallel, delayed
 from tqdm import tqdm
-from utils import write, flush
+from utils import write, flush, setAxisTickSize
 
 from datasets.other.laser_scan import make_laser_scan_curve
 
@@ -59,6 +59,12 @@ embedding_sp_lw = 1.0
 combined_sp_rad = 4.0
 combined_sp_lw = 0.5
 
+embedding_point_radius = 13.0
+embedding_axis_tick_size = 40
+neighbors_axis_tick_size = 20
+embedding_axis_label_size = 30
+title_font_size = 30
+
 min_k = 1
 max_k = 15
 
@@ -104,6 +110,15 @@ f.write("embedding_tol=%s\n" % str(kpca_tol))
 f.write("embedding_max_iter=%d\n" % kpca_max_iter)
 
 f.close()
+
+#################
+
+from utils import pairwiseDistErr
+def error_func(embedded_points, true_vals):
+	ordered_points = np.argsort(embedded_points)
+	return pairwiseDistErr(np.asmatrix(ordered_points).T, np.asmatrix(true_vals).T, dist_metric="l2", mat_norm="max")
+
+#################
 
 for neighbors_k in range(min_k, max_k+1):
 	#######################
@@ -629,11 +644,14 @@ for neighbors_k in range(min_k, max_k+1):
 	flush()
 
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-	ax.scatter(true_vals, feature_coords, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
-	ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from BP Tangent Correction for Edge Pruning (k=%d)" % neighbors_k, 60)))
-	plt.xlabel("Actual Parameter Value")
-	plt.ylabel("Embedded Coordinate")
+	ax.scatter(true_vals, feature_coords, c=true_vals/float(np.max(true_vals)), cmap=plt.cm.Spectral, s=embedding_point_radius**2, linewidths=embedding_sp_lw)
+	# ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from BP Tangent Correction for Edge Pruning (k=%d)" % neighbors_k, 60)))
+	plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
+	plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
+	setAxisTickSize(ax, embedding_axis_tick_size)
 	plt.savefig(output_dir + ("coord_bp_%d_iters_k_%s.svg" % (iter_num-1, str(neighbors_k).zfill(2))))
+
+	print "Maximum error: %f" % error_func(feature_coords, true_vals)
 
 ##############################################################################
 ##############################################################################
@@ -786,10 +804,11 @@ for i in range(num_methods):
 	flush()
 	
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-	ax.scatter(true_vals, feature_coords)
-	ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from %s" % name, 60)))
-	plt.xlabel("Actual Parameter Value")
-	plt.ylabel("Embedded Coordinate")
+	ax.scatter(true_vals, feature_coords, c=true_vals/float(np.max(true_vals)), cmap=plt.cm.Spectral, s=embedding_point_radius**2, linewidths=embedding_sp_lw)
+	# ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from %s" % name, 60)))
+	plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
+	plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
+	setAxisTickSize(ax, embedding_axis_tick_size)
 	plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + name + ".svg")
 	plt.close(fig)
 
@@ -815,10 +834,11 @@ for k in range(min_k, max_k+1):
 		flush()
 		
 		fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-		ax.scatter(true_vals, feature_coords)
-		ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from %s" % name, 60)))
-		plt.xlabel("Actual Parameter Value")
-		plt.ylabel("Embedded Coordinate")
+		ax.scatter(true_vals, feature_coords, c=true_vals/float(np.max(true_vals)), cmap=plt.cm.Spectral, s=embedding_point_radius**2, linewidths=embedding_sp_lw)
+		# ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from %s" % name, 60)))
+		plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
+		plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
+		setAxisTickSize(ax, embedding_axis_tick_size)
 		plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + name + ".svg")
 		plt.close(fig)
 
@@ -845,11 +865,26 @@ for k in range(min_k, max_k+1):
 	flush()
 
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-	ax.scatter(true_vals, feature_coords)
-	ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Classical LTSA", 60)))
-	plt.xlabel("Actual Parameter Value")
-	plt.ylabel("Embedded Coordinate")
+	ax.scatter(true_vals, feature_coords, c=true_vals/float(np.max(true_vals)), cmap=plt.cm.Spectral, s=embedding_point_radius**2, linewidths=embedding_sp_lw)
+	# ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Classical LTSA", 60)))
+	plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
+	plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
+	setAxisTickSize(ax, embedding_axis_tick_size)
 	plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + "LTSA.svg")
+	plt.close(fig)
+
+	from autoencoder import Autoencoder
+
+	solver = Autoencoder(source_dim, target_dim, [64, 32, 32], ["relu", "relu", "relu"])
+	feature_coords = solver.fit_transform(points)
+
+	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+	ax.scatter(true_vals, feature_coords, c=true_vals/float(np.max(true_vals)), cmap=plt.cm.Spectral, s=embedding_point_radius**2, linewidths=embedding_sp_lw)
+	# ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Autoencoder", 60)))
+	plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
+	plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
+	setAxisTickSize(ax, embedding_axis_tick_size)
+	plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + "autoencoder.svg")
 	plt.close(fig)
 
 
