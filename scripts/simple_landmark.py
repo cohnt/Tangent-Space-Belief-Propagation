@@ -6,7 +6,7 @@ from collections import OrderedDict
 
 from utils import setAxisTickSize
 
-neighbors_k = 15
+neighbors_k = 10
 
 output_dir = "results_landmark/"
 
@@ -65,8 +65,12 @@ title_font_size = 30
 # ]
 # num_landmarks = len(landmark_coords)
 
-landmark_coords = np.append(np.stack((np.linspace(1, 1, num=10), np.linspace(1, 10, num=10)), axis=-1), np.stack((np.linspace(10, 10, num=10), np.linspace(1, 10, num=10)), axis=-1), axis=0)
-landmark_coords = landmark_coords + np.random.uniform(low=-0.1, high=0.1, size=landmark_coords.shape)
+# landmark_coords = np.append(np.stack((np.linspace(1, 1, num=10), np.linspace(1, 10, num=10)), axis=-1), np.stack((np.linspace(10, 10, num=10), np.linspace(1, 10, num=10)), axis=-1), axis=0)
+# landmark_coords = landmark_coords + np.random.uniform(low=-0.1, high=0.1, size=landmark_coords.shape)
+# num_landmarks = len(landmark_coords)
+
+landmark_coords = np.stack((np.linspace(1, 10, num=40), np.linspace(1, 10, num=40)), axis=-1)
+landmark_coords = landmark_coords + np.random.uniform(low=-0.75, high=0.75, size=landmark_coords.shape)
 num_landmarks = len(landmark_coords)
 
 print "Landmarks:"
@@ -137,7 +141,7 @@ num_iters = 25
 explore_perc = 0
 
 message_resample_cov = np.eye(target_dim) * 0.01 # TODO: Change
-pruning_angle_thresh = 0.98
+pruning_angle_thresh = 0.99
 ts_noise_variance = 0.01 # In degrees
 
 embedding_name = "KernelPCA" # Could also be MDS
