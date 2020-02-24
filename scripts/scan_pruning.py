@@ -11,6 +11,7 @@ import copy
 from joblib import Parallel, delayed
 from tqdm import tqdm
 from utils import write, flush, setAxisTickSize
+from collections import OrderedDict
 
 from datasets.other.laser_scan import make_laser_scan_curve
 
@@ -28,6 +29,8 @@ points, true_vals = make_laser_scan_curve()
 ######################################################################
 
 global_t0 = time.time()
+
+method_errs = OrderedDict()
 
 dataset_name = "laser_scan"
 num_points = None # Get from the data
@@ -115,8 +118,8 @@ f.close()
 
 from utils import pairwiseDistErr
 def error_func(embedded_points, true_vals):
-	ordered_points = np.argsort(embedded_points)
-	return pairwiseDistErr(np.asmatrix(ordered_points).T, np.asmatrix(true_vals).T, dist_metric="l2", mat_norm="max")
+	ordered_points = np.argsort(embedded_points[:,0])
+	return pairwiseDistErr(np.asmatrix(ordered_points, dtype=float).T, np.asmatrix(true_vals, dtype=float).T, dist_metric="l1", mat_norm="max")
 
 #################
 
@@ -652,6 +655,7 @@ for neighbors_k in range(min_k, max_k+1):
 	plt.savefig(output_dir + ("coord_bp_%d_iters_k_%s.svg" % (iter_num-1, str(neighbors_k).zfill(2))))
 
 	print "Maximum error: %f" % error_func(feature_coords, true_vals)
+	method_errs["TSBP %d" % neighbors_k] = error_func(feature_coords, true_vals)
 
 ##############################################################################
 ##############################################################################
@@ -783,6 +787,7 @@ plt.savefig(output_dir + "pca_pruning.svg")
 
 k = neighbors_k
 
+
 from sklearn.manifold import LocallyLinearEmbedding, MDS, Isomap, SpectralEmbedding, TSNE
 from ltsa import compute_ltsa
 
@@ -811,6 +816,8 @@ for i in range(num_methods):
 	setAxisTickSize(ax, embedding_axis_tick_size)
 	plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + name + ".svg")
 	plt.close(fig)
+	print "Maximum error: %f" % error_func(feature_coords, true_vals)
+	method_errs[name] = error_func(feature_coords, true_vals)
 
 from autoencoder import Autoencoder
 
@@ -825,6 +832,8 @@ plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
 setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + "autoencoder.svg")
 plt.close(fig)
+print "Maximum error: %f" % error_func(feature_coords, true_vals)
+method_errs["Autoencoder"] = error_func(feature_coords, true_vals)
 
 for k in range(min_k, max_k+1):
 	print "\t\t\t\t\tk value: %d" % k
@@ -855,6 +864,8 @@ for k in range(min_k, max_k+1):
 		setAxisTickSize(ax, embedding_axis_tick_size)
 		plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + name + ".svg")
 		plt.close(fig)
+		print "Maximum error: %f" % error_func(feature_coords, true_vals)
+		method_errs[name + " %d" % k] = error_func(feature_coords, true_vals)
 
 	write("Computing Classical LTSA...")
 
@@ -886,6 +897,8 @@ for k in range(min_k, max_k+1):
 	setAxisTickSize(ax, embedding_axis_tick_size)
 	plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + "LTSA.svg")
 	plt.close(fig)
+	print "Maximum error: %f" % error_func(feature_coords, true_vals)
+	method_errs["LTSA %d" % k] = error_func(feature_coords, true_vals)
 
 
 	# methods = []
@@ -917,3 +930,9 @@ for k in range(min_k, max_k+1):
 global_t1 = time.time()
 write("\nTotal program runtime: %d seconds.\n\n" % (global_t1-global_t0))
 flush()
+
+from visualization.error_plots import relativeErrorBarChart
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+relativeErrorBarChart(ax, method_errs)
+plt.savefig(output_dir + "reconstruction_error.svg")
+plt.close(fig)
