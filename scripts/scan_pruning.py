@@ -812,6 +812,20 @@ for i in range(num_methods):
 	plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + name + ".svg")
 	plt.close(fig)
 
+from autoencoder import Autoencoder
+
+solver = Autoencoder(source_dim, target_dim, [64, 32, 32], ["relu", "relu", "relu"])
+feature_coords = solver.fit_transform(points)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(true_vals, feature_coords, c=true_vals/float(np.max(true_vals)), cmap=plt.cm.Spectral, s=embedding_point_radius**2, linewidths=embedding_sp_lw)
+# ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Autoencoder", 60)))
+plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
+plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
+setAxisTickSize(ax, embedding_axis_tick_size)
+plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + "autoencoder.svg")
+plt.close(fig)
+
 for k in range(min_k, max_k+1):
 	print "\t\t\t\t\tk value: %d" % k
 	methods = []
@@ -871,20 +885,6 @@ for k in range(min_k, max_k+1):
 	plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
 	setAxisTickSize(ax, embedding_axis_tick_size)
 	plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + "LTSA.svg")
-	plt.close(fig)
-
-	from autoencoder import Autoencoder
-
-	solver = Autoencoder(source_dim, target_dim, [64, 32, 32], ["relu", "relu", "relu"])
-	feature_coords = solver.fit_transform(points)
-
-	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-	ax.scatter(true_vals, feature_coords, c=true_vals/float(np.max(true_vals)), cmap=plt.cm.Spectral, s=embedding_point_radius**2, linewidths=embedding_sp_lw)
-	# ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Autoencoder", 60)))
-	plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
-	plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
-	setAxisTickSize(ax, embedding_axis_tick_size)
-	plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + "autoencoder.svg")
 	plt.close(fig)
 
 
