@@ -30,7 +30,6 @@ points, true_vals = make_laser_scan_curve()
 
 global_t0 = time.time()
 
-method_errs = OrderedDict()
 
 dataset_name = "laser_scan"
 num_points = None # Get from the data
@@ -65,11 +64,12 @@ combined_sp_lw = 0.5
 embedding_point_radius = 13.0
 embedding_axis_tick_size = 40
 neighbors_axis_tick_size = 20
-embedding_axis_label_size = 30
+embedding_axis_label_size = 20
 title_font_size = 30
 
 min_k = 1
 max_k = 15
+method_errs_list = [OrderedDict() for _ in range(min_k, max_k+1)]
 
 write("\n")
 
@@ -655,7 +655,7 @@ for neighbors_k in range(min_k, max_k+1):
 	plt.savefig(output_dir + ("coord_bp_%d_iters_k_%s.svg" % (iter_num-1, str(neighbors_k).zfill(2))))
 
 	print "Maximum error: %f" % error_func(feature_coords, true_vals)
-	method_errs["TSBP %d" % neighbors_k] = error_func(feature_coords, true_vals)
+	method_errs_list[neighbors_k-min_k]["TSBP"] = error_func(feature_coords, true_vals)
 
 ##############################################################################
 ##############################################################################
@@ -817,7 +817,8 @@ for i in range(num_methods):
 	plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + name + ".svg")
 	plt.close(fig)
 	print "Maximum error: %f" % error_func(feature_coords, true_vals)
-	method_errs[name] = error_func(feature_coords, true_vals)
+	for k in range(min_k, max_k+1):
+		method_errs_list[k-min_k][name] = error_func(feature_coords, true_vals)
 
 from autoencoder import Autoencoder
 
@@ -833,7 +834,8 @@ setAxisTickSize(ax, embedding_axis_tick_size)
 plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + "autoencoder.svg")
 plt.close(fig)
 print "Maximum error: %f" % error_func(feature_coords, true_vals)
-method_errs["Autoencoder"] = error_func(feature_coords, true_vals)
+for k in range(min_k, max_k+1):
+	method_errs_list[k-min_k]["Autoencoder"] = error_func(feature_coords, true_vals)
 
 for k in range(min_k, max_k+1):
 	print "\t\t\t\t\tk value: %d" % k
@@ -865,7 +867,7 @@ for k in range(min_k, max_k+1):
 		plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + name + ".svg")
 		plt.close(fig)
 		print "Maximum error: %f" % error_func(feature_coords, true_vals)
-		method_errs[name + " %d" % k] = error_func(feature_coords, true_vals)
+		method_errs_list[k-min_k][name] = error_func(feature_coords, true_vals)
 
 	write("Computing Classical LTSA...")
 
@@ -898,7 +900,7 @@ for k in range(min_k, max_k+1):
 	plt.savefig(output_dir + ("k_%s_" % str(k).zfill(2)) + "LTSA.svg")
 	plt.close(fig)
 	print "Maximum error: %f" % error_func(feature_coords, true_vals)
-	method_errs["LTSA %d" % k] = error_func(feature_coords, true_vals)
+	method_errs_list[k-min_k]["LTSA"] = error_func(feature_coords, true_vals)
 
 
 	# methods = []
@@ -932,7 +934,8 @@ write("\nTotal program runtime: %d seconds.\n\n" % (global_t1-global_t0))
 flush()
 
 from visualization.error_plots import relativeErrorBarChart
-fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-relativeErrorBarChart(ax, method_errs)
-plt.savefig(output_dir + "reconstruction_error.svg")
-plt.close(fig)
+for k in range(min_k, max_k+1):
+	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+	relativeErrorBarChart(ax, method_errs_list[k-min_k])
+	plt.savefig(output_dir + "reconstruction_error_%d.svg" % k)
+	plt.close(fig)
