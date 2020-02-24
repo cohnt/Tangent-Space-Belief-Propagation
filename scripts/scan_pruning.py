@@ -119,7 +119,7 @@ f.close()
 from utils import pairwiseDistErr
 def error_func(embedded_points, true_vals):
 	ordered_points = np.argsort(embedded_points[:,0])
-	return pairwiseDistErr(np.asmatrix(ordered_points, dtype=float).T, np.asmatrix(true_vals, dtype=float).T, dist_metric="l1", mat_norm="max")
+	return pairwiseDistErr(np.asmatrix(ordered_points, dtype=float).T, np.asmatrix(true_vals, dtype=float).T, dist_metric="l1", mat_norm="max", normalize_data=False)
 
 #################
 
