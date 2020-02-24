@@ -34,12 +34,12 @@ title_font_size = 30
 # ]
 # num_landmarks = len(landmark_coords)
 
-landmark_coords = [
-	np.array([6.93128243, 2.88532531]),
-	np.array([3.54094086, 5.58023536]),
-	np.array([1.46209511, 10.62733474])
-]
-num_landmarks = len(landmark_coords)
+# landmark_coords = [
+# 	np.array([6.93128243, 2.88532531]),
+# 	np.array([3.54094086, 5.58023536]),
+# 	np.array([1.46209511, 10.62733474])
+# ]
+# num_landmarks = len(landmark_coords)
 
 # landmark_coords = [
 # 	np.array([6.98200123, 6.30701217]),
@@ -64,6 +64,10 @@ num_landmarks = len(landmark_coords)
 # 	np.array([7.29313071, 9.15263291])
 # ]
 # num_landmarks = len(landmark_coords)
+
+landmark_coords = np.append(np.stack((np.linspace(1, 1, num=10), np.linspace(1, 10, num=10)), axis=-1), np.stack((np.linspace(10, 10, num=10), np.linspace(1, 10, num=10)), axis=-1), axis=0)
+landmark_coords = landmark_coords + np.random.uniform(low=-0.1, high=0.1, size=landmark_coords.shape)
+num_landmarks = len(landmark_coords)
 
 print "Landmarks:"
 for landmark in landmark_coords:
