@@ -109,8 +109,8 @@ neighbor_dict = sparseMatrixToDict(neighbor_graph)
 neighbor_pair_list = [(key, value) for key, arr in neighbor_dict.items() for value in arr]
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-plot_neighbors_2d(points, points[:,0]/10.0, neighbor_graph, ax, show_labels=False, point_size=embedding_point_radius)
 ax.scatter(np.asarray(landmark_coords)[:,0], np.asarray(landmark_coords)[:,1], c="black", s=(embedding_point_radius*3)**2, marker="*")
+plot_neighbors_2d(points, points[:,0]/10.0, neighbor_graph, ax, show_labels=False, point_size=embedding_point_radius)
 ax.set_title("Nearest Neighbors (k=%d)\n" % neighbors_k, fontsize=title_font_size)
 setAxisTickSize(ax, neighbors_axis_tick_size)
 plt.savefig(output_dir + "nearest_neighbors.svg")
@@ -736,8 +736,8 @@ flush()
 print "Pruned %d edges!" % num_pruned
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-plot_neighbors_2d(true_vals, true_vals[:,0]/10.0, pruned_neighbors, ax, show_labels=False, point_size=embedding_point_radius)
 ax.scatter(np.asarray(landmark_coords)[:,0], np.asarray(landmark_coords)[:,1], c="black", s=(embedding_point_radius*3)**2, marker="*")
+plot_neighbors_2d(true_vals, true_vals[:,0]/10.0, pruned_neighbors, ax, show_labels=False, point_size=embedding_point_radius)
 ax.set_title("Pruned Nearest Neighbors\n", fontsize=title_font_size)
 setAxisTickSize(ax, neighbors_axis_tick_size)
 plt.savefig(output_dir + "pruned_neighbors.svg")
@@ -1056,11 +1056,11 @@ plt.close(fig)
 
 ##################
 
-ideal_neighbor_graph = kneighbors_graph(points, neighbors_k, mode="distance", n_jobs=-1)
+ideal_neighbor_graph = kneighbors_graph(true_vals, neighbors_k, mode="distance", n_jobs=-1)
 ideal_shortest_distances = graph_shortest_path(ideal_neighbor_graph, directed=False)
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-plot_neighbors_2d(points, points[:,0]/10.0, ideal_neighbor_graph, ax, show_labels=False, point_size=embedding_point_radius)
+plot_neighbors_2d(true_vals, true_vals[:,0]/10.0, ideal_neighbor_graph, ax, show_labels=False, point_size=embedding_point_radius)
 ax.set_title("Ideal Nearest Neighbors (k=%d)\n" % neighbors_k, fontsize=title_font_size)
 setAxisTickSize(ax, neighbors_axis_tick_size)
 plt.savefig(output_dir + "ideal_nearest_neighbors.svg")
