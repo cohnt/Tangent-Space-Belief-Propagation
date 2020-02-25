@@ -88,6 +88,7 @@
 * https://stackoverflow.com/questions/10404759/matplotlib-set-yaxis-label-size
 * https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.legend.html
 * https://stackoverflow.com/questions/6390393/matplotlib-make-tick-labels-font-size-smaller
+* https://matplotlib.org/3.1.1/gallery/misc/zorder_demo.html
 
 ### Other
 
