@@ -41,6 +41,14 @@
 * https://en.wikipedia.org/wiki/Rectifier_(neural_networks)
 * https://towardsdatascience.com/activation-functions-neural-networks-1cbd9f8d91d6
 
+##### t-SNE
+
+* https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html
+* https://scikit-learn.org/stable/modules/manifold.html#t-sne
+* https://lvdmaaten.github.io/tsne/
+* https://lvdmaaten.github.io/publications/papers/JMLR_2008.pdf
+* https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding
+
 ### Mathematics
 
 ##### Linear Algebra
@@ -51,15 +59,30 @@
 * https://en.wikipedia.org/wiki/Singular_value_decomposition
 * https://en.wikipedia.org/wiki/Singular_value
 * https://stats.stackexchange.com/questions/134282/relationship-between-svd-and-pca-how-to-use-svd-to-perform-pca
+* https://en.wikipedia.org/wiki/Vector_projection
+* https://en.wikipedia.org/wiki/Basis_(linear_algebra)
+* https://en.wikipedia.org/wiki/Rotation_matrix
+* https://en.wikipedia.org/wiki/Flat_(geometry)
+* https://en.wikipedia.org/wiki/Orthogonal_group
+* https://en.wikipedia.org/wiki/Metric_(mathematics)
 
 ##### Differential Geometry
 
 * https://en.wikipedia.org/wiki/Laplace%E2%80%93Beltrami_operator
 * https://en.wikipedia.org/wiki/Laplace_operator
+* https://en.wikipedia.org/wiki/Tangent_space
+* https://en.wikipedia.org/wiki/Exterior_derivative
 
 ##### Statistics and Probability
 
 * https://en.wikipedia.org/wiki/Bingham_distribution
+* https://en.wikipedia.org/wiki/Principal_component_analysis
+* https://en.wikipedia.org/wiki/Markov_random_field
+* https://en.wikipedia.org/wiki/Normal_distribution
+
+##### Graph Theory
+
+* https://en.wikipedia.org/wiki/Neighbourhood_(graph_theory)
 
 ### Python
 
@@ -96,6 +119,7 @@
 * https://scikit-learn.org/stable/modules/generated/sklearn.metrics.pairwise_distances.html
 * https://stackoverflow.com/questions/16664874/how-to-add-an-element-to-the-beginning-of-an-ordereddict
 * https://stackoverflow.com/questions/34491808/how-to-get-the-current-scripts-code-in-python
+* https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.special_ortho_group.html
 
 ### Numpy
 
