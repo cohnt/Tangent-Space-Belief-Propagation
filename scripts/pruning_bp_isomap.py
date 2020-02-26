@@ -1141,6 +1141,16 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
+
+######################
+
+print "Creating unrolling animation images"
+
+from visualization.unroll import unrollAnimation
+unrollAnimation(points, color, true_parameters, pruned_neighbors, output_dir + "unrolling", point_size=data_sp_rad, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False)
+
+#######################
+
 global_t1 = time.time()
 write("\nTotal program runtime: %d seconds.\n\n" % (global_t1-global_t0))
 flush()
