@@ -9,12 +9,6 @@ def unrollAnimation(points, color, true_parameters, neighbor_graph, base_filenam
 		point_set = points_by_frame[i]
 		fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 		plot_neighbors_2d(point_set, color, neighbor_graph, ax, point_size=point_size, line_width=line_width, edge_thickness=edge_thickness, show_labels=False)
-		min_x = np.min([np.min(true_parameters[:,0]), np.min(points[:,0])])
-		max_x = np.max([np.max(true_parameters[:,0]), np.max(points[:,0])])
-		min_y = np.min([0, np.min(points[:,1])])
-		max_y = np.max([0, np.max(points[:,1])])
-		ax.set_xlim((min_x, max_x))
-		ax.set_ylim((min_y, max_y))
 		plt.savefig(base_filename + "%03d" % i + ".png")
 		plt.close(fig)
 
