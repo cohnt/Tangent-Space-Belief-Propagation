@@ -5,7 +5,6 @@ from plot_neighbors import plot_neighbors_2d
 
 def unrollAnimation(points, color, true_parameters, neighbor_graph, base_filename, num_images=50, delay=10, line_color="grey", point_size=5, line_width=1, edge_thickness=1, show_labels=False):
 	points_by_frame = unrollGetPoints(points, true_parameters, num_images)
-	print "Got points!"
 	for i in range(len(points_by_frame)):
 		point_set = points_by_frame[i]
 		fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
@@ -26,10 +25,8 @@ def unrollGetPoints(points, true_parameters, num_images):
 	points_by_frame = []
 	num_points = len(points)
 	for i in range(0, num_images):
-		print "Image %d" % i
 		points_by_frame.append(points.copy())
 		for j in range(len(points)):
-			print "\tPoint %d" % j
 			x_min = x_vals[j]
 			x_max = goal_x_vals[j]
 			y_min = y_vals[j]
