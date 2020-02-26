@@ -21,6 +21,7 @@ def unrollAnimation(points, color, true_parameters, neighbor_graph, base_filenam
 def unrollGetPoints(points, true_parameters, num_images, embedding_y_val=0):
 	x_vals, y_vals = np.transpose(points)
 	goal_x_vals = (true_parameters[:,0] - np.min(true_parameters[:,0])) / (np.max(true_parameters[:,0]) - np.min(true_parameters[:,0]))
+	goal_x_vals = goal_x_vals * (np.max(x_vals) - np.min(x_vals)) + np.min(x_vals)
 	goal_y_vals = np.zeros(len(true_parameters)) + embedding_y_val
 	points_by_frame = []
 	num_points = len(points)
