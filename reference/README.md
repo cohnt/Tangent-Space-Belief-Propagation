@@ -119,10 +119,13 @@
 * https://scikit-learn.org/stable/modules/generated/sklearn.metrics.pairwise_distances.html
 * https://stackoverflow.com/questions/16664874/how-to-add-an-element-to-the-beginning-of-an-ordereddict
 * https://stackoverflow.com/questions/34491808/how-to-get-the-current-scripts-code-in-python
-* https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.special_ortho_group.html
 
-### Numpy
+### Numpy and Scipy
 
 * https://docs.scipy.org/doc/numpy/reference/generated/numpy.triu_indices.html
 * https://docs.scipy.org/doc/numpy/reference/generated/numpy.linalg.norm.html
 * https://stackoverflow.com/questions/42438370/create-all-x-y-pairs-from-two-coordinate-arrays
+* https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.special_ortho_group.html
+* https://docs.scipy.org/doc/numpy/reference/generated/numpy.transpose.html
+* https://docs.scipy.org/doc/scipy/reference/tutorial/interpolate.html
+* https://docs.scipy.org/doc/numpy/reference/generated/numpy.interp.html
