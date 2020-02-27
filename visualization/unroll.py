@@ -9,14 +9,18 @@ def unrollAnimation(points, color, true_parameters, neighbor_graph, base_filenam
 	max_x = np.max(points[:,0])
 	min_y = np.min(points[:,1])
 	max_y = np.max(points[:,1])
+	xmin, xmax, ymin, ymax = None, None, None, None
 	points_by_frame = unrollGetPoints(points, true_parameters, num_images, embedding_y_val = (min_y + max_y) / 2.0)
 	file_list = []
 	for i in range(len(points_by_frame)):
 		point_set = points_by_frame[i]
 		fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 		plot_neighbors_2d(point_set, color, neighbor_graph, ax, point_size=point_size, line_width=line_width, edge_thickness=edge_thickness, show_labels=False)
-		ax.set_xlim((min_x, max_x))
-		ax.set_ylim((min_y, max_y))
+		if i == 0:
+			xmin, xmax = ax.get_xlim()
+			ymin, ymax = ax.get_ylim()
+		ax.set_xlim((xmin, xmax))
+		ax.set_ylim((ymin, ymax))
 		fname = base_filename + "%03d" % i + ".png"
 		file_list.append(fname)
 		plt.savefig(fname)
