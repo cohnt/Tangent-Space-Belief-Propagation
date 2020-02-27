@@ -22,7 +22,7 @@ def unrollAnimation(points, color, true_parameters, neighbor_graph, base_filenam
 		ax.set_xlim((xmin, xmax))
 		ax.set_ylim((ymin, ymax))
 		plt.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
-		plt.tick_params(axis='y', which='both', left=False, right=False, labelLeft=False)
+		plt.tick_params(axis='y', which='both', left=False, right=False, labelleft=False)
 		fname = base_filename + "%03d" % i + ".png"
 		file_list.append(fname)
 		plt.savefig(fname)
