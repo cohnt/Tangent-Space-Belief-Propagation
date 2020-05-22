@@ -1,8 +1,12 @@
 import numpy as np
 import scipy
 import random
+
 import matplotlib
 matplotlib.use('Agg')
+import matplotlib.style
+matplotlib.style.use('classic')
+
 from textwrap import wrap
 import matplotlib.pyplot as plt
 import time

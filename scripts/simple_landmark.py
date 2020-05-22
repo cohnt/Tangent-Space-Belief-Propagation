@@ -1,6 +1,12 @@
 import numpy as np
+import scipy
+import random
+
 import matplotlib
 matplotlib.use('Agg')
+import matplotlib.style
+matplotlib.style.use('classic')
+
 import matplotlib.pyplot as plt
 from collections import OrderedDict
 
