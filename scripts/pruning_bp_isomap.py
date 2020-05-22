@@ -1094,9 +1094,14 @@ plt.savefig(output_dir + "rec_combined.svg")
 plt.close(fig)
 
 # Corrected Spectral Embedding
-
+write("Computing Corrected t-SNE...")
+flush()
+t0 = time.time()
 solver = SpectralEmbedding(n_components=target_dim, affinity="precomputed", n_neighbors=neighbors_k, n_jobs=-1)
 feature_coords = solver.fit_transform(pruned_neighbors.toarray())
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
