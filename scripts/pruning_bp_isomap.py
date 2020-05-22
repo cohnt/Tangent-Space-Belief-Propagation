@@ -1096,7 +1096,7 @@ plt.close(fig)
 # Corrected Spectral Embedding
 
 solver = SpectralEmbedding(n_components=target_dim, affinity="precomputed", n_neighbors=neighbors_k, n_jobs=-1)
-feature_coords = solver.fit_transform(pruned_neighbors)
+feature_coords = solver.fit_transform(pruned_neighbors.toarray())
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
