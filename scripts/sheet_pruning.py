@@ -1,8 +1,12 @@
 import numpy as np
 import scipy
 import random
+
 import matplotlib
 matplotlib.use('Agg')
+import matplotlib.style
+matplotlib.style.use('classic')
+
 from textwrap import wrap
 import matplotlib.pyplot as plt
 import time
@@ -54,8 +58,10 @@ combined_sp_rad = 4.0
 combined_sp_lw = 0.5
 disp_elev = 5.0
 disp_azim = -85.0
-embedding_axis_tick_size = 30
-neighbors_axis_tick_size = 20
+embedding_axis_tick_size = 60
+embedding_axis_n_ticks = 5
+neighbors_axis_tick_size = 30
+neighbors_axis_n_ticks = 4
 title_font_size = 30
 
 write("\n")
@@ -114,6 +120,10 @@ f.write("combined_sp_rad=%s\n" % str(combined_sp_rad))
 f.write("combined_sp_lw=%s\n" % str(combined_sp_lw))
 f.write("disp_elev=%s\n" % str(disp_elev))
 f.write("disp_azim=%s\n" % str(disp_azim))
+f.write("embedding_axis_tick_size%s\n" % str(embedding_axis_tick_size))
+f.write("embedding_axis_n_ticks%s\n" % str(embedding_axis_n_ticks))
+f.write("neighbors_axis_tick_size%s\n" % str(neighbors_axis_tick_size))
+f.write("neighbors_axis_n_ticks%s\n" % str(neighbors_axis_n_ticks))
 
 f.close()
 
@@ -194,8 +204,13 @@ t0 = time.time()
 fig, ax = make3DFigure()
 # Not squared because it's squared inside plot_neighbors_3d
 plot_neighbors_3d(points, color, neighbor_graph, ax, point_size=data_sp_rad, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False, line_color="grey")
-ax.set_title("Nearest Neighbors (k=%d)\n" % neighbors_k)
-setAxisTickSize3D(ax, neighbors_axis_tick_size)
+# ax.set_title("Nearest Neighbors (k=%d)\n" % neighbors_k)
+setAxisTickSize3D(ax, neighbors_axis_tick_size, n_ticks=neighbors_axis_n_ticks)
+ax.yaxis.set_major_locator(plt.MaxNLocator(3))
+plt.setp(ax.yaxis.get_majorticklabels(), va="bottom")
+plt.setp(ax.yaxis.get_majorticklabels(), ha="left")
+plt.setp(ax.zaxis.get_majorticklabels(), va="center")
+plt.setp(ax.zaxis.get_majorticklabels(), ha="left")
 plt.savefig(output_dir + "nearest_neighbors.svg")
 angles = np.linspace(0, 360, 40+1)[:-1]
 rotanimate(ax, angles, output_dir + "nearest_neighbors.gif", delay=30, width=14.4, height=10.8, folder=output_dir, elevation=disp_elev)
@@ -744,8 +759,8 @@ flush()
 
 fig, ax = make3DFigure()
 plot_neighbors_3d(points, color, pruned_neighbors, ax, point_size=data_sp_rad, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False, line_color="grey")
-ax.set_title("Pruned Nearest Neighbors (k=%d, thresh=%f)\n" % (neighbors_k, pruning_angle_thresh))
-setAxisTickSize3D(ax, neighbors_axis_tick_size)
+# ax.set_title("Pruned Nearest Neighbors (k=%d, thresh=%f)\n" % (neighbors_k, pruning_angle_thresh))
+setAxisTickSize3D(ax, neighbors_axis_tick_size, n_ticks=neighbors_axis_n_ticks)
 plt.savefig(output_dir + "pruned_nearest_neighbors.svg")
 angles = np.linspace(0, 360, 40+1)[:-1]
 rotanimate(ax, angles, output_dir + "pruned_nearest_neighbors.gif", delay=30, width=14.4, height=10.8, folder=output_dir, elevation=disp_elev)
@@ -810,8 +825,13 @@ flush()
 
 fig, ax = make3DFigure()
 plot_neighbors_3d(points, color, pruned_neighbors, ax, point_size=data_sp_rad, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False, line_color="grey")
-ax.set_title("Added Edges after Pruning\n")
-setAxisTickSize3D(ax, neighbors_axis_tick_size)
+# ax.set_title("Added Edges after Pruning\n")
+setAxisTickSize3D(ax, neighbors_axis_tick_size, n_ticks=neighbors_axis_n_ticks)
+ax.yaxis.set_major_locator(plt.MaxNLocator(3))
+plt.setp(ax.yaxis.get_majorticklabels(), va="bottom")
+plt.setp(ax.yaxis.get_majorticklabels(), ha="left")
+plt.setp(ax.zaxis.get_majorticklabels(), va="center")
+plt.setp(ax.zaxis.get_majorticklabels(), ha="left")
 plt.savefig(output_dir + "added_edges.svg")
 angles = np.linspace(0, 360, 40+1)[:-1]
 rotanimate(ax, angles, output_dir + "added_edges.gif", delay=30, width=14.4, height=10.8, folder=output_dir, elevation=disp_elev)
@@ -847,8 +867,8 @@ print "TSBP Error: %f" % tsbp_err
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
-ax.set_title("2D Embedding from BP Tangent Correction")
-setAxisTickSize(ax, embedding_axis_tick_size)
+# ax.set_title("2D Embedding from BP Tangent Correction")
+setAxisTickSize(ax, embedding_axis_tick_size, n_ticks=embedding_axis_n_ticks)
 plt.savefig(output_dir + "coord_bp.svg")
 plt.close(fig)
 
@@ -909,7 +929,7 @@ for i in range(num_methods):
 	
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 	ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
-	setAxisTickSize(ax, embedding_axis_tick_size)
+	setAxisTickSize(ax, embedding_axis_tick_size, n_ticks=embedding_axis_n_ticks)
 	plt.savefig(output_dir + ("comparison_%s.svg" % name))
 	plt.close(fig)
 
@@ -935,7 +955,7 @@ embeddings_name_list.append("LTSA")
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
-setAxisTickSize(ax, embedding_axis_tick_size)
+setAxisTickSize(ax, embedding_axis_tick_size, n_ticks=embedding_axis_n_ticks)
 plt.savefig(output_dir + "comparison_orig_LTSA.svg")
 plt.close(fig)
 
@@ -958,7 +978,7 @@ print "LTSA BPT Error: %f" % method_errs["LTSA BPT"]
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
-setAxisTickSize(ax, embedding_axis_tick_size)
+setAxisTickSize(ax, embedding_axis_tick_size, n_ticks=embedding_axis_n_ticks)
 plt.savefig(output_dir + "comparison_corrected_LTSA.svg")
 plt.close(fig)
 
@@ -982,7 +1002,7 @@ print "LTSA Pruning Error: %f" % method_errs["LTSA Pruning"]
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
-setAxisTickSize(ax, embedding_axis_tick_size)
+setAxisTickSize(ax, embedding_axis_tick_size, n_ticks=embedding_axis_n_ticks)
 plt.savefig(output_dir + "comparison_pruned_LTSA.svg")
 plt.close(fig)
 
@@ -1008,7 +1028,7 @@ embeddings_name_list.append("HLLE")
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
-setAxisTickSize(ax, embedding_axis_tick_size)
+setAxisTickSize(ax, embedding_axis_tick_size, n_ticks=embedding_axis_n_ticks)
 plt.savefig(output_dir + "comparison_HLLE.svg")
 plt.close(fig)
 
@@ -1033,8 +1053,7 @@ embeddings_list.append(feature_coords)
 embeddings_name_list.append("Corrected t-SNE")
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
-ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
-ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Corrected t-SNE\n Reconstruction Error: %f" % method_errs["Corrected t-SNE"], 50)))
+ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 plt.savefig(output_dir + "comparison_corrected_t-SNE.svg")
 plt.close(fig)
 
@@ -1057,6 +1076,22 @@ fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 listRegressionErrorCharacteristic(ax, embeddings_list, true_parameters, embeddings_name_list, dist_metric=err_dist_metric)
 ax.set_title("\n".join(wrap("Regression Error Characteristic from All Methods", 50)))
 plt.savefig(output_dir + "rec_combined.svg")
+plt.close(fig)
+
+# Corrected Spectral Embedding
+write("Computing Corrected t-SNE...")
+flush()
+t0 = time.time()
+solver = SpectralEmbedding(n_components=target_dim, affinity="precomputed", n_neighbors=neighbors_k, n_jobs=-1)
+feature_coords = solver.fit_transform(pruned_neighbors.toarray())
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
+setAxisTickSize(ax, embedding_axis_tick_size, n_ticks=embedding_axis_n_ticks)
+plt.savefig(output_dir + "comparison_corrected_spectral_embedding.svg")
 plt.close(fig)
 
 write("Creating combined image...")
