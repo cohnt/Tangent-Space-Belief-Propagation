@@ -1095,7 +1095,7 @@ plt.close(fig)
 
 # Corrected Spectral Embedding
 
-solver = SpectralEmbedding(n_components=target_dim, affinity="precomputed_nearest_neighbors", n_neighbors=neighbors_k, n_jobs=-1)
+solver = SpectralEmbedding(n_components=target_dim, affinity="precomputed", n_neighbors=neighbors_k, n_jobs=-1)
 feature_coords = solver.fit_transform(pruned_neighbors)
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
