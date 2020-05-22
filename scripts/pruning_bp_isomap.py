@@ -1093,6 +1093,19 @@ ax.set_title("\n".join(wrap("Regression Error Characteristic from All Methods", 
 plt.savefig(output_dir + "rec_combined.svg")
 plt.close(fig)
 
+# Corrected Spectral Embedding
+
+solver = SpectralEmbedding(n_components=target_dim, affinity="precomputed_nearest_neighbors", n_neighbors=neighbors_k, n_jobs=-1)
+feature_coords = solver.fit_transform(pruned_neighbors)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
+plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
+plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
+setAxisTickSize(ax, embedding_axis_tick_size)
+plt.savefig(output_dir + "comparison_corrected_spectral_embedding.svg")
+plt.close(fig)
+
 write("Creating combined image...")
 flush()
 t0 = time.time()
