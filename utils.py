@@ -119,7 +119,11 @@ def setAxisTickSize(ax, size, n_ticks=None):
 	for tick in ax.yaxis.get_major_ticks():
 		tick.label.set_fontsize(size)
 
-def setAxisTickSize3D(ax, size):
+def setAxisTickSize3D(ax, size, n_ticks=None):
+	if not n_ticks is None:
+		ax.xaxis.set_major_locator(plt.MaxNLocator(n_ticks))
+		ax.yaxis.set_major_locator(plt.MaxNLocator(n_ticks))
+		ax.zaxis.set_major_locator(plt.MaxNLocator(n_ticks))
 	for tick in ax.xaxis.get_major_ticks():
 		tick.label.set_fontsize(size)
 	for tick in ax.yaxis.get_major_ticks():
