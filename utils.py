@@ -1,6 +1,7 @@
 import numpy as np
 import sys
 from scipy.stats import special_ortho_group
+import matplotlib.pyplot as plt
 
 class Message:
 	def __init__(self, num_samples, target_dim):
@@ -109,7 +110,10 @@ def pairwiseDistErr(embedded_points, true_parameters, normalize_data=True, norma
 			err = np.linalg.norm(embedded_dists - true_dists, ord=mat_norm, axis=None)
 		return err
 
-def setAxisTickSize(ax, size):
+def setAxisTickSize(ax, size, n_ticks=None):
+	if not n_ticks is None:
+		ax.xaxis.set_major_locator(plt.MaxNLocator(n_ticks))
+		ax.yaxis.set_major_locator(plt.MaxNLocator(n_ticks))
 	for tick in ax.xaxis.get_major_ticks():
 		tick.label.set_fontsize(size)
 	for tick in ax.yaxis.get_major_ticks():

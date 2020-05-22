@@ -54,13 +54,16 @@ embedding_sp_rad = 13.0
 embedding_sp_lw = 1.0
 combined_sp_rad = 4.0
 combined_sp_lw = 0.5
-embedding_axis_tick_size = 30
-neighbors_axis_tick_size = 20
+embedding_axis_tick_size = 40
+embedding_axis_n_ticks = 5
+neighbors_axis_tick_size = 30
+neighbors_axis_n_ticks = 7
 embedding_axis_label_size = 30
 
 write("\n")
 
 matplotlib.rcParams.update({'font.size': 15})
+plt.locator_params(nbins=4)
 
 ####################
 # Write Parameters #
@@ -106,6 +109,11 @@ f.write("embedding_sp_rad=%s\n" % str(embedding_sp_rad))
 f.write("embedding_sp_lw=%s\n" % str(embedding_sp_lw))
 f.write("combined_sp_rad=%s\n" % str(combined_sp_rad))
 f.write("combined_sp_lw=%s\n" % str(combined_sp_lw))
+f.write("embedding_axis_tick_size=%s\n" % str(embedding_axis_tick_size))
+f.write("embedding_axis_n_ticks=%s\n" % str(embedding_axis_n_ticks))
+f.write("neighbors_axis_tick_size=%s\n" % str(neighbors_axis_tick_size))
+f.write("neighbors_axis_n_ticks=%s\n" % str(neighbors_axis_n_ticks))
+f.write("embedding_axis_label_size=%s\n" % str(embedding_axis_label_size))
 
 f.close()
 
@@ -186,8 +194,8 @@ flush()
 t0 = time.time()
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 plot_neighbors_2d(points, color, neighbor_graph, ax, point_size=data_sp_rad, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False)
-ax.set_title("Nearest Neighbors (k=%d)\n" % neighbors_k)
-setAxisTickSize(ax, neighbors_axis_tick_size)
+# ax.set_title("Nearest Neighbors (k=%d)\n" % neighbors_k)
+setAxisTickSize(ax, neighbors_axis_tick_size, n_ticks=neighbors_axis_n_ticks)
 plt.savefig(output_dir + "nearest_neighbors.svg")
 plt.close(fig)
 t1 = time.time()
@@ -759,7 +767,7 @@ flush()
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 plot_neighbors_2d(points, color, pruned_neighbors, ax, point_size=data_sp_rad, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False)
 ax.set_title("Pruned Nearest Neighbors (k=%d, thresh=%f)\n" % (neighbors_k, pruning_angle_thresh))
-setAxisTickSize(ax, neighbors_axis_tick_size)
+setAxisTickSize(ax, neighbors_axis_tick_size, n_ticks=neighbors_axis_n_ticks)
 plt.savefig(output_dir + "pruned_nearest_neighbors.svg")
 plt.close(fig)
 
@@ -822,8 +830,8 @@ else:
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 plot_neighbors_2d(points, color, pruned_neighbors, ax, point_size=data_sp_rad, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False)
-ax.set_title("Added Edges after Pruning\n")
-setAxisTickSize(ax, neighbors_axis_tick_size)
+# ax.set_title("Added Edges after Pruning\n")
+setAxisTickSize(ax, neighbors_axis_tick_size, n_ticks=neighbors_axis_n_ticks)
 plt.savefig(output_dir + "added_edges.svg")
 plt.close(fig)
 
@@ -862,9 +870,9 @@ print "TSBP Error: %f" % tsbp_err
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 # ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from BP Tangent Correction for Edge Pruning\n Reconstruction Error: %f" % tsbp_err, 50)))
-plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
-plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
-setAxisTickSize(ax, embedding_axis_tick_size)
+# plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
+# plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
+setAxisTickSize(ax, embedding_axis_tick_size, n_ticks=embedding_axis_n_ticks)
 plt.savefig(output_dir + "coord_bp.svg")
 plt.close(fig)
 
@@ -926,9 +934,9 @@ for i in range(num_methods):
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 	ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 	# ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from %s\n Reconstruction Error: %f" % (name, method_errs[name]), 50)))
-	plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
-	plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
-	setAxisTickSize(ax, embedding_axis_tick_size)
+	# plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
+	# plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
+	setAxisTickSize(ax, embedding_axis_tick_size, n_ticks=embedding_axis_n_ticks)
 	plt.savefig(output_dir + ("comparison_%s.svg" % name))
 	plt.close(fig)
 
@@ -955,9 +963,9 @@ embeddings_name_list.append("LTSA")
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 # ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Classical LTSA\n Reconstruction Error: %f" % method_errs["LTSA"], 50)))
-plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
-plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
-setAxisTickSize(ax, embedding_axis_tick_size)
+# plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
+# plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
+setAxisTickSize(ax, embedding_axis_tick_size, n_ticks=embedding_axis_n_ticks)
 plt.savefig(output_dir + "comparison_orig_LTSA.svg")
 plt.close(fig)
 
@@ -981,9 +989,9 @@ print "LTSA BPT Error: %f" % method_errs["LTSA BPT"]
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 # ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction\n Reconstruction Error: %f" % method_errs["LTSA BPT"], 50)))
-plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
-plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
-setAxisTickSize(ax, embedding_axis_tick_size)
+# plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
+# plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
+setAxisTickSize(ax, embedding_axis_tick_size, n_ticks=embedding_axis_n_ticks)
 plt.savefig(output_dir + "comparison_corrected_LTSA.svg")
 plt.close(fig)
 
@@ -1008,9 +1016,9 @@ print "LTSA Pruning Error: %f" % method_errs["LTSA Pruning"]
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 # ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction and Edge Pruning\n Reconstruction Error: %f" % method_errs["LTSA Pruning"], 50)))
-plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
-plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
-setAxisTickSize(ax, embedding_axis_tick_size)
+# plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
+# plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
+setAxisTickSize(ax, embedding_axis_tick_size, n_ticks=embedding_axis_n_ticks)
 plt.savefig(output_dir + "comparison_pruned_LTSA.svg")
 plt.close(fig)
 
@@ -1037,9 +1045,9 @@ embeddings_name_list.append("HLLE")
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 # ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from HLLE\n Reconstruction Error: %f" % method_errs["HLLE"], 50)))
-plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
-plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
-setAxisTickSize(ax, embedding_axis_tick_size)
+# plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
+# plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
+setAxisTickSize(ax, embedding_axis_tick_size, n_ticks=embedding_axis_n_ticks)
 plt.savefig(output_dir + "comparison_HLLE.svg")
 plt.close(fig)
 
@@ -1066,9 +1074,9 @@ embeddings_name_list.append("Corrected t-SNE")
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 # ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Corrected t-SNE\n Reconstruction Error: %f" % method_errs["Corrected t-SNE"], 50)))
-plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
-plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
-setAxisTickSize(ax, embedding_axis_tick_size)
+# plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
+# plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
+setAxisTickSize(ax, embedding_axis_tick_size, n_ticks=embedding_axis_n_ticks)
 plt.savefig(output_dir + "comparison_corrected_t-SNE.svg")
 plt.close(fig)
 
@@ -1105,9 +1113,9 @@ flush()
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
-plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
-plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
-setAxisTickSize(ax, embedding_axis_tick_size)
+# plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
+# plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
+setAxisTickSize(ax, embedding_axis_tick_size, n_ticks=embedding_axis_n_ticks)
 plt.savefig(output_dir + "comparison_corrected_spectral_embedding.svg")
 plt.close(fig)
 
