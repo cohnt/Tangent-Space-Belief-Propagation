@@ -931,6 +931,9 @@ for i in range(num_methods):
 	embeddings_list.append(feature_coords)
 	embeddings_name_list.append(name)
 
+	if name == "SpectralEmbedding":
+		feature_coords = 10*feature_coords
+
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 	ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
 	# ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from %s\n Reconstruction Error: %f" % (name, method_errs[name]), 50)))
@@ -949,7 +952,7 @@ for i in range(num_methods):
 write("Computing Classical LTSA...")
 flush()
 t0 = time.time()
-feature_coords = compute_ltsa(points, neighbor_dict, observations, source_dim, target_dim)
+feature_coords = 10*compute_ltsa(points, neighbor_dict, observations, source_dim, target_dim)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
@@ -1005,7 +1008,7 @@ write("Computing LTSA with Tangent Space Correction and Edge Pruning...")
 flush()
 t0 = time.time()
 pruned_neighbor_dict = sparseMatrixToDict(pruned_neighbors)
-feature_coords = compute_ltsa(points, pruned_neighbor_dict, mle_bases, source_dim, target_dim)
+feature_coords = 10*compute_ltsa(points, pruned_neighbor_dict, mle_bases, source_dim, target_dim)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
@@ -1102,11 +1105,11 @@ plt.savefig(output_dir + "rec_combined.svg")
 plt.close(fig)
 
 # Corrected Spectral Embedding
-write("Computing Corrected t-SNE...")
+write("Computing Corrected Spectral Embedding...")
 flush()
 t0 = time.time()
 solver = SpectralEmbedding(n_components=target_dim, affinity="precomputed", n_neighbors=neighbors_k, n_jobs=-1)
-feature_coords = solver.fit_transform(pruned_neighbors.toarray())
+feature_coords = 10*solver.fit_transform(pruned_neighbors.toarray())
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
