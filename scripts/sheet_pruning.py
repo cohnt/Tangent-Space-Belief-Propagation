@@ -59,7 +59,7 @@ combined_sp_lw = 0.5
 disp_elev = 5.0
 disp_azim = -85.0
 embedding_axis_tick_size = 60
-embedding_axis_n_ticks = 5
+embedding_axis_n_ticks = 4
 neighbors_axis_tick_size = 30
 neighbors_axis_n_ticks = 4
 title_font_size = 30
@@ -212,8 +212,8 @@ plt.setp(ax.yaxis.get_majorticklabels(), ha="left")
 plt.setp(ax.zaxis.get_majorticklabels(), va="center")
 plt.setp(ax.zaxis.get_majorticklabels(), ha="left")
 plt.savefig(output_dir + "nearest_neighbors.svg")
-angles = np.linspace(0, 360, 40+1)[:-1]
-rotanimate(ax, angles, output_dir + "nearest_neighbors.gif", delay=30, width=14.4, height=10.8, folder=output_dir, elevation=disp_elev)
+# angles = np.linspace(0, 360, 40+1)[:-1]
+# rotanimate(ax, angles, output_dir + "nearest_neighbors.gif", delay=30, width=14.4, height=10.8, folder=output_dir, elevation=disp_elev)
 plt.close(fig)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
@@ -762,8 +762,8 @@ plot_neighbors_3d(points, color, pruned_neighbors, ax, point_size=data_sp_rad, l
 # ax.set_title("Pruned Nearest Neighbors (k=%d, thresh=%f)\n" % (neighbors_k, pruning_angle_thresh))
 setAxisTickSize3D(ax, neighbors_axis_tick_size, n_ticks=neighbors_axis_n_ticks)
 plt.savefig(output_dir + "pruned_nearest_neighbors.svg")
-angles = np.linspace(0, 360, 40+1)[:-1]
-rotanimate(ax, angles, output_dir + "pruned_nearest_neighbors.gif", delay=30, width=14.4, height=10.8, folder=output_dir, elevation=disp_elev)
+# angles = np.linspace(0, 360, 40+1)[:-1]
+# rotanimate(ax, angles, output_dir + "pruned_nearest_neighbors.gif", delay=30, width=14.4, height=10.8, folder=output_dir, elevation=disp_elev)
 plt.close(fig)
 
 # Uses the disjoint-set datatype
@@ -833,8 +833,8 @@ plt.setp(ax.yaxis.get_majorticklabels(), ha="left")
 plt.setp(ax.zaxis.get_majorticklabels(), va="center")
 plt.setp(ax.zaxis.get_majorticklabels(), ha="left")
 plt.savefig(output_dir + "added_edges.svg")
-angles = np.linspace(0, 360, 40+1)[:-1]
-rotanimate(ax, angles, output_dir + "added_edges.gif", delay=30, width=14.4, height=10.8, folder=output_dir, elevation=disp_elev)
+# angles = np.linspace(0, 360, 40+1)[:-1]
+# rotanimate(ax, angles, output_dir + "added_edges.gif", delay=30, width=14.4, height=10.8, folder=output_dir, elevation=disp_elev)
 plt.close(fig)
 
 from sklearn.utils.graph_shortest_path import graph_shortest_path
@@ -1054,6 +1054,7 @@ embeddings_name_list.append("Corrected t-SNE")
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(feature_coords[:,0], feature_coords[:,1], c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
+setAxisTickSize(ax, embedding_axis_tick_size, n_ticks=embedding_axis_n_ticks)
 plt.savefig(output_dir + "comparison_corrected_t-SNE.svg")
 plt.close(fig)
 
