@@ -18,7 +18,7 @@ output_dir = "results_landmark/"
 
 embedding_point_radius = 13.0
 embedding_axis_tick_size = 40
-neighbors_axis_tick_size = 20
+neighbors_axis_tick_size = 30
 title_font_size = 30
 
 # landmark_coords = [
