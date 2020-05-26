@@ -60,6 +60,7 @@ for new_dim in new_dim_list:
 	from utils import increaseDimensionMatrix
 	write("Increasing dimenion.\n")
 	flush()
+	source_dim = len(points[0])
 	mat = increaseDimensionMatrix(source_dim, new_dim)
 	points = np.matmul(points, mat)
 	true_tangents = np.matmul(true_tangents, mat)
