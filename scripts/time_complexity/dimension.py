@@ -39,6 +39,7 @@ time_by_dim = []
 
 for new_dim in new_dim_list:
 	iter_time_list = []
+	print "\n\n\n"
 
 	################
 	# Load Dataset #
@@ -460,3 +461,6 @@ for new_dim in new_dim_list:
 	print "Average iteration time for dimension %d: %f" % (new_dim, time_by_dim[-1])
 
 print time_by_dim
+
+plt.plot(new_dim_list, time_by_dim)
+plt.show()
