@@ -15,14 +15,14 @@ global_t0 = time.time()
 
 dataset_name = "long_spiral_curve"
 dataset_seed = 4045775215 # np.random.randint(0, 2**32)
-num_points = 25    # Number of data points
+num_points = 5    # Number of data points
 data_noise = 0 # How much noise is added to the data
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1      # The number of dimensions the data is being reduced to
-new_dim_list = [3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 200, 250, 300, 400, 500, 1000] # The higher dimension the data will be mapped to
+new_dim_list = [3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 200, 250, 300, 400, 500, 750, 1000] # The higher dimension the data will be mapped to
 
-num_iters = 5+1      # Number of iterations of the message passing algorithm to run for each dimension
-neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
+num_iters = 10+1      # Number of iterations of the message passing algorithm to run for each dimension
+neighbors_k = 3    # The value of 'k' used for k-nearest-neighbors
 num_samples = 1     # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
 
@@ -390,11 +390,7 @@ for new_dim in new_dim_list:
 				t = neighbor_pair[0]
 				s = neighbor_pair[1]
 				# We will update m_t->s
-				t00 = time.time()
 				resampleMessage(t, s)
-				t11 = time.time()
-				if iter_num > 1:
-					iter_time_list.append(t11-t00)
 
 		# Weight messages based on their neighbors. If it's the first iteration, then no weighting is performed.
 		if iter_num != 1:
@@ -458,9 +454,11 @@ for new_dim in new_dim_list:
 
 		total_time = message_time + belief_time
 		write("Total iteration time: %f\n" % total_time)
-		# if iter_num > 1:
-		# 	iter_time_list.append(total_time)
+		if iter_num > 1:
+			iter_time_list.append(total_time)
 
+	print iter_time_list
+	print np.average(iter_time_list)
 	time_by_dim.append(np.average(iter_time_list))
 	print "Average iteration time for dimension %d: %f" % (new_dim, time_by_dim[-1])
 
