@@ -464,3 +464,6 @@ print time_by_dim
 
 plt.plot(new_dim_list, time_by_dim)
 plt.show()
+
+plt.plot(np.log(new_dim_list), np.log(time_by_dim))
+plt.show()
