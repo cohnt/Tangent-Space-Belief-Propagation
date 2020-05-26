@@ -19,7 +19,7 @@ num_points = 25    # Number of data points
 data_noise = 0 # How much noise is added to the data
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1      # The number of dimensions the data is being reduced to
-new_dim_list = [3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 50, 100, 200, 300, 400, 500]        # The higher dimension the data will be mapped to
+new_dim_list = [3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 40, 50] # The higher dimension the data will be mapped to
 
 num_iters = 5+1      # Number of iterations of the message passing algorithm to run for each dimension
 neighbors_k = 12    # The value of 'k' used for k-nearest-neighbors
@@ -467,3 +467,8 @@ plt.show()
 
 plt.plot(np.log(new_dim_list), np.log(time_by_dim))
 plt.show()
+
+from scipy.stats import linregress
+slope, intercept, r_value, p_value, std_err = stats.linregress(np.log(new_dim_list), np.log(time_by_dim))
+print "Slope: %f" % slope
+print "r: %f" % r_value
