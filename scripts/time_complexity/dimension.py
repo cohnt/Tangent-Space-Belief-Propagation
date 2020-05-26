@@ -468,7 +468,7 @@ plt.show()
 plt.plot(np.log(new_dim_list), np.log(time_by_dim))
 plt.show()
 
-from scipy.stats import linregress
+from scipy import stats
 slope, intercept, r_value, p_value, std_err = stats.linregress(np.log(new_dim_list), np.log(time_by_dim))
 print "Slope: %f" % slope
 print "r: %f" % r_value
