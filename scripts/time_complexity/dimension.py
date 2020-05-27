@@ -19,7 +19,7 @@ num_points = 5    # Number of data points
 data_noise = 0 # How much noise is added to the data
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1      # The number of dimensions the data is being reduced to
-new_dim_list = [3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 200, 250, 300, 400, 500, 750, 1000] # The higher dimension the data will be mapped to
+new_dim_list = [100, 110, 120, 130, 140, 150, 175, 200, 225, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000] # The higher dimension the data will be mapped to
 
 num_iters = 10+1      # Number of iterations of the message passing algorithm to run for each dimension
 neighbors_k = 3    # The value of 'k' used for k-nearest-neighbors
