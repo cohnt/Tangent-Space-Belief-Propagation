@@ -477,6 +477,7 @@ def evalError(true_tangents, estimated_tangents):
 	error_arr = np.zeros(len(true_tangents))
 	for i in range(len(true_tangents)):
 		error_arr[i] = compareSubspaces(true_tangents[i], estimated_tangents[i])
+	error_arr = error_arr[num_outliers:]
 	max_error = np.max(error_arr)
 	mean_error = np.mean(error_arr)
 	median_error = np.median(error_arr)
