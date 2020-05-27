@@ -450,7 +450,7 @@ for num_points in num_points_list:
 	print iter_time_list
 	print np.average(iter_time_list)
 	time_by_num_points.append(np.average(iter_time_list))
-	print "Average iteration time for points %d: %f" % (num_samples, time_by_num_points[-1])
+	print "Average iteration time for points %d: %f" % (num_points, time_by_num_points[-1])
 
 print time_by_num_points
 
