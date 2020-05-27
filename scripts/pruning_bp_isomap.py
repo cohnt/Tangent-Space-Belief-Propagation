@@ -20,11 +20,12 @@ from collections import OrderedDict
 global_t0 = time.time()
 
 dataset_name = "long_spiral_curve"
-dataset_seed = 4045775215
+# dataset_seed = 4045775215
 # dataset_seed = 4015005259
-# dataset_seed = np.random.randint(0, 2**32)
+dataset_seed = np.random.randint(0, 2**32)
 num_points = 500    # Number of data points
 data_noise = 0.001 # How much noise is added to the data
+num_outliers = 25
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1      # The number of dimensions the data is being reduced to
 
@@ -80,6 +81,7 @@ f.write("name=%s\n" % dataset_name)
 f.write("seed=%d\n" % dataset_seed)
 f.write("num_points=%d\n" % num_points)
 f.write("noise=%s\n" % str(data_noise))
+f.write("num_outliers=%d\n" % num_outliers)
 f.write("source_dim=%d\n" % source_dim)
 f.write("target_dim=%d\n" % target_dim)
 
@@ -133,6 +135,13 @@ points, color, true_tangents, true_parameters, dataset_seed = make_long_spiral_c
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
+
+mins = np.min(points, axis=0)
+maxes = np.max(points, axis=0)
+outliers = np.random.uniform(low=mins, high=maxes, size=(num_outliers, source_dim))
+outlier_colors = np.zeros(num_outliers)
+points[0:num_outliers] = outliers
+color[0:num_outliers] = outlier_colors
 
 write("Saving dataset plot...")
 flush()
