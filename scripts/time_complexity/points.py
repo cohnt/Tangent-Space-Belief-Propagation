@@ -15,7 +15,7 @@ global_t0 = time.time()
 
 dataset_name = "long_spiral_curve"
 dataset_seed = 4045775215 # np.random.randint(0, 2**32)
-num_points_list = [4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 35, 40, 45, 50, 75, 100, 125, 150, 175, 200, 250, 300, 350, 400, 450, 500]    # Number of data points
+num_points_list = [50, 75, 100, 125, 150, 175, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000]    # Number of data points
 data_noise = 0 # How much noise is added to the data
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1      # The number of dimensions the data is being reduced to
