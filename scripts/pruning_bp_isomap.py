@@ -20,11 +20,12 @@ from collections import OrderedDict
 global_t0 = time.time()
 
 dataset_name = "long_spiral_curve"
-dataset_seed = 4045775215
+# dataset_seed = 4045775215
 # dataset_seed = 4015005259
-# dataset_seed = np.random.randint(0, 2**32)
-num_points = 500    # Number of data points
-data_noise = 0.001 # How much noise is added to the data
+dataset_seed = np.random.randint(0, 2**32)
+num_points = 525    # Number of data points
+data_noise = 0.0005 # How much noise is added to the data
+num_outliers = 25
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1      # The number of dimensions the data is being reduced to
 
@@ -80,6 +81,7 @@ f.write("name=%s\n" % dataset_name)
 f.write("seed=%d\n" % dataset_seed)
 f.write("num_points=%d\n" % num_points)
 f.write("noise=%s\n" % str(data_noise))
+f.write("num_outliers=%d\n" % num_outliers)
 f.write("source_dim=%d\n" % source_dim)
 f.write("target_dim=%d\n" % target_dim)
 
@@ -134,11 +136,19 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
+mins = np.min(points, axis=0)
+maxes = np.max(points, axis=0)
+outliers = np.random.uniform(low=mins, high=maxes, size=(num_outliers, source_dim))
+outlier_colors = np.zeros(num_outliers)
+points[0:num_outliers] = outliers
+color[0:num_outliers] = outlier_colors
+
 write("Saving dataset plot...")
 flush()
 t0 = time.time()
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(points[:,0], points[:,1], c=color, cmap=plt.cm.Spectral, s=data_sp_rad**2, zorder=2, linewidth=data_sp_lw)
+ax.scatter(points[0:num_outliers,0], points[0:num_outliers,1], color="black", s=data_sp_rad**2, linewidth=data_sp_lw, zorder=3)
 ax.set_title("Dataset (num=%d, variance=%f, seed=%d)\n" % (num_points, data_noise, dataset_seed))
 plt.savefig(output_dir + "dataset.svg")
 plt.close(fig)
@@ -196,6 +206,7 @@ fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 plot_neighbors_2d(points, color, neighbor_graph, ax, point_size=data_sp_rad, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False)
 # ax.set_title("Nearest Neighbors (k=%d)\n" % neighbors_k)
 setAxisTickSize(ax, neighbors_axis_tick_size, n_ticks=neighbors_axis_n_ticks)
+ax.scatter(points[0:num_outliers,0], points[0:num_outliers,1], color="black", s=data_sp_rad**2, linewidth=data_sp_lw, zorder=3)
 plt.savefig(output_dir + "nearest_neighbors.svg")
 plt.close(fig)
 t1 = time.time()
@@ -244,6 +255,7 @@ t0 = time.time()
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 # plot_neighbors_2d(points, color, neighbor_graph, ax, point_size=2, line_width=0.25, edge_thickness=0.1, show_labels=False)
 plot_pca_2d(points, color, observations, ax, point_size=data_sp_rad, point_line_width=data_sp_lw, line_width=nn_lw, line_length=pca_ll)
+ax.scatter(points[0:num_outliers,0], points[0:num_outliers,1], color="black", s=data_sp_rad**2, linewidth=data_sp_lw, zorder=3)
 ax.set_title("Measured Tangent Spaces (PCA)")
 plt.savefig(output_dir + "pca_observations.svg")
 plt.close(fig)
@@ -468,6 +480,7 @@ def evalError(true_tangents, estimated_tangents):
 	error_arr = np.zeros(len(true_tangents))
 	for i in range(len(true_tangents)):
 		error_arr[i] = compareSubspaces(true_tangents[i], estimated_tangents[i])
+	error_arr = error_arr[num_outliers:]
 	max_error = np.max(error_arr)
 	mean_error = np.mean(error_arr)
 	median_error = np.median(error_arr)
@@ -583,12 +596,14 @@ try:
 
 		fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 		plot_pca_2d(points, color, mle_bases, ax, point_size=data_sp_rad, point_line_width=data_sp_lw, line_width=nn_lw, line_length=pca_ll)
+		ax.scatter(points[0:num_outliers,0], points[0:num_outliers,1], color="black", s=data_sp_rad**2, linewidth=data_sp_lw, zorder=3)
 		ax.set_title("Tangent Space MLE (iter %d)" % iter_num)
 		plt.savefig(output_dir + ("ts_mle_iter%s.svg" % str(iter_num).zfill(4)))
 		plt.close(fig)
 
 		fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 		ax.scatter(points[:,0], points[:,1], c=color, cmap=plt.cm.Spectral, s=data_sp_rad**2, zorder=2, linewidth=data_sp_lw)
+		ax.scatter(points[0:num_outliers,0], points[0:num_outliers,1], color="black", s=data_sp_rad**2, linewidth=data_sp_lw, zorder=3)
 
 		coordinates = np.zeros((num_points*num_samples, 2, 2))
 		colors = np.zeros((num_points*num_samples, 4))
@@ -766,6 +781,7 @@ flush()
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 plot_neighbors_2d(points, color, pruned_neighbors, ax, point_size=data_sp_rad, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False)
+ax.scatter(points[0:num_outliers,0], points[0:num_outliers,1], color="black", s=data_sp_rad**2, linewidth=data_sp_lw, zorder=3)
 ax.set_title("Pruned Nearest Neighbors (k=%d, thresh=%f)\n" % (neighbors_k, pruning_angle_thresh))
 setAxisTickSize(ax, neighbors_axis_tick_size, n_ticks=neighbors_axis_n_ticks)
 plt.savefig(output_dir + "pruned_nearest_neighbors.svg")
@@ -830,6 +846,7 @@ else:
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 plot_neighbors_2d(points, color, pruned_neighbors, ax, point_size=data_sp_rad, line_width=data_sp_lw, edge_thickness=nn_lw, show_labels=False)
+ax.scatter(points[0:num_outliers,0], points[0:num_outliers,1], color="black", s=data_sp_rad**2, linewidth=data_sp_lw, zorder=3)
 # ax.set_title("Added Edges after Pruning\n")
 setAxisTickSize(ax, neighbors_axis_tick_size, n_ticks=neighbors_axis_n_ticks)
 plt.savefig(output_dir + "added_edges.svg")
