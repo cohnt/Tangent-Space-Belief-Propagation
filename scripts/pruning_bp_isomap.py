@@ -247,7 +247,7 @@ for i in range(num_points):
 	neighborhood = points[neighbors]
 	if use_l1_pca:
 		print "Computing L1 PCA for observation %d" % i
-		observations[i] = l1_pca(neighborhood.T, target_dim)
+		observations[i] = l1_pca(neighborhood.T, target_dim).T
 	else:
 		pca.fit(neighborhood)
 		# vec1 = pca.components_[0]
