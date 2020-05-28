@@ -61,7 +61,8 @@ neighbors_axis_tick_size = 30
 neighbors_axis_n_ticks = 7
 embedding_axis_label_size = 30
 
-use_l1_pca = True
+use_l1_pca = False
+use_leave_one_out_pca = True
 
 write("\n")
 
@@ -248,6 +249,13 @@ for i in range(num_points):
 	if use_l1_pca:
 		print "Computing L1 PCA for observation %d" % i
 		observations[i] = l1_pca(neighborhood.T, target_dim).T
+	elif use_leave_one_out_pca:
+		vec_list = neighborhood - og_point
+		dist_list = np.linalg.norm(vec_list, axis=1)
+		max_dist_ind = np.argmax(dist_list)
+		new_neighborhood = np.delete(neighborhood, max_dist_ind, axis=0)
+		pca.fit(new_neighborhood)
+		observations[i] = pca.components_[0:target_dim]
 	else:
 		pca.fit(neighborhood)
 		# vec1 = pca.components_[0]
