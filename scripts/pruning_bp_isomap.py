@@ -136,8 +136,8 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
-mins = np.min(points, axis=0) - 0.5
-maxes = np.max(points, axis=0) + 0.5
+mins = np.min(points, axis=0)
+maxes = np.max(points, axis=0)
 outliers = np.random.uniform(low=mins, high=maxes, size=(num_outliers, source_dim))
 outlier_colors = np.zeros(num_outliers)
 points[0:num_outliers] = outliers
