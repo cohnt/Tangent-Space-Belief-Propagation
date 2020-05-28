@@ -4,7 +4,7 @@ from sklearn import preprocessing
 # Using this algorithm https://iehttps://ieeexplore-ieee-org.proxy.lib.umich.edu/stamp/stamp.jsp?tp=&arnumber=6629811eexplore-ieee-org.proxy.lib.umich.edu/stamp/stamp.jsp?tp=&arnumber=6629811
 
 def l1_pca(X, K):
-	X = preprocessing.scale(X, axis=1)
+	X = preprocessing.scale(X, with_std=False, axis=1)
 	D, N = X.shape
 	B_candidates = generate_matrices(N, K)
 	best_ind = 0
