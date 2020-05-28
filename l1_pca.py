@@ -12,6 +12,11 @@ def l1_pca(X, K):
 		if norm_val > best_norm_val:
 			best_norm_val = norm_val
 			best_ind = i
+	B_opt = B_candidates[best_ind]
+	U, S, VT = np.linalg.svd(np.matmul(X, B_opt), full_matrices=True)
+	V = VT.T
+	Rl1 = np.matmul(U[:,0:K], V.T)
+	return Rl1
 
 def generate_matrices(N, K):
 	num_mats = 2**(N*K)
