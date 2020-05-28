@@ -24,7 +24,7 @@ dataset_name = "long_spiral_curve"
 # dataset_seed = 4015005259
 dataset_seed = np.random.randint(0, 2**32)
 num_points = 550    # Number of data points
-data_noise = 0.001 # How much noise is added to the data
+data_noise = 0.0005 # How much noise is added to the data
 num_outliers = 50
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1      # The number of dimensions the data is being reduced to
@@ -136,8 +136,8 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
-mins = np.min(points, axis=0)
-maxes = np.max(points, axis=0)
+mins = np.min(points, axis=0) - 0.5
+maxes = np.max(points, axis=0) + 0.5
 outliers = np.random.uniform(low=mins, high=maxes, size=(num_outliers, source_dim))
 outlier_colors = np.zeros(num_outliers)
 points[0:num_outliers] = outliers
