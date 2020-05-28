@@ -135,6 +135,7 @@ from l1_pca import l1_pca
 pca = PCA(n_components=target_dim)
 observations_l1 = [None for i in range(num_points)]
 observations_l2 = [None for i in range(num_points)]
+observations_leave_one_out = [None for i in range(num_points)]
 
 write("Computing PCA observations...")
 flush()
@@ -149,6 +150,13 @@ for i in range(num_points):
 	pca.fit(neighborhood)
 	# vec1 = pca.components_[0]
 	observations_l2[i] = pca.components_[0:target_dim]
+	#
+	vec_list = neighborhood - og_point
+	dist_list = np.linalg.norm(vec_list, axis=1)
+	max_dist_ind = np.argmax(dist_list)
+	new_neighborhood = np.delete(neighborhood, max_dist_ind, axis=0)
+	pca.fit(new_neighborhood)
+	observations_leave_one_out[i] = pca.components_[0:target_dim]
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
@@ -158,13 +166,18 @@ fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 plot_pca_2d(points, color, observations_l1, ax, point_size=data_sp_rad, point_line_width=data_sp_lw, line_width=nn_lw, line_length=pca_ll)
 ax.scatter(points[0:num_outliers,0], points[0:num_outliers,1], color="black", s=data_sp_rad**2, linewidth=data_sp_lw, zorder=3)
 ax.set_title("Measured Tangent Spaces (L1-PCA)")
-plt.savefig(output_dir + "l1_pca_observations.svg")
-plt.close(fig)
+plt.show()
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 # plot_neighbors_2d(points, color, neighbor_graph, ax, point_size=2, line_width=0.25, edge_thickness=0.1, show_labels=False)
 plot_pca_2d(points, color, observations_l2, ax, point_size=data_sp_rad, point_line_width=data_sp_lw, line_width=nn_lw, line_length=pca_ll)
 ax.scatter(points[0:num_outliers,0], points[0:num_outliers,1], color="black", s=data_sp_rad**2, linewidth=data_sp_lw, zorder=3)
 ax.set_title("Measured Tangent Spaces (L2-PCA)")
-plt.savefig(output_dir + "l2_pca_observations.svg")
-plt.close(fig)
+plt.show()
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+# plot_neighbors_2d(points, color, neighbor_graph, ax, point_size=2, line_width=0.25, edge_thickness=0.1, show_labels=False)
+plot_pca_2d(points, color, observations_leave_one_out, ax, point_size=data_sp_rad, point_line_width=data_sp_lw, line_width=nn_lw, line_length=pca_ll)
+ax.scatter(points[0:num_outliers,0], points[0:num_outliers,1], color="black", s=data_sp_rad**2, linewidth=data_sp_lw, zorder=3)
+ax.set_title("Measured Tangent Spaces (L2-PCA, ignore furthest point)")
+plt.show()
