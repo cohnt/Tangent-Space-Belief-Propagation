@@ -464,11 +464,17 @@ for new_dim in new_dim_list:
 
 print time_by_dim
 
+fig = plt.figure()
 plt.plot(new_dim_list, time_by_dim)
-plt.show()
+plt.title("Time by Dimension")
+plt.savefig("time_by_dimension.png")
+plt.close(fig)
 
+fig = plt.figure()
 plt.plot(np.log(new_dim_list), np.log(time_by_dim))
-plt.show()
+plt.title("Time by Dimension (Log-Log)")
+plt.savefig("time_by_dimension_log_log.png")
+plt.close(fig)
 
 from scipy import stats
 slope, intercept, r_value, p_value, std_err = stats.linregress(np.log(new_dim_list), np.log(time_by_dim))

@@ -61,6 +61,9 @@ neighbors_axis_tick_size = 30
 neighbors_axis_n_ticks = 7
 embedding_axis_label_size = 30
 
+use_l1_pca = False
+use_leave_one_out_pca = True
+
 write("\n")
 
 matplotlib.rcParams.update({'font.size': 15})
@@ -229,6 +232,7 @@ flush()
 # Measure PCA #
 ###############
 from sklearn.decomposition import PCA
+from l1_pca import l1_pca
 
 # n_components is the number of principal components pca will compute
 pca = PCA(n_components=target_dim)
@@ -242,9 +246,20 @@ for i in range(num_points):
 	row = neighbor_graph.toarray()[i]
 	neighbors = np.nonzero(row)[0]
 	neighborhood = points[neighbors]
-	pca.fit(neighborhood)
-	# vec1 = pca.components_[0]
-	observations[i] = pca.components_[0:target_dim]
+	if use_l1_pca:
+		print "Computing L1 PCA for observation %d" % i
+		observations[i] = l1_pca(neighborhood.T, target_dim).T
+	elif use_leave_one_out_pca:
+		vec_list = neighborhood - og_point
+		dist_list = np.linalg.norm(vec_list, axis=1)
+		max_dist_ind = np.argmax(dist_list)
+		new_neighborhood = np.delete(neighborhood, max_dist_ind, axis=0)
+		pca.fit(new_neighborhood)
+		observations[i] = pca.components_[0:target_dim]
+	else:
+		pca.fit(neighborhood)
+		# vec1 = pca.components_[0]
+		observations[i] = pca.components_[0:target_dim]
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
