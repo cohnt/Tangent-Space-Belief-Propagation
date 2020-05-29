@@ -454,11 +454,17 @@ for num_points in num_points_list:
 
 print time_by_num_points
 
+fig = plt.figure()
 plt.plot(num_points_list, time_by_num_points)
-plt.show()
+plt.title("Time by Dimension")
+plt.savefig("time_by_dimension.png")
+plt.close(fig)
 
+fig = plt.figure()
 plt.plot(np.log(num_points_list), np.log(time_by_num_points))
-plt.show()
+plt.title("Time by Dimension (Log-Log)")
+plt.savefig("time_by_dimension_log_log.png")
+plt.close(fig)
 
 from scipy import stats
 slope, intercept, r_value, p_value, std_err = stats.linregress(np.log(num_points_list), np.log(time_by_num_points))
