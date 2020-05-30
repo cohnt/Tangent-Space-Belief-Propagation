@@ -456,14 +456,14 @@ print time_by_num_samples
 
 fig = plt.figure()
 plt.plot(num_samples_list, time_by_num_samples)
-plt.title("Time by Dimension")
-plt.savefig("time_by_dimension.png")
+plt.title("Time by Samples")
+plt.savefig("time_by_samples.png")
 plt.close(fig)
 
 fig = plt.figure()
 plt.plot(np.log(num_samples_list), np.log(time_by_num_samples))
-plt.title("Time by Dimension (Log-Log)")
-plt.savefig("time_by_dimension_log_log.png")
+plt.title("Time by Samples (Log-Log)")
+plt.savefig("time_by_samples_log_log.png")
 plt.close(fig)
 
 from scipy import stats

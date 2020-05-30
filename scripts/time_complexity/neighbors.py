@@ -456,14 +456,14 @@ print time_by_k
 
 fig = plt.figure()
 plt.plot(neighbors_list, time_by_k)
-plt.title("Time by Dimension")
-plt.savefig("time_by_dimension.png")
+plt.title("Time by Neighbors")
+plt.savefig("time_by_neighbors.png")
 plt.close(fig)
 
 fig = plt.figure()
 plt.plot(np.log(neighbors_list), np.log(time_by_k))
-plt.title("Time by Dimension (Log-Log)")
-plt.savefig("time_by_dimension_log_log.png")
+plt.title("Time by Neighbors (Log-Log)")
+plt.savefig("time_by_neighbors_log_log.png")
 plt.close(fig)
 
 from scipy import stats
