@@ -20,12 +20,12 @@ from collections import OrderedDict
 global_t0 = time.time()
 
 dataset_name = "long_spiral_curve"
-# dataset_seed = 4045775215
+dataset_seed = 4045775215
 # dataset_seed = 4015005259
-dataset_seed = np.random.randint(0, 2**32)
-num_points = 525    # Number of data points
-data_noise = 0.0005 # How much noise is added to the data
-num_outliers = 25
+# dataset_seed = np.random.randint(0, 2**32)
+num_points = 500    # Number of data points
+data_noise = 0.001 # How much noise is added to the data
+num_outliers = 0
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1      # The number of dimensions the data is being reduced to
 
@@ -62,7 +62,7 @@ neighbors_axis_n_ticks = 7
 embedding_axis_label_size = 30
 
 use_l1_pca = False
-use_leave_one_out_pca = True
+use_leave_one_out_pca = False
 
 write("\n")
 
@@ -589,7 +589,7 @@ try:
 			# Resample from combined_message to get the belief
 			message_inds = weightedSample(combined_message.weights, num_samples)
 			belief[i].ts = combined_message.ts[message_inds]
-			belief[i].weights = combined_message.weights[message_inds]
+			belief[i].weights = combined_message.weights[message_inds] / combined_message.weights[message_inds].sum()
 
 		t1 = time.time()
 		belief_time = t1-t0

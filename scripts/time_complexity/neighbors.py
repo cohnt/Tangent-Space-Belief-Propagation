@@ -15,13 +15,13 @@ global_t0 = time.time()
 
 dataset_name = "long_spiral_curve"
 dataset_seed = 4045775215 # np.random.randint(0, 2**32)
-num_points = 5000    # Number of data points
+num_points = 1000    # Number of data points
 data_noise = 0 # How much noise is added to the data
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1      # The number of dimensions the data is being reduced to
 
 num_iters = 10+1      # Number of iterations of the message passing algorithm to run for each dimension
-neighbors_list = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 125, 150, 175, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000]
+neighbors_list = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100]
 num_samples = 1     # Numbers of samples used in the belief propagation algorithm
 explore_perc = 0.1  # Fraction of uniform samples to keep exploring
 
@@ -456,14 +456,14 @@ print time_by_k
 
 fig = plt.figure()
 plt.plot(neighbors_list, time_by_k)
-plt.title("Time by Dimension")
-plt.savefig("time_by_dimension.png")
+plt.title("Time by Neighbors")
+plt.savefig("time_by_neighbors.png")
 plt.close(fig)
 
 fig = plt.figure()
 plt.plot(np.log(neighbors_list), np.log(time_by_k))
-plt.title("Time by Dimension (Log-Log)")
-plt.savefig("time_by_dimension_log_log.png")
+plt.title("Time by Neighbors (Log-Log)")
+plt.savefig("time_by_neighbors_log_log.png")
 plt.close(fig)
 
 from scipy import stats
