@@ -21,6 +21,8 @@ embedding_axis_tick_size = 40
 neighbors_axis_tick_size = 30
 title_font_size = 30
 
+matplotlib.rcParams.update({'font.size': 24})
+
 # landmark_coords = [
 # 	np.array([0., 0.]),
 # 	np.array([5., 5.]),
