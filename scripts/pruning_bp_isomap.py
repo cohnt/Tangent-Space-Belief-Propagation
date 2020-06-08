@@ -23,9 +23,9 @@ dataset_name = "long_spiral_curve"
 dataset_seed = 4045775215
 # dataset_seed = 4015005259
 # dataset_seed = np.random.randint(0, 2**32)
-num_points = 500    # Number of data points
-data_noise = 0.001 # How much noise is added to the data
-num_outliers = 0
+num_points = 525    # Number of data points
+data_noise = 0.0005 # How much noise is added to the data
+num_outliers = 25
 source_dim = 2      # The dimensionality of the incoming dataset (see "Load Dataset" below)
 target_dim = 1      # The number of dimensions the data is being reduced to
 
@@ -901,6 +901,7 @@ print "TSBP Error: %f" % tsbp_err
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
+ax.scatter(color[0:num_outliers], feature_coords[0:num_outliers], color="black", s=embedding_sp_rad**2, linewidth=embedding_sp_lw, zorder=3)
 # ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from BP Tangent Correction for Edge Pruning\n Reconstruction Error: %f" % tsbp_err, 50)))
 # plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
 # plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
@@ -968,6 +969,7 @@ for i in range(num_methods):
 
 	fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 	ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
+	ax.scatter(color[0:num_outliers], feature_coords[0:num_outliers], color="black", s=embedding_sp_rad**2, linewidth=embedding_sp_lw, zorder=3)
 	# ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from %s\n Reconstruction Error: %f" % (name, method_errs[name]), 50)))
 	# plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
 	# plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
@@ -997,6 +999,7 @@ embeddings_name_list.append("LTSA")
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
+ax.scatter(color[0:num_outliers], feature_coords[0:num_outliers], color="black", s=embedding_sp_rad**2, linewidth=embedding_sp_lw, zorder=3)
 # ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Classical LTSA\n Reconstruction Error: %f" % method_errs["LTSA"], 50)))
 # plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
 # plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
@@ -1023,6 +1026,7 @@ print "LTSA BPT Error: %f" % method_errs["LTSA BPT"]
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
+ax.scatter(color[0:num_outliers], feature_coords[0:num_outliers], color="black", s=embedding_sp_rad**2, linewidth=embedding_sp_lw, zorder=3)
 # ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction\n Reconstruction Error: %f" % method_errs["LTSA BPT"], 50)))
 # plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
 # plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
@@ -1050,6 +1054,7 @@ print "LTSA Pruning Error: %f" % method_errs["LTSA Pruning"]
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
+ax.scatter(color[0:num_outliers], feature_coords[0:num_outliers], color="black", s=embedding_sp_rad**2, linewidth=embedding_sp_lw, zorder=3)
 # ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction and Edge Pruning\n Reconstruction Error: %f" % method_errs["LTSA Pruning"], 50)))
 # plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
 # plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
@@ -1079,6 +1084,7 @@ embeddings_name_list.append("HLLE")
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
+ax.scatter(color[0:num_outliers], feature_coords[0:num_outliers], color="black", s=embedding_sp_rad**2, linewidth=embedding_sp_lw, zorder=3)
 # ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from HLLE\n Reconstruction Error: %f" % method_errs["HLLE"], 50)))
 # plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
 # plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
@@ -1108,6 +1114,7 @@ embeddings_name_list.append("Corrected t-SNE")
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
+ax.scatter(color[0:num_outliers], feature_coords[0:num_outliers], color="black", s=embedding_sp_rad**2, linewidth=embedding_sp_lw, zorder=3)
 # ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Corrected t-SNE\n Reconstruction Error: %f" % method_errs["Corrected t-SNE"], 50)))
 # plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
 # plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
@@ -1148,6 +1155,7 @@ flush()
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
+ax.scatter(color[0:num_outliers], feature_coords[0:num_outliers], color="black", s=embedding_sp_rad**2, linewidth=embedding_sp_lw, zorder=3)
 # plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
 # plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
 setAxisTickSize(ax, embedding_axis_tick_size, n_ticks=embedding_axis_n_ticks)
@@ -1174,18 +1182,22 @@ for i in range(num_methods):
 	feature_coords = solver.fit_transform(points)
 
 	axes_list[i].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
+	axes_list[i].scatter(color[0:num_outliers], feature_coords[0:num_outliers], color="black", s=embedding_sp_rad**2, linewidth=embedding_sp_lw, zorder=3)
 	axes_list[i].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from %s" % name, 25)))
 
 feature_coords = compute_ltsa(points, neighbor_dict, observations, source_dim, target_dim)
 axes_list[5].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
+axes_list[5].scatter(color[0:num_outliers], feature_coords[0:num_outliers], color="black", s=embedding_sp_rad**2, linewidth=embedding_sp_lw, zorder=3)
 axes_list[5].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Classical LTSA", 25)))
 
 feature_coords = compute_ltsa(points, neighbor_dict, mle_bases, source_dim, target_dim)
 axes_list[6].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
+axes_list[6].scatter(color[0:num_outliers], feature_coords[0:num_outliers], color="black", s=embedding_sp_rad**2, linewidth=embedding_sp_lw, zorder=3)
 axes_list[6].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Tangent Space Correction", 25)))
 
 feature_coords = compute_ltsa(points, pruned_neighbor_dict, mle_bases, source_dim, target_dim)
 axes_list[7].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
+axes_list[7].scatter(color[0:num_outliers], feature_coords[0:num_outliers], color="black", s=embedding_sp_rad**2, linewidth=embedding_sp_lw, zorder=3)
 axes_list[7].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from LTSA with Edge Pruning", 25)))
 
 # mds = MDS(n_components=target_dim, max_iter=3000, eps=1e-9, n_init=25, dissimilarity="precomputed", n_jobs=-1)
@@ -1193,6 +1205,7 @@ axes_list[7].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordi
 kpca = KernelPCA(n_components=target_dim, kernel="precomputed", eigen_solver=kpca_eigen_solver, tol=kpca_tol, max_iter=kpca_max_iter, n_jobs=-1)
 feature_coords = kpca.fit_transform((shortest_distances**2) * -0.5)
 axes_list[8].scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=combined_sp_rad**2, linewidths=combined_sp_lw)
+axes_list[8].scatter(color[0:num_outliers], feature_coords[0:num_outliers], color="black", s=embedding_sp_rad**2, linewidth=embedding_sp_lw, zorder=3)
 axes_list[8].set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from BP Tangent Correction for Edge Pruning", 25)))
 
 for i in range(9):
