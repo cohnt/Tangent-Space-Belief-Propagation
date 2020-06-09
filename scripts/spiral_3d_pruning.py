@@ -869,15 +869,17 @@ flush()
 
 from sklearn.manifold import LocallyLinearEmbedding, MDS, Isomap, SpectralEmbedding
 from ltsa import compute_ltsa
+from autoencoder import Autoencoder
 
 methods = []
 methods.append(LocallyLinearEmbedding(n_neighbors=neighbors_k, n_components=target_dim, n_jobs=-1))
 methods.append(MDS(n_components=target_dim, n_jobs=-1))
 methods.append(Isomap(n_neighbors=neighbors_k, n_components=target_dim, n_jobs=-1))
 methods.append(SpectralEmbedding(n_components=target_dim, n_neighbors=neighbors_k, n_jobs=-1))
+methods.append(Autoencoder(source_dim, target_dim, [64, 32, 32], ["relu", "relu", "relu"]))
 num_methods = len(methods)
 
-method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding"]
+method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding", "Autoencoder"]
 
 for i in range(num_methods):
 	solver = methods[i]
@@ -945,6 +947,46 @@ ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from 
 plt.xlabel("Actual Parameter Value")
 plt.ylabel("Embedded Coordinate")
 plt.savefig(output_dir + "comparison_pruned_LTSA.svg")
+plt.close(fig)
+
+write("Computing Corrected t-SNE...")
+flush()
+t0 = time.time()
+feature_coords = TSNE(n_components=target_dim, metric="precomputed").fit_transform(shortest_distances)
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+embeddings_list.append(feature_coords)
+embeddings_name_list.append("Corrected t-SNE")
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
+ax.scatter(color[0:num_outliers], feature_coords[0:num_outliers], color="black", s=embedding_sp_rad**2, linewidth=embedding_sp_lw, zorder=3)
+# ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Corrected t-SNE\n Reconstruction Error: %f" % method_errs["Corrected t-SNE"], 50)))
+# plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
+# plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
+setAxisTickSize(ax, embedding_axis_tick_size, n_ticks=embedding_axis_n_ticks)
+plt.savefig(output_dir + "comparison_corrected_t-SNE.svg")
+plt.close(fig)
+
+# Corrected Spectral Embedding
+write("Computing Corrected Spectral Embedding...")
+flush()
+t0 = time.time()
+solver = SpectralEmbedding(n_components=target_dim, affinity="precomputed", n_neighbors=neighbors_k, n_jobs=-1)
+feature_coords = 10*solver.fit_transform(pruned_neighbors.toarray())
+t1 = time.time()
+write("Done! dt=%f\n" % (t1-t0))
+flush()
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
+ax.scatter(color[0:num_outliers], feature_coords[0:num_outliers], color="black", s=embedding_sp_rad**2, linewidth=embedding_sp_lw, zorder=3)
+# plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
+# plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
+setAxisTickSize(ax, embedding_axis_tick_size, n_ticks=embedding_axis_n_ticks)
+plt.savefig(output_dir + "comparison_corrected_spectral_embedding.svg")
 plt.close(fig)
 
 write("Creating combined image...")
