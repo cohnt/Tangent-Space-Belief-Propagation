@@ -212,8 +212,8 @@ plt.setp(ax.yaxis.get_majorticklabels(), ha="left")
 plt.setp(ax.zaxis.get_majorticklabels(), va="center")
 plt.setp(ax.zaxis.get_majorticklabels(), ha="left")
 plt.savefig(output_dir + "nearest_neighbors.svg")
-# angles = np.linspace(0, 360, 40+1)[:-1]
-# rotanimate(ax, angles, output_dir + "nearest_neighbors.gif", delay=30, width=14.4, height=10.8, folder=output_dir, elevation=disp_elev)
+angles = np.linspace(0, 360, 40+1)[:-1]
+rotanimate(ax, angles, output_dir + "nearest_neighbors.gif", delay=30, width=14.4, height=10.8, folder=output_dir, elevation=disp_elev)
 plt.close(fig)
 t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
@@ -762,8 +762,8 @@ plot_neighbors_3d(points, color, pruned_neighbors, ax, point_size=data_sp_rad, l
 # ax.set_title("Pruned Nearest Neighbors (k=%d, thresh=%f)\n" % (neighbors_k, pruning_angle_thresh))
 setAxisTickSize3D(ax, neighbors_axis_tick_size, n_ticks=neighbors_axis_n_ticks)
 plt.savefig(output_dir + "pruned_nearest_neighbors.svg")
-# angles = np.linspace(0, 360, 40+1)[:-1]
-# rotanimate(ax, angles, output_dir + "pruned_nearest_neighbors.gif", delay=30, width=14.4, height=10.8, folder=output_dir, elevation=disp_elev)
+angles = np.linspace(0, 360, 40+1)[:-1]
+rotanimate(ax, angles, output_dir + "pruned_nearest_neighbors.gif", delay=30, width=14.4, height=10.8, folder=output_dir, elevation=disp_elev)
 plt.close(fig)
 
 # Uses the disjoint-set datatype
@@ -833,8 +833,8 @@ plt.setp(ax.yaxis.get_majorticklabels(), ha="left")
 plt.setp(ax.zaxis.get_majorticklabels(), va="center")
 plt.setp(ax.zaxis.get_majorticklabels(), ha="left")
 plt.savefig(output_dir + "added_edges.svg")
-# angles = np.linspace(0, 360, 40+1)[:-1]
-# rotanimate(ax, angles, output_dir + "added_edges.gif", delay=30, width=14.4, height=10.8, folder=output_dir, elevation=disp_elev)
+angles = np.linspace(0, 360, 40+1)[:-1]
+rotanimate(ax, angles, output_dir + "added_edges.gif", delay=30, width=14.4, height=10.8, folder=output_dir, elevation=disp_elev)
 plt.close(fig)
 
 from sklearn.utils.graph_shortest_path import graph_shortest_path
