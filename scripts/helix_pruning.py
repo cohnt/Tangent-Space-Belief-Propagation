@@ -1039,7 +1039,6 @@ ax.scatter(color, feature_coords, color="black", s=embedding_sp_rad**2, linewidt
 # ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Corrected t-SNE\n Reconstruction Error: %f" % method_errs["Corrected t-SNE"], 50)))
 # plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
 # plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
-setAxisTickSize(ax, embedding_axis_tick_size, n_ticks=embedding_axis_n_ticks)
 plt.savefig(output_dir + "comparison_corrected_t-SNE.svg")
 plt.close(fig)
 
@@ -1079,7 +1078,6 @@ ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_
 ax.scatter(color, feature_coords, color="black", s=embedding_sp_rad**2, linewidth=embedding_sp_lw, zorder=3)
 # plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
 # plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
-setAxisTickSize(ax, embedding_axis_tick_size, n_ticks=embedding_axis_n_ticks)
 plt.savefig(output_dir + "comparison_corrected_spectral_embedding.svg")
 plt.close(fig)
 
