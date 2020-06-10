@@ -867,7 +867,7 @@ plt.close(fig)
 write("\nComparing to other methods...\n")
 flush()
 
-from sklearn.manifold import LocallyLinearEmbedding, MDS, Isomap, SpectralEmbedding
+from sklearn.manifold import LocallyLinearEmbedding, MDS, Isomap, SpectralEmbedding, TSNE
 from ltsa import compute_ltsa
 from autoencoder import Autoencoder
 
@@ -877,9 +877,10 @@ methods.append(MDS(n_components=target_dim, n_jobs=-1))
 methods.append(Isomap(n_neighbors=neighbors_k, n_components=target_dim, n_jobs=-1))
 methods.append(SpectralEmbedding(n_components=target_dim, n_neighbors=neighbors_k, n_jobs=-1))
 methods.append(Autoencoder(source_dim, target_dim, [64, 32, 32], ["relu", "relu", "relu"]))
+methods.append(TSNE(n_components=target_dim))
 num_methods = len(methods)
 
-method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding", "Autoencoder"]
+method_names = ["LLE", "MDS", "Isomap", "SpectralEmbedding", "Autoencoder", "TSNE"]
 
 for i in range(num_methods):
 	solver = methods[i]
@@ -957,12 +958,8 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
-embeddings_list.append(feature_coords)
-embeddings_name_list.append("Corrected t-SNE")
-
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
-ax.scatter(color, feature_coords, color="black", s=embedding_sp_rad**2, linewidth=embedding_sp_lw, zorder=3)
 # ax.set_title("\n".join(wrap("Actual Parameter Value vs Embedded Coordinate from Corrected t-SNE\n Reconstruction Error: %f" % method_errs["Corrected t-SNE"], 50)))
 # plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
 # plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
@@ -981,7 +978,6 @@ flush()
 
 fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
 ax.scatter(color, feature_coords, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
-ax.scatter(color, feature_coords, color="black", s=embedding_sp_rad**2, linewidth=embedding_sp_lw, zorder=3)
 # plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
 # plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
 plt.savefig(output_dir + "comparison_corrected_spectral_embedding.svg")
