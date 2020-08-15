@@ -1219,6 +1219,22 @@ t1 = time.time()
 write("Done! dt=%f\n" % (t1-t0))
 flush()
 
+# Ideal embedding 1 and 2
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(color, color, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
+# plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
+# plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
+setAxisTickSize(ax, embedding_axis_tick_size, n_ticks=embedding_axis_n_ticks)
+plt.savefig(output_dir + "ideal_embedding_1.svg")
+plt.close(fig)
+
+fig, ax = plt.subplots(figsize=(14.4, 10.8), dpi=100)
+ax.scatter(color, -color, c=color, cmap=plt.cm.Spectral, s=embedding_sp_rad**2, linewidths=embedding_sp_lw)
+# plt.xlabel("Actual Parameter Value", fontsize=embedding_axis_label_size)
+# plt.ylabel("Embedded Coordinate", fontsize=embedding_axis_label_size)
+setAxisTickSize(ax, embedding_axis_tick_size, n_ticks=embedding_axis_n_ticks)
+plt.savefig(output_dir + "ideal_embedding_2.svg")
+plt.close(fig)
 
 ######################
 
